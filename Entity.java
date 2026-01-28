@@ -63,7 +63,8 @@ public class Entity{ //rename any variable if needed
     /*public void movement(float speed) {
 
     }*/
-    
+
+    // constructor for null values
     public Entity() {
         posX = 0f;
         posY = 0f;
@@ -72,25 +73,32 @@ public class Entity{ //rename any variable if needed
         speedY = 0f;
         batch = null;
     }
-    
+
+    // constructor for TexturedObject (no color, static)
     public Entity(float x, float y) {
         posX = x;
         posY = y;
-        color = null;
+        batch = null;
+    }
+
+    // contructor for TexturedObject (no color, dynamic)
+    public Entity(float x, float y, float spdX, float spdY) {
+        posX = x;
+        posY = y;
         speedX = 0f;
         speedY = 0f;
         batch = null;
     }
-    
+
+    // constructor for shapes (color, static)
     public Entity(float x, float y, Color c) {
         posX = x;
         posY = y;
         color = c;
-        speedX = 0f;
-        speedY = 0f;
         batch = null;
     }
-    
+
+    // constructor for shapes (color, dynamic)
     public Entity(float x, float y, Color c, float spdX, float spdY) {
         posX = x;
         posY = y;
@@ -99,4 +107,5 @@ public class Entity{ //rename any variable if needed
         speedY = spdY;
         batch = null;
     }
+
 }
