@@ -78,6 +78,9 @@ public class Entity{ //rename any variable if needed
     public Entity(float x, float y) {
         posX = x;
         posY = y;
+        color = null;
+        speedX = 0f;
+        speedY = 0f;
         batch = null;
     }
 
@@ -85,8 +88,9 @@ public class Entity{ //rename any variable if needed
     public Entity(float x, float y, float spdX, float spdY) {
         posX = x;
         posY = y;
-        speedX = 0f;
-        speedY = 0f;
+        color = null;
+        speedX = spdX;
+        speedY = spdY;
         batch = null;
     }
 
@@ -95,6 +99,8 @@ public class Entity{ //rename any variable if needed
         posX = x;
         posY = y;
         color = c;
+        speedX = 0f;
+        speedY = 0f;
         batch = null;
     }
 
