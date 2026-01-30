@@ -60,7 +60,7 @@ public abstract class Entity{ //rename any variable if needed
 
     }
 
-    private abstract void update();
+    //public abstract void update();
 
     // constructor for null values
     public Entity() {

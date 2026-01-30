@@ -11,7 +11,6 @@ public class GameMaster extends ApplicationAdapter{
 	private Texture bucketImage;
 	private TextureObject bucket;
 	private SpriteBatch batch;
-	private Circle circle;
 	private EntityManager entityManager;
 
 	@Override
@@ -31,7 +30,7 @@ public class GameMaster extends ApplicationAdapter{
 	public void render() {
 	    ScreenUtils.clear(0, 0, 0.2f, 1);
 	    
-	    bucket.movement(5);
+	    //bucket.movement(5);
 
 	    batch.begin();
 	    

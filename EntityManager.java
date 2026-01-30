@@ -22,18 +22,18 @@ public class EntityManager {
 	}
 	
 	// update entity list
-	public void updateList() {
+	/*public void updateList() {
 		for (Entity entity : entityList) {
 			entity.update();
 		}
-	}
+	}*/
 	
 	// allow entity to move with their own speeds by calling movement function
-	public void movement(float speed) {
+	/*public void MovementComponent(float speed) {
 		for (Entity entity : entityList) {
-			entity.movement(speed);
+			entity.MovementComponent(speed);
 		}
-	}
+	}*/
 	
 	// draw entity
 	public void draw(ShapeRenderer shape) {
