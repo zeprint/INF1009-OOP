@@ -112,5 +112,13 @@ public abstract class Entity{ //rename any variable if needed
         batch = null;
     }
 
+    public void draw(ShapeRenderer shape) {
+        // Intentionally empty
+    }
+
+    // - Adding this to match UML
+    public void draw(SpriteBatch batch) {
+        // Intentionally empty
+    }
 
 }

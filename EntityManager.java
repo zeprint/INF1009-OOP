@@ -47,4 +47,18 @@ public class EntityManager {
 		entityList = new Array<Entity>();
 	}
 
+	public void draw(SpriteBatch batch, ShapeRenderer shape) 
+	{
+        for (Entity entity : entityList) {
+            // 1. If the batch is active (drawing textures), let the entity try to draw a texture
+            if (batch != null && batch.isDrawing()) {
+                entity.draw(batch);
+            }
+            // 2. If the shape renderer is active (drawing shapes), let the entity try to draw a shape
+            else if (shape != null && shape.isDrawing()) {
+                entity.draw(shape);
+            }
+		}
+	}
+
 }
