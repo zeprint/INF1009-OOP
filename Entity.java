@@ -6,7 +6,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 
 //Default functions for now, remove or add any if needed
-public class Entity{ //rename any variable if needed
+public abstract class Entity{ //rename any variable if needed
     protected float posX;
     protected float posY; 
     protected Color color;
@@ -59,10 +59,8 @@ public class Entity{ //rename any variable if needed
     public void draw(ShapeRenderer shape) {
 
     }
-    
-    /*public void movement(float speed) {
 
-    }*/
+    private abstract void update();
 
     // constructor for null values
     public Entity() {
@@ -113,5 +111,6 @@ public class Entity{ //rename any variable if needed
         speedY = spdY;
         batch = null;
     }
+
 
 }
