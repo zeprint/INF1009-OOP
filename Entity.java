@@ -64,6 +64,10 @@ public abstract class Entity{ //rename any variable if needed
         
     }
 
+    public void update(float deltaTime) {
+        // Override in subclasses
+    }
+
     // For RotatingShape support
     public void setRotationAngle(float angle) {
         // Override in subclasses that support rotation
