@@ -8,22 +8,26 @@ public class TextureObject extends Entity {
     private int height;
     private int width;
     
-    // --- ADDED THIS METHOD ---
-    @Override
-    public void draw(SpriteBatch batch) {
-        // This allows the EntityManager to draw the bucket automatically
-        batch.draw(texture, getX(), getY(), width, height);
+    public Texture getTexture() { 
+        return texture; 
     }
-    // -------------------------
+    public void setTexture(Texture t) { 
+        texture = t; 
+    }
     
-    public Texture getTexture() { return texture; }
-    public void setTexture(Texture t) { texture = t; }
+    public int getHeight() { 
+        return height; 
+    }
+    public void setHeight(int h) { 
+        height = h; 
+    }
     
-    public int getHeight() { return height; }
-    public void setHeight(int h) { height = h; }
-    
-    public int getWidth() { return width; }
-    public void setWidth(int w) { width = w; }
+    public int getWidth() { 
+        return width; 
+    }
+    public void setWidth(int w) { 
+        width = w; 
+    }
     
     public TextureObject(Texture t, float x, float y, int h, int w) {
         super(x, y);
@@ -37,5 +41,12 @@ public class TextureObject extends Entity {
         texture = t;
         height = h;
         width = w;
+    }
+    
+    @Override
+    public void draw(SpriteBatch batch) {
+        if (texture != null && batch != null) {
+            batch.draw(texture, posX, posY, width, height);
+        }
     }
 }

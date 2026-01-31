@@ -60,7 +60,15 @@ public abstract class Entity{ //rename any variable if needed
 
     }
 
-    //public abstract void update();
+    public void draw(SpriteBatch batch) {
+        
+    }
+
+    // For RotatingShape support
+    public void setRotationAngle(float angle) {
+        // Override in subclasses that support rotation
+    }
+
 
     // constructor for null values
     public Entity() {
@@ -111,14 +119,4 @@ public abstract class Entity{ //rename any variable if needed
         speedY = spdY;
         batch = null;
     }
-
-    public void draw(ShapeRenderer shape) {
-        // Intentionally empty
-    }
-
-    // - Adding this to match UML
-    public void draw(SpriteBatch batch) {
-        // Intentionally empty
-    }
-
 }
