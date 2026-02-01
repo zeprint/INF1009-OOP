@@ -5,46 +5,52 @@ import com.badlogic.gdx.utils.ObjectMap;
 
 public class InputBindings {
 
-    // Axis -> list of key pairs (neg, pos)
-    private final ObjectMap<InputAxis, Array<KeyPair>> axisPairs = new ObjectMap<>();
-
-    // Action -> keycode
-    private final ObjectMap<InputAction, Integer> actionKeys = new ObjectMap<>();
-
-    public static class KeyPair {
+    // Small helper class: one axis pair (neg, pos)
+    public static class AxisPair {
         public int negativeKey;
         public int positiveKey;
 
-        public KeyPair(int negativeKey, int positiveKey) {
+        public AxisPair(int negativeKey, int positiveKey) {
             this.negativeKey = negativeKey;
             this.positiveKey = positiveKey;
         }
     }
 
-    /** Allow multiple bindAxis calls for same axis (adds another pair). */
+    // Axis -> list of pairs (so you can bind A/D AND Left/Right)
+    private final ObjectMap<InputAxis, Array<AxisPair>> axisPairs = new ObjectMap<>();
+
+    // Action -> list of keys (so you can bind multiple keys to one action)
+    private final ObjectMap<InputAction, Array<Integer>> actionKeys = new ObjectMap<>();
+
+    public InputBindings() {}
+
+    // Adds another pair to the axis
     public void bindAxis(InputAxis axis, int negativeKey, int positiveKey) {
-        Array<KeyPair> list = axisPairs.get(axis);
-        if (list == null) {
-            list = new Array<>();
-            axisPairs.put(axis, list);
+        Array<AxisPair> pairs = axisPairs.get(axis);
+        if (pairs == null) {
+            pairs = new Array<>();
+            axisPairs.put(axis, pairs);
         }
-        list.add(new KeyPair(negativeKey, positiveKey));
+        pairs.add(new AxisPair(negativeKey, positiveKey));
     }
 
-    /** Get all key pairs bound to this axis (may be empty). */
-    public Array<KeyPair> getAxisPairs(InputAxis axis) {
-        Array<KeyPair> list = axisPairs.get(axis);
-        if (list == null) return new Array<>();
-        return list;
+    // Adds another key to the action
+    public void bindAction(InputAction action, int key) {
+        Array<Integer> keys = actionKeys.get(action);
+        if (keys == null) {
+            keys = new Array<>();
+            actionKeys.put(action, keys);
+        }
+        keys.add(key);
     }
 
-    /** Bind a single key to an action. */
-    public void bindAction(InputAction action, int keycode) {
-        actionKeys.put(action, keycode);
+    public Array<AxisPair> getAxisPairs(InputAxis axis) {
+        Array<AxisPair> pairs = axisPairs.get(axis);
+        return (pairs == null) ? new Array<AxisPair>() : pairs;
     }
 
-    /** Returns the key for the action, or null if unbound. */
-    public Integer getActionKey(InputAction action) {
-        return actionKeys.get(action);
+    public Array<Integer> getActionKeys(InputAction action) {
+        Array<Integer> keys = actionKeys.get(action);
+        return (keys == null) ? new Array<Integer>() : keys;
     }
 }
