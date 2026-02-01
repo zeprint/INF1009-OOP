@@ -1,27 +1,30 @@
 package io.github.some_example_name.lwjgl3;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.utils.ObjectMap;
 
 public class AudioManager {
 
-    private final Map<String, Sound> sounds = new HashMap<>();
+    private final ObjectMap<String, Sound> sounds = new ObjectMap<>();
     private float volume = 1.0f;
     private boolean muted = false;
 
     public void loadSound(String name, String pathInAssets) {
-        if (sounds.containsKey(name)) return; // avoid reloading / leaks
+        // If already loaded, dispose old one first (safe reload)
+        Sound old = sounds.get(name);
+        if (old != null) old.dispose();
+
         Sound s = Gdx.audio.newSound(Gdx.files.internal(pathInAssets));
         sounds.put(name, s);
     }
 
     public void playSound(String name) {
         if (muted) return;
+
         Sound s = sounds.get(name);
         if (s == null) return;
+
         s.play(volume);
     }
 
@@ -35,8 +38,8 @@ public class AudioManager {
         return volume;
     }
 
-    public void setMuted(boolean m) {
-        muted = m;
+    public void setMuted(boolean muted) {
+        this.muted = muted;
     }
 
     public boolean isMuted() {
