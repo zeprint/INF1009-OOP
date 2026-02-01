@@ -1,35 +1,42 @@
 package io.github.some_example_name.lwjgl3;
 
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-
 public class InputOutputManagement {
-    private final InputHandler input;
+
+    private final InputProvider input;
     private final AudioManager audio;
 
-    public InputOutputManagement() {
-        input = new InputHandler();
-        audio = new AudioManager();
+    public InputOutputManagement(InputProvider input) {
+        this.input = input;
+        this.audio = new AudioManager();
     }
 
-    // LibGDX polls automatically; keep for UML consistency
-    public void updateInput() {}
-
-    public boolean isKeyDown(String key) {
-        return input.isKeyDown(key);
+    public void update() {
+        input.update();
     }
 
-    public boolean isKeyJustPressed(String key) {
-        return input.isKeyJustPressed(key);
+    public float getAxis(InputAxis axis) {
+        return input.getAxis(axis);
     }
 
-    public float getMouseX() { return input.getMouseX(); }
-    public float getMouseY() { return input.getMouseY(); }
+    public boolean isActionTriggered(InputAction action) {
+        return input.isActionTriggered(action);
+    }
 
-    public AudioManager getAudio() { return audio; }
+    public boolean isActionDown(InputAction action) {
+        return input.isActionDown(action);
+    }
 
-    // Helper draw wrapper (optional)
-    public void begin(SpriteBatch batch) { batch.begin(); }
-    public void end(SpriteBatch batch) { batch.end(); }
+    public float getMouseX() {
+        return input.getMouseX();
+    }
+
+    public float getMouseY() {
+        return input.getMouseY();
+    }
+
+    public AudioManager getAudio() {
+        return audio;
+    }
 
     public void dispose() {
         audio.dispose();
