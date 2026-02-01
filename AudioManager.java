@@ -10,12 +10,11 @@ public class AudioManager {
     private float volume = 1.0f;
     private boolean muted = false;
 
-    public void loadSound(String name, String pathInAssets) {
-        // If already loaded, dispose old one first (safe reload)
+    public void loadSound(String name, String assetPath) {
         Sound old = sounds.get(name);
         if (old != null) old.dispose();
 
-        Sound s = Gdx.audio.newSound(Gdx.files.internal(pathInAssets));
+        Sound s = Gdx.audio.newSound(Gdx.files.internal(assetPath));
         sounds.put(name, s);
     }
 
@@ -28,22 +27,18 @@ public class AudioManager {
         s.play(volume);
     }
 
-    public void setVolume(float v) {
-        if (v < 0f) v = 0f;
-        if (v > 1f) v = 1f;
-        volume = v;
-    }
-
-    public float getVolume() {
-        return volume;
-    }
-
     public void setMuted(boolean muted) {
         this.muted = muted;
     }
 
     public boolean isMuted() {
         return muted;
+    }
+
+    public void setVolume(float v) {
+        if (v < 0f) v = 0f;
+        if (v > 1f) v = 1f;
+        volume = v;
     }
 
     public void dispose() {
