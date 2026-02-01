@@ -10,9 +10,6 @@ public abstract class Entity{ //rename any variable if needed
     protected float posX;
     protected float posY; 
     protected Color color;
-    protected float speedX;
-    protected float speedY;
-    protected SpriteBatch batch;
     
     public float getX() {
         return posX;
@@ -33,27 +30,6 @@ public abstract class Entity{ //rename any variable if needed
     }
     public void setColor(Color c) {
         color = c;
-    }
-    
-    public float getSpeedX() {
-        return speedX;
-    }
-    public void setSpeedX(float spdX) {
-        speedX = spdX;
-    }
-    
-    public float getSpeedY() {
-        return speedY;
-    }
-    public void setSpeedY(float spdY) {
-        speedY = spdY;
-    }
-    
-    public SpriteBatch getBatch() {
-        return batch;
-    }
-    public void setBatch(SpriteBatch b) {
-        batch = b;
     }
     
     public void draw(ShapeRenderer shape) {
@@ -77,48 +53,20 @@ public abstract class Entity{ //rename any variable if needed
         posX = 0f;
         posY = 0f;
         color = null;
-        speedX = 0f;
-        speedY = 0f;
-        batch = null;
     }
 
-    // constructor for TexturedObject (no color, static)
+    // constructor for TexturedObject
     public Entity(float x, float y) {
         posX = x;
         posY = y;
         color = null;
-        speedX = 0f;
-        speedY = 0f;
-        batch = null;
     }
 
-    // contructor for TexturedObject (no color, dynamic)
-    public Entity(float x, float y, float spdX, float spdY) {
-        posX = x;
-        posY = y;
-        color = null;
-        speedX = spdX;
-        speedY = spdY;
-        batch = null;
-    }
-
-    // constructor for shapes (color, static)
+    // constructor for shapes
     public Entity(float x, float y, Color c) {
         posX = x;
         posY = y;
         color = c;
-        speedX = 0f;
-        speedY = 0f;
-        batch = null;
     }
 
-    // constructor for shapes (color, dynamic)
-    public Entity(float x, float y, Color c, float spdX, float spdY) {
-        posX = x;
-        posY = y;
-        color = c;
-        speedX = spdX;
-        speedY = spdY;
-        batch = null;
-    }
 }
