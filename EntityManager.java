@@ -21,25 +21,23 @@ public class EntityManager {
 		return entityList;
 	}
 	
-	// update entity list
-	/*public void updateList() {
-		for (Entity entity : entityList) {
-			entity.update();
-		}
-	}*/
-	
-	// allow entity to move with their own speeds by calling movement function
-	/*public void MovementComponent(float speed) {
-		for (Entity entity : entityList) {
-			entity.MovementComponent(speed);
-		}
-	}*/
-	
 	// draw entity
 	public void draw(ShapeRenderer shape) {
 		for (Entity entity : entityList) {
 			entity.draw(shape);
 		}
+	}
+
+	// update all entities
+	public void update(float deltaTime) {
+    	for (Entity entity : entityList) {
+        	entity.update(deltaTime);
+    	}
+	}
+
+	// dispose all entities
+	public void dispose() {
+    	entityList.clear();
 	}
 	
 	// constructor for entity list

@@ -57,22 +57,20 @@ public abstract class Entity{ //rename any variable if needed
     }
     
     public void draw(ShapeRenderer shape) {
-
+        // Override in subclasses to draw shapes
     }
 
     public void draw(SpriteBatch batch) {
-        
+        // Override in subclasses to draw TexturedObjects
     }
 
     public void update(float deltaTime) {
         // Override in subclasses
     }
 
-    // For RotatingShape support
     public void setRotationAngle(float angle) {
         // Override in subclasses that support rotation
     }
-
 
     // constructor for null values
     public Entity() {
