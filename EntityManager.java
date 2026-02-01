@@ -42,7 +42,7 @@ public class EntityManager {
                 entity.draw(batch);
             }
             // 2. If the shape renderer is active (drawing shapes), let the entity try to draw a shape
-            else if (shape != null && shape.isDrawing()) {
+            if (shape != null && shape.isDrawing()) {
                 entity.draw(shape);
             }
 		}

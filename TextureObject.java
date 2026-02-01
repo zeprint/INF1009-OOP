@@ -35,13 +35,6 @@ public class TextureObject extends Entity {
         height = h;
         width = w;
     }
-
-    public TextureObject(Texture t, float x, float y, float spdX, float spdY, int h, int w) {
-        super(x, y, spdX, spdY);
-        texture = t;
-        height = h;
-        width = w;
-    }
     
     @Override
     public void draw(SpriteBatch batch) {

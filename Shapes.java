@@ -25,14 +25,6 @@ public class Shapes extends Entity {
         this.dimensions = new ObjectMap<>();
     }
 
-    // 3. Dynamic Shape Constructor (With speed)
-    // We pass the 'speed' to speedY (assuming these fall down like the bucket game)
-    public Shapes(ShapeType shapeType, float x, float y, Color color, float speed) {
-        super(x, y, color, 0, speed); 
-        this.shapeType = shapeType;
-        this.dimensions = new ObjectMap<>();
-    }
-
     // --- Dimension Helpers ---
 
     public void setDimensions(String key, float value) {

@@ -168,7 +168,6 @@ public class GameMaster extends ApplicationAdapter {
             dropletImage,
             MathUtils.random(0, screenWidth - 32),
             screenHeight,
-            0, -50,
             32, 32
         );
         entityManager.addEntity(droplet1);
@@ -187,7 +186,6 @@ public class GameMaster extends ApplicationAdapter {
             dropletImage,
             MathUtils.random(0, screenWidth - 32),
             screenHeight + 150,
-            0, -70,
             32, 32
         );
         entityManager.addEntity(droplet2);
@@ -206,7 +204,6 @@ public class GameMaster extends ApplicationAdapter {
             dropletImage,
             MathUtils.random(0, screenWidth - 32),
             screenHeight + 300,
-            0, -90,
             32, 32
         );
         entityManager.addEntity(droplet3);
@@ -280,8 +277,7 @@ public class GameMaster extends ApplicationAdapter {
             ShapeType.RECTANGLE,
             screenWidth * 0.25f,
             screenHeight,
-            Color.GREEN,
-            0
+            Color.GREEN
         );
         fallingRectangle.setDimensions("width", 50);
         fallingRectangle.setDimensions("height", 70);
@@ -300,8 +296,7 @@ public class GameMaster extends ApplicationAdapter {
             ShapeType.CIRCLE,
             screenWidth * 0.75f,
             screenHeight + 200,
-            Color.ORANGE,
-            0
+            Color.ORANGE
         );
         fallingCircle.setDimensions("radius", 30);
         entityManager.addEntity(fallingCircle);
@@ -319,8 +314,7 @@ public class GameMaster extends ApplicationAdapter {
             ShapeType.TRIANGLE,
             screenWidth * 0.5f,
             screenHeight + 400,
-            Color.RED,
-            0
+            Color.RED
         );
         fallingTriangle.setDimensions("size", 60);
         entityManager.addEntity(fallingTriangle);
