@@ -3,75 +3,84 @@ package io.github.some_example_name.lwjgl3;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.ObjectMap;
 
-/**
- * Single InputManager:
- * - polls input (update)
- * - exposes axes + actions + mouse
- * - owns AudioManager (I/O)
- *
- * IMPORTANT:
- * - NO key bindings are hardcoded here.
- * - Bindings are provided by GameMaster (test harness).
- */
 public class InputManager {
 
     private final InputBindings bindings;
 
+    // Stores computed values after update()
     private final ObjectMap<InputAxis, Float> axisValues = new ObjectMap<>();
     private final ObjectMap<InputAction, Boolean> actionTriggered = new ObjectMap<>();
 
-    private final AudioManager audio = new AudioManager();
-
-    // optional state flags (not tied to any keys here)
-    private boolean mouseModeEnabled = false;
-    private boolean muted = false;
+    // Optional state flags (not specifying keys here, only toggling states)
+    private boolean mouseMode = false;
 
     public InputManager(InputBindings bindings) {
         this.bindings = bindings;
 
-        for (InputAxis a : InputAxis.values()) axisValues.put(a, 0f);
-        for (InputAction ac : InputAction.values()) actionTriggered.put(ac, false);
+        // init defaults
+        for (InputAxis axis : InputAxis.values()) axisValues.put(axis, 0f);
+        for (InputAction a : InputAction.values()) actionTriggered.put(a, false);
     }
 
-    /** Poll input once per frame */
+    /** Call once per frame */
     public void update() {
-        // Axes
+        // 1) compute axes
         for (InputAxis axis : InputAxis.values()) {
-            float v = 0f;
-
-            // ✅ FIXED: iterate KeyPair, not int[]
-            for (InputBindings.KeyPair pair : bindings.getAxisPairs(axis)) {
-                int neg = pair.negativeKey;
-                int pos = pair.positiveKey;
-
-                if (Gdx.input.isKeyPressed(neg)) v -= 1f;
-                if (Gdx.input.isKeyPressed(pos)) v += 1f;
-            }
-
-            if (v > 1f) v = 1f;
-            if (v < -1f) v = -1f;
-
-            axisValues.put(axis, v);
+            axisValues.put(axis, computeAxis(axis));
         }
 
-        // Actions (just pressed)
+        // 2) compute actions (just pressed)
         for (InputAction action : InputAction.values()) {
-            Integer key = bindings.getActionKey(action);
-            boolean pressed = (key != null) && Gdx.input.isKeyJustPressed(key);
-            actionTriggered.put(action, pressed);
+            actionTriggered.put(action, computeActionJustPressed(action));
         }
+
+        // 3) optional: flip internal state based on actions (still not binding keys here)
+        if (isActionTriggered(InputAction.TOGGLE_MOUSE_MODE)) {
+            mouseMode = !mouseMode;
+        }
+    }
+
+    private float computeAxis(InputAxis axis) {
+        float v = 0f;
+
+        // supports multiple pairs (A/D + LEFT/RIGHT)
+        for (InputBindings.AxisPair pair : bindings.getAxisPairs(axis)) {
+            if (pair == null) continue;
+
+            if (Gdx.input.isKeyPressed(pair.negativeKey)) v -= 1f;
+            if (Gdx.input.isKeyPressed(pair.positiveKey)) v += 1f;
+        }
+
+        // clamp [-1, 1]
+        if (v > 1f) v = 1f;
+        if (v < -1f) v = -1f;
+        return v;
+    }
+
+    private boolean computeActionJustPressed(InputAction action) {
+        for (Integer key : bindings.getActionKeys(action)) {
+            if (key == null) continue;
+            if (Gdx.input.isKeyJustPressed(key)) return true;
+        }
+        return false;
     }
 
     public float getAxis(InputAxis axis) {
         Float v = axisValues.get(axis);
-        return v == null ? 0f : v;
+        return (v == null) ? 0f : v;
     }
 
+    /** True only on the frame the key was pressed */
     public boolean isActionTriggered(InputAction action) {
-        Boolean v = actionTriggered.get(action);
-        return v != null && v;
+        Boolean b = actionTriggered.get(action);
+        return b != null && b;
     }
 
+    public boolean isMouseMode() {
+        return mouseMode;
+    }
+
+    /** Mouse position in world-style Y (0 at bottom) */
     public float getMouseX() {
         return Gdx.input.getX();
     }
@@ -80,27 +89,12 @@ public class InputManager {
         return Gdx.graphics.getHeight() - Gdx.input.getY();
     }
 
-    public AudioManager getAudio() {
-        return audio;
-    }
-
-    public boolean isMouseModeEnabled() {
-        return mouseModeEnabled;
-    }
-
-    public void setMouseModeEnabled(boolean enabled) {
-        this.mouseModeEnabled = enabled;
-    }
-
-    public boolean isMuted() {
-        return muted;
-    }
-
-    public void setMuted(boolean muted) {
-        this.muted = muted;
+    /** Optional convenience */
+    public boolean isKeyDown(int keycode) {
+        return Gdx.input.isKeyPressed(keycode);
     }
 
     public void dispose() {
-        audio.dispose();
+        // nothing to dispose (Input has no resources)
     }
 }
