@@ -20,13 +20,6 @@ public class EntityManager {
 	public Array<Entity> getEntityList() {
 		return entityList;
 	}
-	
-	// draw entity
-	public void draw(ShapeRenderer shape) {
-		for (Entity entity : entityList) {
-			entity.draw(shape);
-		}
-	}
 
 	// update all entities
 	public void update(float deltaTime) {
@@ -40,11 +33,7 @@ public class EntityManager {
     	entityList.clear();
 	}
 	
-	// constructor for entity list
-	public EntityManager() {
-		entityList = new Array<Entity>();
-	}
-
+	// draw all entities
 	public void draw(SpriteBatch batch, ShapeRenderer shape) 
 	{
         for (Entity entity : entityList) {
@@ -59,4 +48,8 @@ public class EntityManager {
 		}
 	}
 
+	// constructor for entity list
+	public EntityManager() {
+		entityList = new Array<Entity>();
+	}
 }
