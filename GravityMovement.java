@@ -126,7 +126,7 @@ public class GravityMovement extends MovementComponent implements Acceleratable 
         return accelerationX;
     }
     
-    // Gets acceleration of X component 
+    // Gets acceleration of Y component 
     @Override
     public float getAccelerationY() {
         return accelerationY;
