@@ -5,8 +5,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 
-//Default functions for now, remove or add any if needed
-public abstract class Entity{ //rename any variable if needed
+// Default functions for now, remove or add any if needed
+public abstract class Entity{
     protected float posX;
     protected float posY; 
     protected Color color;
@@ -48,21 +48,21 @@ public abstract class Entity{ //rename any variable if needed
         // Override in subclasses that support rotation
     }
 
-    // constructor for null values
+    // Constructor for null values
     public Entity() {
         posX = 0f;
         posY = 0f;
         color = null;
     }
 
-    // constructor for TexturedObject
+    // Constructor for TexturedObject
     public Entity(float x, float y) {
         posX = x;
         posY = y;
         color = null;
     }
 
-    // constructor for shapes
+    // Constructor for shapes
     public Entity(float x, float y, Color c) {
         posX = x;
         posY = y;
