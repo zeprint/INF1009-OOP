@@ -3,7 +3,7 @@ package io.github.some_example_name.lwjgl3;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
-/* Rotating shape entity (circle, triangle, or square) */
+// Rotating shape entity (circle, triangle, or square) 
 public class RotatingShape extends Entity {
     private float radius;
     private boolean isCircle;
@@ -52,12 +52,12 @@ public class RotatingShape extends Entity {
         } else if (isSquare) {
             drawSquare(shape);
         } else {
-            // Draw triangle (equilateral)
+            // Draws equilateral triangle
             drawTriangle(shape);
         }
     }
     
-    /* Draw a rotating square */
+    // Draws a rotating square 
     private void drawSquare(ShapeRenderer shape) {
         float angle = (float) Math.toRadians(rotationAngle);
         float halfSize = radius;
@@ -83,7 +83,7 @@ public class RotatingShape extends Entity {
         shape.triangle(x1, y1, x3, y3, x4, y4);
     }
     
-    /* Draw an equilateral triangle rotated by the current rotation angle */
+    // Draw an equilateral triangle rotated by the current rotation angle 
     private void drawTriangle(ShapeRenderer shape) {
         float angle1 = (float) Math.toRadians(rotationAngle);
         float angle2 = angle1 + (float) (2 * Math.PI / 3);

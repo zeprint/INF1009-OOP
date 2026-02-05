@@ -1,7 +1,7 @@
 package io.github.some_example_name.lwjgl3;
 import com.badlogic.gdx.math.MathUtils;
 
-/* Drop speed with acceleration and speed reset */
+// Drop speed with acceleration and speed reset 
 public class GravityMovement extends MovementComponent implements Acceleratable {
     protected static final float DEFAULT_GRAVITY = 9.81f;
     protected static final float DEFAULT_ACCELERATION = 0f;
@@ -45,25 +45,25 @@ public class GravityMovement extends MovementComponent implements Acceleratable 
         this.resetXConfigured = false;
     }
     
-    /* Update the movement with gravity and acceleration applied */
+    // Updates the movement with gravity and acceleration applied 
     @Override
     public void update(float deltaTime) {
         if (!enabled) {
             return;
         }
         
-        // Apply acceleration to velocity
+        // Appliies acceleration to velocity
         velocityX += accelerationX * deltaTime;
         velocityY += accelerationY * deltaTime;
         
-        // Apply gravity to Y velocity
+        // Applies gravity to Y velocity
         velocityY += gravity * deltaTime;
         
-        // Update entity position
+        // Updates entity position
         updateEntityPosition(deltaTime);
     }
     
-    /* Update entity's position based on current velocity */
+    // Updates entity's position based on current velocity 
     private void updateEntityPosition(float deltaTime) {
         Entity entity = getEntity();
         if (entity != null) {
@@ -88,14 +88,14 @@ public class GravityMovement extends MovementComponent implements Acceleratable 
         }
     }
 
-    /* Configure vertical bounds for reset behavior */
+    // Configures vertical bounds for reset behavior 
     public void setVerticalBounds(float bottomBoundaryY, float resetTopY) {
         this.bottomBoundaryY = bottomBoundaryY;
         this.resetTopY = resetTopY;
         this.boundsConfigured = true;
     }
 
-    /* Configure horizontal reset range for randomized spawn positions */
+    // Configures horizontal reset range for randomized spawn positions 
     public void setHorizontalResetRange(float minX, float maxX) {
         this.resetMinX = minX;
         this.resetMaxX = maxX;
@@ -103,41 +103,41 @@ public class GravityMovement extends MovementComponent implements Acceleratable 
         this.randomizeXOnReset = true;
     }
 
-    /* Set maximum drop speed cap */
+    // Sets maximum drop speed cap 
     public void setMaxDropSpeed(float maxDropSpeed) {
         this.maxDropSpeed = maxDropSpeed;
     }
 
-    /* Set speed multiplier applied on each reset */
+    // Sets speed multiplier applied on each reset 
     public void setSpeedMultiplier(float speedMultiplier) {
         this.speedMultiplier = speedMultiplier;
     }
 
     
-    /* Set the acceleration affecting this entity */
+    // Sets the acceleration affecting this entity 
     public void setAcceleration(float accelerationX, float accelerationY) {
         this.accelerationX = accelerationX;
         this.accelerationY = accelerationY;
     }
     
-    /* Get acceleration of X component */
+    // Gets acceleration of X component 
     @Override
     public float getAccelerationX() {
         return accelerationX;
     }
     
-    /* Get acceleration of X component */
+    // Gets acceleration of X component 
     @Override
     public float getAccelerationY() {
         return accelerationY;
     }
     
-    /* Set gravity value */
+    // Sets gravity value 
     public void setGravity(float gravity) {
         this.gravity = gravity;
     }
     
-    /* Retrieve current gravity value */
+    // Retrieves current gravity value 
     public float getGravity() {
         return gravity;
     }
