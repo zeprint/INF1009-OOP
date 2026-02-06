@@ -6,9 +6,8 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
-//PauseScene - Scene displayed when game is paused , "P" key
-//Shows pause menu and handles pause state
-
+// PauseScene - Scene displayed when game is paused
+// Shows pause menu and handles pause state
 public class PauseScene extends Scene {
     private SpriteBatch batch;
     private BitmapFont font;
@@ -27,10 +26,10 @@ public class PauseScene extends Scene {
         batch = new SpriteBatch();
         font = new BitmapFont();
         shapeRenderer = new ShapeRenderer();
-
+        
         // Set font color to white for visibility
         font.setColor(Color.WHITE);
-
+        
         return true;
     }
 
@@ -53,26 +52,26 @@ public class PauseScene extends Scene {
         if (shapeRenderer != null) {
             Gdx.gl.glEnable(Gdx.gl.GL_BLEND);
             Gdx.gl.glBlendFunc(Gdx.gl.GL_SRC_ALPHA, Gdx.gl.GL_ONE_MINUS_SRC_ALPHA);
-
+            
             shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
             shapeRenderer.setColor(0, 0, 0, 0.5f); // Semi-transparent black
             shapeRenderer.rect(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
             shapeRenderer.end();
-
+            
             Gdx.gl.glDisable(Gdx.gl.GL_BLEND);
         }
 
         // Draw pause text
         if (batch != null && font != null) {
             batch.begin();
-
+            
             String pauseText = "PAUSED";
             float textWidth = font.getRegion().getRegionWidth() * pauseText.length();
             float x = (Gdx.graphics.getWidth() - textWidth) / 2;
             float y = Gdx.graphics.getHeight() / 2;
-
+            
             font.draw(batch, pauseText, x, y);
-
+            
             batch.end();
         }
 

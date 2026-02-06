@@ -5,10 +5,9 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
-//SimulationScene - Main game simulation scene
-//Contains the entity manager and handles game logic
+// SimulationScene - Main game simulation scene
+// Contains the entity manager and handles game logic
 public class SimulationScene extends Scene {
-    private EntityManager entityManager;
     private SpriteBatch batch;
     private ShapeRenderer shapeRenderer;
 
@@ -17,18 +16,19 @@ public class SimulationScene extends Scene {
         super();
     }
 
-    // Initialise the simulation scene
+    // Initialize the simulation scene
     // Sets up entity manager and creates initial entities
     // @return true if successful
     @Override
     public boolean create() {
-        // Initialise managers
-        entityManager = new EntityManager();
+        // Initialize rendering components
         batch = new SpriteBatch();
         shapeRenderer = new ShapeRenderer();
 
+        // EntityManager is already initialized in parent Scene class
+
         // Example: Create some initial entities
-        // add your game-specific entities here
+        // You can add your game-specific entities here
         // For example:
         // Entity entity = new SomeEntityType(x, y);
         // entityManager.addEntity(entity);
@@ -101,11 +101,5 @@ public class SimulationScene extends Scene {
         }
 
         return true;
-    }
-
-    // Get the entity manager
-    // @return Entity manager instance
-    public EntityManager getEntityManager() {
-        return entityManager;
     }
 }

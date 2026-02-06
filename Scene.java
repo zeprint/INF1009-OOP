@@ -1,16 +1,17 @@
 package io.github.some_example_name.lwjgl3;
 
-//Abstract Scene class
-//Base class for all scenes in the game
-
+// Abstract Scene class
+// Base class for all scenes in the game
 public abstract class Scene {
     protected String name;
     protected boolean isPaused;
+    protected EntityManager entityManager;
 
     // Constructor for Scene
     public Scene() {
         this.name = "";
         this.isPaused = false;
+        this.entityManager = new EntityManager();
     }
 
     // Initialize the scene
@@ -60,5 +61,11 @@ public abstract class Scene {
     // @return true if paused, false otherwise
     public boolean isPaused() {
         return isPaused;
+    }
+
+    // Get the entity manager
+    // @return EntityManager instance
+    public EntityManager getEntityManager() {
+        return entityManager;
     }
 }

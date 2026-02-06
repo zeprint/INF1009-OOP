@@ -3,8 +3,8 @@ package io.github.some_example_name.lwjgl3;
 import java.util.HashMap;
 import java.util.Map;
 
-//SceneManager - Manages all scenes in the game
-//Handles scene switching, updating, and rendering
+// SceneManager - Manages all scenes in the game
+// Handles scene switching, updating, and rendering
 public class SceneManager {
     private Scene currentScene;
     private Map<String, Scene> scenes;
@@ -43,7 +43,7 @@ public class SceneManager {
 
         // Switch to new scene
         currentScene = scenes.get(name);
-
+        
         // Create the scene if it hasn't been created yet
         if (currentScene != null) {
             currentScene.create();
