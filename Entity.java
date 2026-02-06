@@ -1,5 +1,4 @@
 package io.github.some_example_name.lwjgl3;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -44,29 +43,15 @@ public abstract class Entity{
         // Override in subclasses
     }
 
-    public void setRotationAngle(float angle) {
-        // Override in subclasses that support rotation
+    public void dispose() {
+        // Override in subclasses to dispose of resources
     }
 
-    // Constructor for null values
-    public Entity() {
-        posX = 0f;
-        posY = 0f;
-        color = null;
-    }
-
-    // Constructor for TexturedObject
+    // Constructor
     public Entity(float x, float y) {
         posX = x;
         posY = y;
-        color = null;
-    }
-
-    // Constructor for shapes
-    public Entity(float x, float y, Color c) {
-        posX = x;
-        posY = y;
-        color = c;
+        color = Color.WHITE;
     }
 
 }

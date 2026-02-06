@@ -44,7 +44,7 @@ public class RotationComponent extends MovementComponent implements Rotatable {
         // Updates entity's rotation angle representation
         Entity entity = getEntity();
         if (entity != null) {
-            entity.setRotationAngle(rotationAngle);
+            ((RotatingShape) entity).setRotationAngle(rotationAngle);
         }
         
         // Applies velocity to position

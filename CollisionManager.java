@@ -15,6 +15,10 @@ public class CollisionManager {
         collidables.removeValue(obj, true);
     }
 
+    public Array<Collidable> getCollidables() {
+        return collidables;
+    }
+
     public void checkCollisions() {
         for (int i = 0; i < collidables.size; i++) {
             for (int j = i + 1; j < collidables.size; j++) {

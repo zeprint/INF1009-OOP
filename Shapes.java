@@ -1,5 +1,7 @@
 package io.github.some_example_name.lwjgl3;
 
+import javax.swing.text.html.parser.Entity;
+
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.ObjectMap;
@@ -13,16 +15,21 @@ public class Shapes extends Entity {
 
     // 1. Default Constructor
     public Shapes() {
-        super();
+        super(0f, 0f);
         this.dimensions = new ObjectMap<>();
     }
 
     // 2. Static Shape Constructor (No speed)
     // We pass 0 for speedX and speedY to the Entity constructor
     public Shapes(ShapeType shapeType, float x, float y, Color color) {
-        super(x, y, color); 
+        super(x, y); 
         this.shapeType = shapeType;
+        this.color = color;
         this.dimensions = new ObjectMap<>();
+    }
+
+    public ShapeType getShapeType() {
+        return shapeType;
     }
 
     // --- Dimension Helpers ---
