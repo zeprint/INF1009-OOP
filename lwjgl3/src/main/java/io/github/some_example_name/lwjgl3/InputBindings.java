@@ -21,10 +21,10 @@ public class InputBindings {
         }
     }
 
-    private final ObjectMap<InputAxis, Array<AxisPair>>   axisPairs  = new ObjectMap<>();
-    private final ObjectMap<InputAction, Array<Integer>>  actionKeys = new ObjectMap<>();
+    private final ObjectMap<InputAxis, Array<AxisPair>> axisPairs = new ObjectMap<>();
+    private final ObjectMap<InputAction, Array<Integer>> actionKeys = new ObjectMap<>();
 
-    /** Bind an additional negative/positive key pair to an axis. */
+    /* Bind an additional negative/positive key pair to an axis. */
     public void bindAxis(InputAxis axis, int negativeKey, int positiveKey) {
         Array<AxisPair> pairs = axisPairs.get(axis);
         if (pairs == null) {

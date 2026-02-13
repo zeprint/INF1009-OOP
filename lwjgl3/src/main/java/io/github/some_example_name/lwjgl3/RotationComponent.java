@@ -8,7 +8,7 @@ package io.github.some_example_name.lwjgl3;
  */
 public class RotationComponent extends MovementComponent implements Rotatable {
 
-    protected static final float DEFAULT_ROTATION         = 0f;
+    protected static final float DEFAULT_ROTATION = 0f;
     protected static final float DEFAULT_ANGULAR_VELOCITY = 0f;
 
     private float rotationAngle;
@@ -16,29 +16,31 @@ public class RotationComponent extends MovementComponent implements Rotatable {
 
     public RotationComponent(Entity entity) {
         super(entity);
-        this.rotationAngle   = DEFAULT_ROTATION;
+        this.rotationAngle = DEFAULT_ROTATION;
         this.angularVelocity = DEFAULT_ANGULAR_VELOCITY;
     }
 
     public RotationComponent(Entity entity, float rotationAngle) {
         super(entity);
-        this.rotationAngle   = rotationAngle;
+        this.rotationAngle = rotationAngle;
         this.angularVelocity = DEFAULT_ANGULAR_VELOCITY;
     }
 
     public RotationComponent(Entity entity, float rotationAngle, float velocityX, float velocityY) {
         super(entity);
-        this.rotationAngle   = rotationAngle;
+        this.rotationAngle = rotationAngle;
         this.angularVelocity = DEFAULT_ANGULAR_VELOCITY;
-        this.velocityX       = velocityX;
-        this.velocityY       = velocityY;
+        this.velocityX = velocityX;
+        this.velocityY = velocityY;
     }
 
     // --- Per-frame update ---
 
     @Override
     public void update(float deltaTime) {
-        if (!enabled) return;
+        if (!enabled) {
+            return;
+        }
 
         rotationAngle += angularVelocity * deltaTime;
         normaliseRotationAngle();
@@ -59,9 +61,14 @@ public class RotationComponent extends MovementComponent implements Rotatable {
 
     // --- Angular velocity ---
 
-    public void  setAngularVelocity(float av) { this.angularVelocity = av; }
+    public void  setAngularVelocity(float av) {
+        this.angularVelocity = av;
+    }
+
     @Override
-    public float getAngularVelocity()         { return angularVelocity; }
+    public float getAngularVelocity() {
+        return angularVelocity;
+    }
 
     // --- Rotation angle ---
 
@@ -70,5 +77,7 @@ public class RotationComponent extends MovementComponent implements Rotatable {
         normaliseRotationAngle();
     }
 
-    public float getRotationAngle() { return rotationAngle; }
+    public float getRotationAngle() {
+        return rotationAngle;
+    }
 }

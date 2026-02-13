@@ -10,14 +10,14 @@ package io.github.some_example_name.lwjgl3;
  */
 public abstract class Scene {
 
-    protected String        name;
-    protected boolean       isPaused;
+    protected String name;
+    protected boolean isPaused;
     protected IEntitySystem entitySystem;
 
     public Scene() {
-        this.name          = "";
-        this.isPaused      = false;
-        this.entitySystem  = null;   // subclasses set as needed
+        this.name = "";
+        this.isPaused = false;
+        this.entitySystem = null;   // subclasses set as needed
     }
 
     // --- Lifecycle (template methods) ---
@@ -27,13 +27,31 @@ public abstract class Scene {
     public abstract boolean render();
     public abstract boolean dispose();
 
-    public boolean pause()  { isPaused = true;  return true; }
-    public boolean resume() { isPaused = false; return true; }
+    public boolean pause() {
+        isPaused = true;
+        return true;
+    }
+
+    public boolean resume() {
+        isPaused = false;
+        return true;
+    }
 
     // --- Accessors ---
 
-    public String  getName()                  { return name;          }
-    public void    setName(String name)       { this.name = name;    }
-    public boolean isPaused()                 { return isPaused;      }
-    public IEntitySystem getEntitySystem()    { return entitySystem;  }
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public boolean isPaused() {
+        return isPaused;
+    }
+
+    public IEntitySystem getEntitySystem() {
+        return entitySystem;
+    }
 }

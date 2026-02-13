@@ -46,6 +46,13 @@ public class MobileRandom implements DistributionType {
         this.max = max;
     }
 
-    @Override public float getMin() { return min; }
-    @Override public float getMax() { return max; }
+    @Override
+    public float getMin() {
+        return min;
+    }
+
+    @Override
+    public float getMax() {
+        return max;
+    }
 }

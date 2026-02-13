@@ -13,7 +13,7 @@ import com.badlogic.gdx.utils.ObjectMap;
 public class AudioManager implements IAudioSystem {
 
     private final ObjectMap<String, Sound> sounds = new ObjectMap<>();
-    private float   volume = 1.0f;
+    private float volume = 1.0f;
     private boolean muted  = false;
 
     @Override
@@ -30,8 +30,14 @@ public class AudioManager implements IAudioSystem {
         if (s != null) s.play(volume);
     }
 
-    @Override public void    setMuted(boolean muted) { this.muted = muted; }
-    @Override public boolean isMuted()               { return muted;       }
+    @Override
+    public void setMuted(boolean muted) {
+        this.muted = muted;
+    }
+
+    @Override public boolean isMuted() {
+        return muted; 
+    }
 
     @Override
     public void setVolume(float v) {
@@ -47,5 +53,7 @@ public class AudioManager implements IAudioSystem {
     }
 
     /** @return current master volume in [0.0, 1.0]. */
-    public float getVolume() { return volume; }
+    public float getVolume() {
+        return volume;
+    }
 }

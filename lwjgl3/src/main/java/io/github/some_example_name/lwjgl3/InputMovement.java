@@ -13,13 +13,13 @@ package io.github.some_example_name.lwjgl3;
 public class InputMovement extends MovementComponent {
 
     private final IInputSystem inputSystem;
-    private final InputAxis    axis;
-    private final float        speed;
+    private final InputAxis axis;
+    private final float speed;
 
     // Optional screen bounds for clamping
     private boolean boundsConfigured;
-    private float   minBound;
-    private float   maxBound;
+    private float minBound;
+    private float maxBound;
 
     /**
      * @param entity      The entity to move.
@@ -49,17 +49,21 @@ public class InputMovement extends MovementComponent {
      * @param max Maximum X position (inclusive).
      */
     public void setBounds(float min, float max) {
-        this.minBound         = min;
-        this.maxBound         = max;
+        this.minBound = min;
+        this.maxBound = max;
         this.boundsConfigured = true;
     }
 
     @Override
     public void update(float deltaTime) {
-        if (!enabled || inputSystem == null) return;
+        if (!enabled || inputSystem == null) {
+            return;
+        }
 
         Entity entity = getEntity();
-        if (entity == null) return;
+        if (entity == null) {
+            return;
+        }
 
         float axisValue = inputSystem.getAxis(axis);
         float dx = axisValue * speed * deltaTime;
@@ -74,5 +78,7 @@ public class InputMovement extends MovementComponent {
 
     // --- Accessors ---
 
-    public float getSpeed() { return speed; }
+    public float getSpeed() {
+        return speed;
+    }
 }

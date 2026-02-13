@@ -14,16 +14,16 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
  */
 public class PauseScene extends Scene {
 
-    private SpriteBatch   batch;
-    private BitmapFont    font;
-    private GlyphLayout   layout;
+    private SpriteBatch batch;
+    private BitmapFont font;
+    private GlyphLayout layout;
     private ShapeRenderer shapeRenderer;
 
     @Override
     public boolean create() {
-        batch         = new SpriteBatch();
-        font          = new BitmapFont();
-        layout        = new GlyphLayout();
+        batch = new SpriteBatch();
+        font = new BitmapFont();
+        layout = new GlyphLayout();
         shapeRenderer = new ShapeRenderer();
         font.setColor(Color.WHITE);
         return true;
@@ -63,9 +63,19 @@ public class PauseScene extends Scene {
 
     @Override
     public boolean dispose() {
-        if (batch         != null) batch.dispose();
-        if (font          != null) font.dispose();
-        if (shapeRenderer != null) shapeRenderer.dispose();
+        if (batch != null) {
+            batch.dispose();
+        }
+
+        if (font != null) {
+            font.dispose();
+        }
+        
+        if (shapeRenderer != null) {
+            shapeRenderer.dispose();
+        }
+
         return true;
+        
     }
 }

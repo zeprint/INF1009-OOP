@@ -14,17 +14,17 @@ import com.badlogic.gdx.math.Rectangle;
 public class Bucket extends TextureObject implements Collidable {
 
     private final CollisionType collisionType;
-    private final IAudioSystem  audioSystem;
-    private final float         speed;
-    private final Rectangle     bounds;
+    private final IAudioSystem audioSystem;
+    private final float speed;
+    private final Rectangle bounds;
 
     public Bucket(Texture texture, float x, float y, int width, int height,
                   IAudioSystem audioSystem) {
         super(texture, x, y, height, width);
-        this.audioSystem   = audioSystem;
-        this.speed         = 300f;
+        this.audioSystem = audioSystem;
+        this.speed = 300f;
         this.collisionType = new CollisionType("bucket", true, true);
-        this.bounds        = new Rectangle(x, y, width, height);
+        this.bounds = new Rectangle(x, y, width, height);
     }
 
     // --- Collidable ---
@@ -36,7 +36,9 @@ public class Bucket extends TextureObject implements Collidable {
     }
 
     @Override
-    public CollisionType getType() { return collisionType; }
+    public CollisionType getType() {
+        return collisionType;
+    }
 
     @Override
     public void onCollision(CollisionResult result) {
@@ -49,5 +51,7 @@ public class Bucket extends TextureObject implements Collidable {
     // --- Movement ---
 
     /** @return movement speed in pixels per second. */
-    public float getSpeed() { return speed; }
+    public float getSpeed() {
+        return speed;
+    }
 }

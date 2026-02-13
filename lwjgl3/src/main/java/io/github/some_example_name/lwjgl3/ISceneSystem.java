@@ -10,21 +10,21 @@ package io.github.some_example_name.lwjgl3;
  */
 public interface ISceneSystem {
 
-    /** Register a scene under a unique name. */
+    /* Register a scene under a unique name. */
     boolean addScene(String name, Scene scene);
 
-    /** Switch to the named scene. */
+    /* Switch to the named scene. */
     boolean loadScene(String name);
 
     /** @return the currently active scene. */
     Scene getCurrentScene();
 
-    /** Update the current scene. */
+    /* Update the current scene. */
     boolean update(float deltaTime);
 
-    /** Render the current scene. */
+    /* Render the current scene. */
     boolean render();
 
-    /** Dispose all scenes. */
+    /* Dispose all scenes. */
     void dispose();
 }

@@ -16,6 +16,6 @@ public interface Collidable {
     /** @return collision type controlling detection/response behaviour. */
     CollisionType getType();
 
-    /** Called by CollisionManager when a collision is detected. */
+    /* Called by CollisionManager when a collision is detected. */
     void onCollision(CollisionResult result);
 }

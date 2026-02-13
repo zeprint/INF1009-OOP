@@ -17,9 +17,9 @@ public interface IInputSystem {
     /** @return true only on the frame the action key was first pressed. */
     boolean isActionTriggered(InputAction action);
 
-    /** Poll input state. Call once per frame. */
+    /* Poll input state. Call once per frame. */
     void update();
 
-    /** Release resources. */
+    /* Release resources. */
     void dispose();
 }

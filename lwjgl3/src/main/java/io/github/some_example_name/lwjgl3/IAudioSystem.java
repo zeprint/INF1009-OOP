@@ -11,21 +11,21 @@ package io.github.some_example_name.lwjgl3;
  */
 public interface IAudioSystem {
 
-    /** Load a named sound from the given internal asset path. */
+    /* Load a named sound from the given internal asset path. */
     void loadSound(String name, String assetPath);
 
-    /** Play a previously loaded sound at the current volume. */
+    /* Play a previously loaded sound at the current volume. */
     void playSound(String name);
 
-    /** Mute or unmute all audio output. */
+    /* Mute or unmute all audio output. */
     void setMuted(boolean muted);
 
     /** @return true if audio is currently muted. */
     boolean isMuted();
 
-    /** Set the global playback volume, clamped to [0, 1]. */
+    /* Set the global playback volume, clamped to [0, 1]. */
     void setVolume(float volume);
 
-    /** Release all loaded sound resources. */
+    /* Release all loaded sound resources. */
     void dispose();
 }

@@ -10,7 +10,7 @@ package io.github.some_example_name.lwjgl3;
  */
 public interface IEntity {
 
-    /** One-time setup after construction (e.g. load resources, configure state). */
+    /* One-time setup after construction (e.g. load resources, configure state). */
     void initialize();
 
     /**
@@ -20,6 +20,6 @@ public interface IEntity {
      */
     void update(float deltaTime);
 
-    /** Release native resources (textures, sounds, etc.). */
+    /* Release native resources (textures, sounds, etc.). */
     void dispose();
 }

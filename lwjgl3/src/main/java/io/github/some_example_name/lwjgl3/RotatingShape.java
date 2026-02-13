@@ -15,32 +15,47 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
  */
 public class RotatingShape extends Entity implements HasRotation {
 
-    private float     radius;
+    private float radius;
     private ShapeType shapeType;
-    private float     rotationAngle;
+    private float rotationAngle;
 
     public RotatingShape(float x, float y, float radius, Color color, ShapeType shapeType) {
         super(x, y);
-        this.radius        = radius;
-        this.color         = color;
-        this.shapeType     = shapeType;
+        this.radius = radius;
+        this.color = color;
+        this.shapeType = shapeType;
         this.rotationAngle = 0f;
     }
 
     // --- Accessors ---
 
-    public float     getRadius()                  { return radius;    }
-    public void      setRadius(float r)           { radius = r;      }
-    public ShapeType getShapeType()               { return shapeType; }
-    public void      setShapeType(ShapeType type) { shapeType = type; }
+    public float getRadius() {
+        return radius;
+    }
+
+    public void setRadius(float r) {
+        radius = r;
+    }
+
+    public ShapeType getShapeType() {
+        return shapeType;
+    }
+
+    public void setShapeType(ShapeType type) {
+        shapeType = type;
+    }
 
     // --- HasRotation ---
 
     @Override
-    public void setRotationAngle(float angle) { this.rotationAngle = angle; }
+    public void setRotationAngle(float angle) {
+        this.rotationAngle = angle;
+    }
 
     @Override
-    public float getRotationAngle()           { return rotationAngle; }
+    public float getRotationAngle() {
+        return rotationAngle;
+    }
 
     // --- Renderable ---
 
@@ -64,12 +79,12 @@ public class RotatingShape extends Entity implements HasRotation {
         }
     }
 
-    /** Draw a rotated square as two filled triangles. */
+    /* Draw a rotated square as two filled triangles. */
     private void drawSquare(ShapeRenderer shape) {
         float rad = (float) Math.toRadians(rotationAngle);
         float cos = (float) Math.cos(rad);
         float sin = (float) Math.sin(rad);
-        float h   = radius; // half-size
+        float h = radius; // half-size
 
         float x1 = posX + (-h * cos - (-h) * sin);
         float y1 = posY + (-h * sin + (-h) * cos);
@@ -84,7 +99,7 @@ public class RotatingShape extends Entity implements HasRotation {
         shape.triangle(x1, y1, x3, y3, x4, y4);
     }
 
-    /** Draw a rotated equilateral triangle. */
+    /* Draw a rotated equilateral triangle. */
     private void drawTriangle(ShapeRenderer shape) {
         float a1 = (float) Math.toRadians(rotationAngle);
         float a2 = a1 + (float) (2 * Math.PI / 3);
