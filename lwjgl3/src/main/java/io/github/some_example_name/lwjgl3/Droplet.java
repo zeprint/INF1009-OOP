@@ -1,6 +1,7 @@
 package io.github.some_example_name.lwjgl3;
 
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 
 /**
@@ -61,37 +62,40 @@ public class Droplet extends TextureObject implements Collidable {
             if (xDistribution != null) {
                 setX(xDistribution.next());
             }
-            // Reset velocity to a gentle fall speed after being caught
+            // Reset velocity to a gentle fall speed; gravity will accelerate naturally
             if (gravityMovement != null) {
-                gravityMovement.setVelocity(0f, -150f);
+                gravityMovement.setVelocity(0f, -60f);
             }
             return;
         }
 
-        // Non-bucket collision: bounce off by reversing Y velocity
+        // Non-bucket collision: bounce off with energy damping.
+        // Gravity (configured in GravityMovement) naturally decelerates the
+        // upward bounce and pulls the droplet back down to continue falling.
         if (gravityMovement != null) {
             float vx = gravityMovement.getVelocityX();
             float vy = gravityMovement.getVelocityY();
 
-            // Reverse Y direction; ensure minimum bounce speed
-            float newVy = -vy;
-            if (Math.abs(newVy) < 50f) {
-                newVy = (newVy >= 0f) ? 50f : -50f;
-            }
-            gravityMovement.setVelocity(vx, newVy);
+            // Energy damping — lose speed on each bounce (realistic)
+            float damping = 0.65f;
+
+            // Random horizontal kick for a natural-looking arc to one side
+            float kickX = MathUtils.random(-80f, 80f);
 
             // Separate from the other entity to prevent repeated collision
             CollisionDirection dir = result.getDirection();
             if (dir == CollisionDirection.TOP) {
                 setY(getY() + result.getOverlapY() + 1f);
+                gravityMovement.setVelocity(vx + kickX, -vy * damping);
             } else if (dir == CollisionDirection.BOTTOM) {
                 setY(getY() - result.getOverlapY() - 1f);
+                gravityMovement.setVelocity(vx + kickX, -vy * damping);
             } else if (dir == CollisionDirection.LEFT) {
                 setX(getX() - result.getOverlapX() - 1f);
-                gravityMovement.setVelocity(-Math.abs(vx) - 30f, newVy);
+                gravityMovement.setVelocity(-Math.abs(vx) * damping - 30f, vy);
             } else if (dir == CollisionDirection.RIGHT) {
                 setX(getX() + result.getOverlapX() + 1f);
-                gravityMovement.setVelocity(Math.abs(vx) + 30f, newVy);
+                gravityMovement.setVelocity(Math.abs(vx) * damping + 30f, vy);
             }
         }
     }
