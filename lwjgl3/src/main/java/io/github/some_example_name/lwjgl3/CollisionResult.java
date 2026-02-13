@@ -4,7 +4,6 @@ package io.github.some_example_name.lwjgl3;
  * CollisionResult - Immutable data object describing a detected collision.
  *
  * Contains the other Collidable, overlap depths, and the direction.
- * FIX: Uses CollisionDirection enum instead of raw Strings for type safety.
  */
 public class CollisionResult {
 

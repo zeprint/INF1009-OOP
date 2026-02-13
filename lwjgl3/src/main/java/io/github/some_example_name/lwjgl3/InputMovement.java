@@ -30,6 +30,12 @@ public class InputMovement extends MovementComponent {
     public InputMovement(Entity entity, IInputSystem inputSystem,
                          InputAxis axis, float speed) {
         super(entity);
+        if (inputSystem == null) {
+            throw new IllegalArgumentException("inputSystem cannot be null");
+        }
+        if (axis == null) {
+            throw new IllegalArgumentException("axis cannot be null");
+        }
         this.inputSystem     = inputSystem;
         this.axis            = axis;
         this.speed           = speed;

@@ -6,10 +6,6 @@ import com.badlogic.gdx.utils.ObjectMap;
  * SceneManager - Registers, switches, and forwards updates/renders to scenes (SRP).
  *
  * Implements ISceneSystem so callers depend on the abstraction (DIP).
- *
- * FIX: Tracks which scenes have been created so loadScene() only calls
- * create() on the first load, not every switch. This allows pause/resume
- * without destroying game state.
  */
 public class SceneManager implements ISceneSystem {
 

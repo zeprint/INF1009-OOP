@@ -14,6 +14,12 @@ public class MobileRandom implements DistributionType {
     private float max;
 
     public MobileRandom(float min, float max) {
+        if (Float.isNaN(min) || Float.isInfinite(min) || Float.isNaN(max) || Float.isInfinite(max)) {
+            throw new IllegalArgumentException("range values must be finite");
+        }
+        if (min > max) {
+            throw new IllegalArgumentException("min must be less than or equal to max");
+        }
         this.min = min;
         this.max = max;
     }
@@ -30,6 +36,12 @@ public class MobileRandom implements DistributionType {
 
     @Override
     public void setRange(float min, float max) {
+        if (Float.isNaN(min) || Float.isInfinite(min) || Float.isNaN(max) || Float.isInfinite(max)) {
+            throw new IllegalArgumentException("range values must be finite");
+        }
+        if (min > max) {
+            throw new IllegalArgumentException("min must be less than or equal to max");
+        }
         this.min = min;
         this.max = max;
     }

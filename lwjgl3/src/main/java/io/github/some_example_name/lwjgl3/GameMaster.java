@@ -15,7 +15,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
  * DIP: All managers are stored and exposed as interfaces so the
  * concrete implementations can be swapped without changing this class.
  *
- * SCENES: Manages two scenes â€” GameScene (play) and PauseScene (pause).
+ * SCENES: Manages two scenes: GameScene (play) and PauseScene (pause).
  * The game scene is always rendered; when paused, the PauseScene overlay
  * is drawn on top with a semi-transparent background.
  */
@@ -100,10 +100,10 @@ public class GameMaster extends ApplicationAdapter {
 
     private void initManagers() {
         entitySystem    = new EntityManager();   // concrete → stored as IEntitySystem
-        movementSystem  = new MovementManager();    // concrete â†’ stored as IMovementSystem
-        collisionSystem = new CollisionManager();   // concrete â†’ stored as ICollisionSystem
-        audioSystem     = new AudioManager();       // concrete â†’ stored as IAudioSystem
-        sceneSystem     = new SceneManager();       // concrete â†’ stored as ISceneSystem
+        movementSystem  = new MovementManager();
+        collisionSystem = new CollisionManager();
+        audioSystem     = new AudioManager();
+        sceneSystem     = new SceneManager();
     }
 
     private void initInput() {
@@ -127,7 +127,7 @@ public class GameMaster extends ApplicationAdapter {
         bindings.bindAction(InputAction.TOGGLE_PAUSE,  com.badlogic.gdx.Input.Keys.P);
         bindings.bindAction(InputAction.TOGGLE_PAUSE,  com.badlogic.gdx.Input.Keys.ESCAPE);
 
-        inputSystem = new InputManager(bindings);   // concrete â†’ stored as IInputSystem
+        inputSystem = new InputManager(bindings);
     }
 
     private void loadAssets() {
