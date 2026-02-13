@@ -24,7 +24,11 @@ public class EntityManager {
 	// update all entities
 	public void update(float deltaTime) {
     	for (Entity entity : entityList) {
-        	entity.update(deltaTime);
+        	try {
+            	entity.update(deltaTime);
+        	} catch (Exception e) {
+            	Gdx.app.error("EntityManager", "Error updating entity: " + entity.getClass().getSimpleName(), e);
+        	}
     	}
 	}
 
@@ -53,3 +57,4 @@ public class EntityManager {
 		entityList = new Array<Entity>();
 	}
 }
+
