@@ -18,32 +18,62 @@ public abstract class Entity implements Renderable, IEntity {
     protected Color color;
 
     public Entity(float x, float y) {
-        this.posX  = x;
-        this.posY  = y;
+        this.posX = x;
+        this.posY = y;
         this.color = Color.WHITE;
     }
 
     // --- Position ---
 
-    public float getX()        { return posX; }
-    public void  setX(float x) { posX = x;    }
+    public float getX() {
+        return posX;
+    }
 
-    public float getY()        { return posY; }
-    public void  setY(float y) { posY = y;    }
+    public void setX(float x) {
+        posX = x;
+    }
+
+    public float getY() {
+        return posY;
+    }
+
+    public void  setY(float y) {
+        posY = y;
+    }
 
     // --- Color ---
 
-    public Color getColor()        { return color; }
-    public void  setColor(Color c) { color = c;    }
+    public Color getColor() { 
+        return color;
+    }
+
+    public void  setColor(Color c) {
+        color = c;
+    }
 
     // --- Renderable (no-op defaults) ---
 
-    @Override public void draw(SpriteBatch batch)    { /* override in texture subclasses */ }
-    @Override public void draw(ShapeRenderer shape)  { /* override in shape subclasses   */ }
+    @Override
+    public void draw(SpriteBatch batch) {
+        /* override in texture subclasses */
+    }
+
+    @Override
+    public void draw(ShapeRenderer shape) {
+        /* override in shape subclasses */
+    }
 
     // --- IEntity lifecycle (no-op defaults) ---
 
-    @Override public void initialize()               { /* override for one-time setup     */ }
-    @Override public void update(float deltaTime)    { /* override if per-frame logic     */ }
-    @Override public void dispose()                  { /* override to release resources   */ }
+    @Override public void initialize() {
+        /* override for one-time setup */
+    }
+
+    @Override public void update(float deltaTime) { 
+        /* override if per-frame logic */
+    }
+
+    @Override public void dispose() {
+        /* override to release resources */
+    }
 }

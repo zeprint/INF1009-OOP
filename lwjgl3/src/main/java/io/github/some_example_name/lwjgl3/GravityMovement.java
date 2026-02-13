@@ -8,10 +8,10 @@ package io.github.some_example_name.lwjgl3;
  */
 public class GravityMovement extends MovementComponent implements Acceleratable {
 
-    protected static final float DEFAULT_GRAVITY          = 9.81f;
-    protected static final float DEFAULT_ACCELERATION     = 0f;
+    protected static final float DEFAULT_GRAVITY = 9.81f;
+    protected static final float DEFAULT_ACCELERATION = 0f;
     protected static final float DEFAULT_SPEED_MULTIPLIER = 2f;
-    protected static final float DEFAULT_MAX_DROP_SPEED   = 10f;
+    protected static final float DEFAULT_MAX_DROP_SPEED = 10f;
 
     private float gravity;
     private float accelerationX;
@@ -20,8 +20,8 @@ public class GravityMovement extends MovementComponent implements Acceleratable 
     private float maxDropSpeed;
 
     // Vertical bounds (optional)
-    private float   bottomBoundaryY;
-    private float   resetTopY;
+    private float bottomBoundaryY;
+    private float resetTopY;
     private boolean boundsConfigured;
 
     // Horizontal reset randomisation (optional, DIP)
@@ -35,13 +35,13 @@ public class GravityMovement extends MovementComponent implements Acceleratable 
 
     public GravityMovement(Entity entity, float gravity) {
         super(entity);
-        this.gravity          = gravity;
-        this.accelerationX    = DEFAULT_ACCELERATION;
-        this.accelerationY    = DEFAULT_ACCELERATION;
-        this.speedMultiplier  = DEFAULT_SPEED_MULTIPLIER;
-        this.maxDropSpeed     = DEFAULT_MAX_DROP_SPEED;
+        this.gravity = gravity;
+        this.accelerationX = DEFAULT_ACCELERATION;
+        this.accelerationY = DEFAULT_ACCELERATION;
+        this.speedMultiplier = DEFAULT_SPEED_MULTIPLIER;
+        this.maxDropSpeed = DEFAULT_MAX_DROP_SPEED;
         this.boundsConfigured = false;
-        this.xDistribution    = null;
+        this.xDistribution = null;
     }
 
     // --- Per-frame update ---
@@ -70,9 +70,9 @@ public class GravityMovement extends MovementComponent implements Acceleratable 
                 entity.setX(xDistribution.next());
             }
 
-            float currentSpeed   = Math.abs(velocityY);
+            float currentSpeed = Math.abs(velocityY);
             float increasedSpeed = currentSpeed * speedMultiplier;
-            float cappedSpeed    = Math.min(increasedSpeed, maxDropSpeed);
+            float cappedSpeed = Math.min(increasedSpeed, maxDropSpeed);
             velocityY = (velocityY < 0f) ? -cappedSpeed : cappedSpeed;
         }
     }
@@ -80,8 +80,8 @@ public class GravityMovement extends MovementComponent implements Acceleratable 
     // --- Configuration ---
 
     public void setVerticalBounds(float bottomBoundaryY, float resetTopY) {
-        this.bottomBoundaryY  = bottomBoundaryY;
-        this.resetTopY        = resetTopY;
+        this.bottomBoundaryY = bottomBoundaryY;
+        this.resetTopY = resetTopY;
         this.boundsConfigured = true;
     }
 
@@ -93,9 +93,17 @@ public class GravityMovement extends MovementComponent implements Acceleratable 
         this.xDistribution = new MobileRandom(minX, maxX);
     }
 
-    public void setMaxDropSpeed(float maxDropSpeed)       { this.maxDropSpeed     = maxDropSpeed;     }
-    public void setSpeedMultiplier(float speedMultiplier) { this.speedMultiplier  = speedMultiplier;  }
-    public void setGravity(float gravity)                 { this.gravity          = gravity;          }
+    public void setMaxDropSpeed(float maxDropSpeed) {
+        this.maxDropSpeed = maxDropSpeed;
+    }
+
+    public void setSpeedMultiplier(float speedMultiplier) {
+        this.speedMultiplier  = speedMultiplier;
+    }
+
+    public void setGravity(float gravity) {
+        this.gravity = gravity;
+    }
 
     public void setAcceleration(float ax, float ay) {
         this.accelerationX = ax;
@@ -104,10 +112,17 @@ public class GravityMovement extends MovementComponent implements Acceleratable 
 
     // --- Acceleratable ---
 
-    @Override public float getAccelerationX() { return accelerationX; }
-    @Override public float getAccelerationY() { return accelerationY; }
+    @Override public float getAccelerationX() {
+        return accelerationX;
+    }
+
+    @Override public float getAccelerationY() {
+        return accelerationY;
+    }
 
     // --- Getters ---
 
-    public float getGravity() { return gravity; }
+    public float getGravity() {
+        return gravity;
+    }
 }

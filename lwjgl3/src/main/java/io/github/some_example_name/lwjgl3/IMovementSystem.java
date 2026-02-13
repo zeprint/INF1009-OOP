@@ -10,15 +10,15 @@ package io.github.some_example_name.lwjgl3;
  */
 public interface IMovementSystem {
 
-    /** Register a movement component. */
+    /* Register a movement component. */
     void registerComponent(MovementComponent component);
 
-    /** Unregister a movement component. */
+    /* Unregister a movement component. */
     void unregisterComponent(MovementComponent component);
 
-    /** Find the component attached to a specific entity. */
+    /* Find the component attached to a specific entity. */
     MovementComponent getComponent(Entity entity);
 
-    /** Update all enabled components. */
+    /* Update all enabled components. */
     void update(float deltaTime);
 }

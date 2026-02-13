@@ -49,25 +49,25 @@ public class GameScene extends SimulationScene {
     private boolean mouseMode = false;
 
     // --- Cached rectangles for shape collision (avoid GC per frame) ---
-    private final Rectangle shapeBounds  = new Rectangle();
-    private final Rectangle dropBounds   = new Rectangle();
+    private final Rectangle shapeBounds = new Rectangle();
+    private final Rectangle dropBounds = new Rectangle();
 
     // Sizes
-    private static final int   BUCKET_SIZE   = 64;
-    private static final int   DROPLET_SIZE  = 32;
-    private static final int   NUM_DROPLETS  = 5;
-    private static final float TRIANGLE_R    = 30f;
-    private static final float CIRCLE_R      = 20f;
-    private static final float SQUARE_R      = 25f;
+    private static final int BUCKET_SIZE = 64;
+    private static final int DROPLET_SIZE = 32;
+    private static final int NUM_DROPLETS = 5;
+    private static final float TRIANGLE_R = 30f;
+    private static final float CIRCLE_R = 20f;
+    private static final float SQUARE_R = 25f;
 
     public GameScene(
-            IEntitySystem    entitySystem,
-            IMovementSystem  movementSystem,
+            IEntitySystem entitySystem,
+            IMovementSystem movementSystem,
             ICollisionSystem collisionSystem,
-            IInputSystem     inputSystem,
-            IAudioSystem     audioSystem,
-            SpriteBatch      spriteBatch,
-            ShapeRenderer    shapeRenderer) {
+            IInputSystem inputSystem,
+            IAudioSystem audioSystem,
+            SpriteBatch spriteBatch,
+            ShapeRenderer shapeRenderer) {
 
         super(entitySystem, movementSystem, collisionSystem,
               inputSystem, audioSystem, spriteBatch, shapeRenderer);
@@ -275,7 +275,7 @@ public class GameScene extends SimulationScene {
 
     private void createDroplets() {
         Texture tex = new Texture(Gdx.files.internal("droplet.png"));
-        droplets         = new Droplet[NUM_DROPLETS];
+        droplets = new Droplet[NUM_DROPLETS];
         dropletMovements = new GravityMovement[NUM_DROPLETS];
 
         MobileRandom xRandom = new MobileRandom(20f, screenW - DROPLET_SIZE - 20f);

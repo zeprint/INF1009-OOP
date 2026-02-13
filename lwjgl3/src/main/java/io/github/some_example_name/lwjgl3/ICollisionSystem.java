@@ -11,12 +11,12 @@ package io.github.some_example_name.lwjgl3;
  */
 public interface ICollisionSystem {
 
-    /** Register a collidable object. */
+    /* Register a collidable object. */
     void addObject(Collidable obj);
 
-    /** Unregister a collidable object. */
+    /* Unregister a collidable object. */
     void removeObject(Collidable obj);
 
-    /** Run collision detection and resolution for all registered objects. */
+    /* Run collision detection and resolution for all registered objects. */
     void checkCollisions();
 }

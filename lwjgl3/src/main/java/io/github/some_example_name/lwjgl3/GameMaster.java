@@ -163,10 +163,27 @@ public class GameMaster extends ApplicationAdapter {
 
     // --- Public accessors for Logic Engine (DIP: return interfaces) ---
 
-    public ISceneSystem     getSceneSystem()     { return sceneSystem;     }
-    public IEntitySystem    getEntitySystem()    { return entitySystem;    }
-    public IMovementSystem  getMovementSystem()  { return movementSystem;  }
-    public ICollisionSystem getCollisionSystem() { return collisionSystem; }
-    public IInputSystem     getInputSystem()     { return inputSystem;     }
-    public IAudioSystem     getAudioSystem()     { return audioSystem;     }
+    public ISceneSystem getSceneSystem() {
+        return sceneSystem;
+    }
+
+    public IEntitySystem getEntitySystem() {
+        return entitySystem;
+    }
+
+    public IMovementSystem getMovementSystem() {
+        return movementSystem;
+    }
+
+    public ICollisionSystem getCollisionSystem() {
+        return collisionSystem;
+    }
+
+    public IInputSystem getInputSystem() {
+        return inputSystem;
+    }
+
+    public IAudioSystem getAudioSystem() {
+        return audioSystem;
+    }
 }

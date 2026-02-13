@@ -11,26 +11,41 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 public class TextureObject extends Entity {
 
     private Texture texture;
-    private int     height;
-    private int     width;
+    private int height;
+    private int width;
 
     public TextureObject(Texture t, float x, float y, int h, int w) {
         super(x, y);
         this.texture = t;
-        this.height  = h;
-        this.width   = w;
+        this.height = h;
+        this.width = w;
     }
 
     // --- Accessors ---
 
-    public Texture getTexture()       { return texture; }
-    public void    setTexture(Texture t) { texture = t; }
+    public Texture getTexture() {
+        return texture;
+    }
 
-    public int  getHeight()           { return height; }
-    public void setHeight(int h)      { height = h;    }
+    public void setTexture(Texture t) {
+        texture = t;
+    }
 
-    public int  getWidth()            { return width; }
-    public void setWidth(int w)       { width = w;    }
+    public int getHeight() {
+        return height;
+    }
+
+    public void setHeight(int h) {
+        height = h;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public void setWidth(int w) {
+        width = w;
+    }
 
     // --- Renderable ---
 

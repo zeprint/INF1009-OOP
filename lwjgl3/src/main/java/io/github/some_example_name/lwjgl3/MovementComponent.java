@@ -14,15 +14,15 @@ public abstract class MovementComponent {
     protected static final float DEFAULT_VELOCITY = 0f;
 
     private final Entity entity;
-    protected float   velocityX;
-    protected float   velocityY;
+    protected float velocityX;
+    protected float velocityY;
     protected boolean enabled;
 
     public MovementComponent(Entity entity) {
-        this.entity    = entity;
+        this.entity = entity;
         this.velocityX = DEFAULT_VELOCITY;
         this.velocityY = DEFAULT_VELOCITY;
-        this.enabled   = true;
+        this.enabled = true;
     }
 
     /** Subclasses implement their specific movement logic. */
@@ -42,17 +42,35 @@ public abstract class MovementComponent {
 
     // --- Velocity ---
 
-    public void  setVelocity(float vx, float vy) { velocityX = vx; velocityY = vy; }
-    public float getVelocityX()                   { return velocityX; }
-    public float getVelocityY()                   { return velocityY; }
+    public void  setVelocity(float vx, float vy) {
+        velocityX = vx; velocityY = vy;
+    }
+
+    public float getVelocityX() {
+        return velocityX;
+    }
+
+    public float getVelocityY() {
+        return velocityY;
+    }
 
     // --- Enable / Disable ---
 
-    public void    enable()    { enabled = true;  }
-    public void    disable()   { enabled = false; }
-    public boolean isEnabled() { return enabled;  }
+    public void enable() {
+        enabled = true;
+    }
+
+    public void disable() {
+        enabled = false;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
 
     // --- Entity reference ---
 
-    public Entity getEntity() { return entity; }
+    public Entity getEntity() {
+        return entity;
+    }
 }

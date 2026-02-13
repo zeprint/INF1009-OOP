@@ -20,7 +20,7 @@ public class EntityManager implements IEntitySystem {
 
     // --- Lifecycle ---
 
-    /** Register an entity. Null entities are silently ignored. */
+    /* Register an entity. Null entities are silently ignored. */
     @Override
     public void addEntity(Entity entity) {
         if (entity != null) {
@@ -28,13 +28,13 @@ public class EntityManager implements IEntitySystem {
         }
     }
 
-    /** Remove an entity. identity=true uses reference equality. */
+    /* Remove an entity. identity=true uses reference equality. */
     @Override
     public void removeEntity(Entity entity, boolean identity) {
         entityList.removeValue(entity, identity);
     }
 
-    /** Direct reference to the entity list. */
+    /* Direct reference to the entity list. */
     @Override
     public Array<Entity> getEntityList() {
         return entityList;
@@ -51,7 +51,7 @@ public class EntityManager implements IEntitySystem {
 
     // --- Rendering ---
 
-    /** Draw all entities using whichever renderer is currently active. */
+    /* Draw all entities using whichever renderer is currently active. */
     @Override
     public void draw(SpriteBatch batch, ShapeRenderer shape) {
         for (Entity entity : entityList) {
@@ -66,7 +66,7 @@ public class EntityManager implements IEntitySystem {
 
     // --- Shutdown ---
 
-    /** Dispose every entity then clear the list. */
+    /* Dispose every entity then clear the list. */
     @Override
     public void dispose() {
         for (Entity entity : entityList) {

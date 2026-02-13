@@ -17,12 +17,12 @@ import com.badlogic.gdx.math.Rectangle;
 public class Droplet extends TextureObject implements Collidable {
 
     private final CollisionType collisionType;
-    private final float         resetY;
-    private final Rectangle     bounds;
-    private DistributionType    xDistribution;
+    private final float resetY;
+    private final Rectangle bounds;
+    private DistributionType xDistribution;
 
     /** Reference to the GravityMovement driving this droplet (for bounce). */
-    private GravityMovement     gravityMovement;
+    private GravityMovement gravityMovement;
 
     public Droplet(Texture texture, float x, float y, int width, int height, float resetY) {
         super(texture, x, y, height, width);

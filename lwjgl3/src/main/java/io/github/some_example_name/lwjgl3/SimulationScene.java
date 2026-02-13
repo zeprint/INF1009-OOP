@@ -29,22 +29,22 @@ public class SimulationScene extends Scene {
      * No game-specific entities are created here (Logic Engine territory).
      */
     public SimulationScene(
-            IEntitySystem    entitySystem,
-            IMovementSystem  movementSystem,
+            IEntitySystem entitySystem,
+            IMovementSystem movementSystem,
             ICollisionSystem collisionSystem,
-            IInputSystem     inputSystem,
-            IAudioSystem     audioSystem,
-            SpriteBatch      spriteBatch,
-            ShapeRenderer    shapeRenderer) {
+            IInputSystem inputSystem,
+            IAudioSystem audioSystem,
+            SpriteBatch spriteBatch,
+            ShapeRenderer shapeRenderer) {
 
         super();
-        this.entitySystem    = entitySystem;
-        this.movementSystem  = movementSystem;
+        this.entitySystem = entitySystem;
+        this.movementSystem = movementSystem;
         this.collisionSystem = collisionSystem;
-        this.inputSystem     = inputSystem;
-        this.audioSystem     = audioSystem;
-        this.spriteBatch     = spriteBatch;
-        this.shapeRenderer   = shapeRenderer;
+        this.inputSystem = inputSystem;
+        this.audioSystem = audioSystem;
+        this.spriteBatch = spriteBatch;
+        this.shapeRenderer = shapeRenderer;
     }
 
     // --- Scene lifecycle ---
@@ -59,9 +59,17 @@ public class SimulationScene extends Scene {
         if (isPaused) return false;
 
         // Input is already polled by GameMaster â€” subclasses read state directly
-        if (movementSystem  != null) movementSystem.update(dt);
-        if (entitySystem   != null) entitySystem.update(dt);
-        if (collisionSystem != null) collisionSystem.checkCollisions();
+        if (movementSystem != null) {
+            movementSystem.update(dt);
+        }
+
+        if (entitySystem   != null) {
+            entitySystem.update(dt);
+        }
+
+        if (collisionSystem != null) {
+            collisionSystem.checkCollisions();
+        }
 
         return true;
     }
@@ -91,10 +99,27 @@ public class SimulationScene extends Scene {
 
     // --- Accessors for Logic Engine subclasses ---
 
-    public IMovementSystem  getMovementSystem()  { return movementSystem;  }
-    public ICollisionSystem getCollisionSystem() { return collisionSystem; }
-    public IInputSystem     getInputSystem()     { return inputSystem;     }
-    public IAudioSystem     getAudioSystem()     { return audioSystem;     }
-    public SpriteBatch      getSpriteBatch()     { return spriteBatch;     }
-    public ShapeRenderer    getShapeRenderer()   { return shapeRenderer;   }
+    public IMovementSystem getMovementSystem() {
+        return movementSystem;
+    }
+
+    public ICollisionSystem getCollisionSystem() {
+        return collisionSystem;
+    }
+
+    public IInputSystem getInputSystem() {
+        return inputSystem;
+    }
+
+    public IAudioSystem getAudioSystem() {
+        return audioSystem;
+    }
+
+    public SpriteBatch getSpriteBatch() {
+        return spriteBatch;
+    }
+
+    public ShapeRenderer getShapeRenderer() {
+        return shapeRenderer;
+    }
 }

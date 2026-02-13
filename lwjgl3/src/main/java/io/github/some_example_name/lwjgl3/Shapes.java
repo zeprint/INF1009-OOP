@@ -15,23 +15,28 @@ public class Shapes extends Entity {
     private ShapeType shapeType;
     private final ObjectMap<String, Float> dimensions;
 
-    /** Default constructor (origin 0,0, no shape type set). */
+    /* Default constructor (origin 0,0, no shape type set). */
     public Shapes() {
         super(0f, 0f);
         this.dimensions = new ObjectMap<>();
     }
 
-    /** Static shape at (x, y) with a given type and colour. */
+    /* Static shape at (x, y) with a given type and colour. */
     public Shapes(ShapeType shapeType, float x, float y, Color color) {
         super(x, y);
-        this.shapeType  = shapeType;
-        this.color      = color;
+        this.shapeType = shapeType;
+        this.color = color;
         this.dimensions = new ObjectMap<>();
     }
 
-    public ShapeType getShapeType() { return shapeType; }
+    public ShapeType getShapeType() {
+        return shapeType;
+    }
 
-    public void  setDimensions(String key, float value) { dimensions.put(key, value); }
+    public void setDimensions(String key, float value) {
+        dimensions.put(key, value);
+    }
+
     public float getDimension(String key) {
         Float v = dimensions.get(key);
         return (v != null) ? v : 0f;
@@ -56,11 +61,13 @@ public class Shapes extends Entity {
             case TRIANGLE:
                 float s = getDimension("size");
                 shape.triangle(
-                    getX(),              getY(),
-                    getX() + s,          getY(),
-                    getX() + (s / 2f),   getY() + s
+                    getX(), getY(),
+                    getX() + s, getY(),
+                    getX() + (s / 2f), getY() + s
                 );
+
                 break;
+                
         }
     }
 }

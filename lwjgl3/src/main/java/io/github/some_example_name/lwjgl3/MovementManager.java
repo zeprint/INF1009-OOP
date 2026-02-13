@@ -51,7 +51,15 @@ public class MovementManager implements IMovementSystem {
         }
     }
 
-    public int getComponentCount()                  { return components.size;        }
-    public void clearComponents()                   { components.clear();            }
-    public Array<MovementComponent> getAllComponents() { return new Array<>(components); }
+    public int getComponentCount() {
+        return components.size;
+    }
+
+    public void clearComponents() {
+        components.clear();
+    }
+
+    public Array<MovementComponent> getAllComponents() {
+        return new Array<>(components);
+    }
 }

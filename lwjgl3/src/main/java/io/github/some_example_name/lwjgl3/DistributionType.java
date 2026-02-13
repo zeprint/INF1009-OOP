@@ -10,10 +10,10 @@ package io.github.some_example_name.lwjgl3;
  */
 public interface DistributionType {
 
-    /** Generate and return the next random value within the configured range. */
+    /* Generate and return the next random value within the configured range. */
     float next();
 
-    /** Set the inclusive [min, max] range for generation. */
+    /* Set the inclusive [min, max] range for generation. */
     void setRange(float min, float max);
 
     float getMin();

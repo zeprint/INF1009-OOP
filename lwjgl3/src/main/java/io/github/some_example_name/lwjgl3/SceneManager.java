@@ -9,14 +9,14 @@ import com.badlogic.gdx.utils.ObjectMap;
  */
 public class SceneManager implements ISceneSystem {
 
-    private final ObjectMap<String, Scene>   scenes;
+    private final ObjectMap<String, Scene> scenes;
     private final ObjectMap<String, Boolean> createdScenes;
     private Scene currentScene;
 
     public SceneManager() {
-        scenes        = new ObjectMap<>();
+        scenes = new ObjectMap<>();
         createdScenes = new ObjectMap<>();
-        currentScene  = null;
+        currentScene = null;
     }
 
     // --- Registration ---
@@ -92,6 +92,11 @@ public class SceneManager implements ISceneSystem {
     // --- Query ---
 
     @Override
-    public Scene   getCurrentScene()       { return currentScene; }
-    public boolean hasScene(String name)   { return name != null && scenes.containsKey(name); }
+    public Scene getCurrentScene() {
+        return currentScene;
+    }
+
+    public boolean hasScene(String name) {
+        return name != null && scenes.containsKey(name);
+    }
 }
