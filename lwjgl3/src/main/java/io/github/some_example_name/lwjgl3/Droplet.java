@@ -13,9 +13,6 @@ import com.badlogic.gdx.math.Rectangle;
  * Collision behaviour:
  *  - Bucket collision  → reset to top of screen (caught)
  *  - Any other entity  → bounce off (reverse fall velocity)
- *
- * FIX: Caches the Rectangle returned by getBounds() to avoid allocating
- * a new object every frame during collision checks.
  */
 public class Droplet extends TextureObject implements Collidable {
 

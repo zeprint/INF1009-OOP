@@ -10,8 +10,6 @@ import com.badlogic.gdx.math.Rectangle;
  * so the CollisionManager can detect bucket-droplet collisions.
  * On collision, plays a click sound via IAudioSystem (DIP).
  *
- * FIX: Caches the Rectangle returned by getBounds() to avoid allocating
- * a new object every frame during collision checks.
  */
 public class Bucket extends TextureObject implements Collidable {
 

@@ -18,7 +18,10 @@ public class MovementManager implements IMovementSystem {
 
     @Override
     public void registerComponent(MovementComponent component) {
-        if (component != null && !components.contains(component, true)) {
+        if (component == null) {
+            throw new IllegalArgumentException("component cannot be null");
+        }
+        if (!components.contains(component, true)) {
             components.add(component);
         }
     }
@@ -38,6 +41,9 @@ public class MovementManager implements IMovementSystem {
 
     @Override
     public void update(float deltaTime) {
+        if (Float.isNaN(deltaTime) || Float.isInfinite(deltaTime) || deltaTime < 0f) {
+            throw new IllegalArgumentException("deltaTime must be a finite, non-negative value");
+        }
         for (MovementComponent c : components) {
             if (c.isEnabled()) {
                 c.update(deltaTime);
