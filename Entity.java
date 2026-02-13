@@ -28,6 +28,7 @@ public abstract class Entity{
         return color;
     }
     public void setColor(Color c) {
+        if (c == null) throw new IllegalArgumentException("Entity color cannot be null");
         color = c;
     }
     
