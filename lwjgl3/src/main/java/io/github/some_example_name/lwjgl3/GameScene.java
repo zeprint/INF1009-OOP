@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 
 /**
@@ -213,13 +214,20 @@ public class GameScene extends SimulationScene {
     }
 
     /**
-     * Reverses the droplet's velocity and separates it from the shape
-     * to prevent repeated collision triggers on the same frame.
+     * Reverses the droplet's velocity with energy damping and separates it
+     * from the shape. Gravity (configured in GravityMovement) naturally
+     * decelerates the upward bounce and pulls the droplet back down.
      */
     private void bounceDropletOffShape(Droplet droplet, GravityMovement gm,
                                         Rectangle sBounds) {
         float vx = gm.getVelocityX();
         float vy = gm.getVelocityY();
+
+        // Energy damping — droplet loses speed on each bounce (realistic)
+        float damping = 0.65f;
+
+        // Random horizontal kick for a natural-looking arc to one side
+        float kickX = MathUtils.random(-80f, 80f);
 
         // Determine overlap on each axis for minimum-separation direction
         float overlapX = Math.min(
@@ -230,18 +238,15 @@ public class GameScene extends SimulationScene {
                 sBounds.y + sBounds.height - droplet.getY());
 
         if (overlapX < overlapY) {
-            // Horizontal collision — reverse X, nudge sideways
+            // Horizontal collision — reverse X with damping, nudge sideways
             float centerDX = droplet.getX() - (sBounds.x + sBounds.width / 2f);
-            gm.setVelocity(-vx, vy);
+            gm.setVelocity(-vx * damping, vy);
             droplet.setX(droplet.getX() + (centerDX > 0 ? overlapX : -overlapX));
         } else {
-            // Vertical collision — reverse Y, nudge up/down
+            // Vertical collision — reverse Y with damping + random sideways kick
             float centerDY = droplet.getY() - (sBounds.y + sBounds.height / 2f);
-            float newVy = -vy;
-            if (Math.abs(newVy) < 50f) {
-                newVy = (newVy >= 0f) ? 50f : -50f;
-            }
-            gm.setVelocity(vx, newVy);
+            float newVy = -vy * damping;
+            gm.setVelocity(vx + kickX, newVy);
             droplet.setY(droplet.getY() + (centerDY > 0 ? overlapY : -overlapY));
         }
     }
@@ -283,13 +288,13 @@ public class GameScene extends SimulationScene {
                                     DROPLET_SIZE, DROPLET_SIZE, screenH + 40f);
             d.setXDistribution(new MobileRandom(20f, screenW - DROPLET_SIZE - 20f));
 
-            // GravityMovement makes each droplet fall continuously
-            GravityMovement gm = new GravityMovement(d, 0f);  // no gravity accel
-            gm.setVelocity(0f, -(120f + i * 30f));            // varying fall speeds
+            // GravityMovement with real gravity for natural bounce physics
+            GravityMovement gm = new GravityMovement(d, -300f); // gravity pulls downward
+            gm.setVelocity(0f, -(80f + i * 20f));               // gentler initial speed
             gm.setVerticalBounds(-50f, screenH + 40f);
             gm.setHorizontalResetRange(20f, screenW - DROPLET_SIZE - 20f);
-            gm.setSpeedMultiplier(1f);                         // constant speed on reset
-            gm.setMaxDropSpeed(300f);
+            gm.setSpeedMultiplier(1f);
+            gm.setMaxDropSpeed(400f);                            // cap prevents runaway
 
             // Link the movement component to the droplet for bounce access
             d.setGravityMovement(gm);
