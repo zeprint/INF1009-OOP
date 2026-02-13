@@ -4,7 +4,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.graphics.Color;
 
 // Movement Manager class for movement component lifecycle and updates (SRP: Component management) 
-public class MovementManager {
+public class MovementManager implements IMovement {
     private Array<MovementComponent> components;
     
     // Initialises the empty list of movement components 

@@ -90,6 +90,12 @@ public class GravityMovement extends MovementComponent implements Acceleratable 
 
     // Configures vertical bounds for reset behavior 
     public void setVerticalBounds(float bottomBoundaryY, float resetTopY) {
+        if (!Float.isFinite(bottomBoundaryY) || !Float.isFinite(resetTopY)) {
+            throw new IllegalArgumentException("Boundary values must be finite numbers");
+        }
+        if (resetTopY <= bottomBoundaryY) {
+            throw new IllegalArgumentException("Reset top Y must be greater than bottom boundary Y");
+        }
         this.bottomBoundaryY = bottomBoundaryY;
         this.resetTopY = resetTopY;
         this.boundsConfigured = true;
@@ -97,6 +103,12 @@ public class GravityMovement extends MovementComponent implements Acceleratable 
 
     // Configures horizontal reset range for randomized spawn positions 
     public void setHorizontalResetRange(float minX, float maxX) {
+        if (!Float.isFinite(minX) || !Float.isFinite(maxX)) {
+            throw new IllegalArgumentException("Reset range values must be finite numbers");
+        }
+        if (maxX < minX) {
+            throw new IllegalArgumentException("Maximum X must be greater than or equal to minimum X");
+        }
         this.resetMinX = minX;
         this.resetMaxX = maxX;
         this.resetXConfigured = true;
@@ -105,17 +117,32 @@ public class GravityMovement extends MovementComponent implements Acceleratable 
 
     // Sets maximum drop speed cap 
     public void setMaxDropSpeed(float maxDropSpeed) {
+        if (!Float.isFinite(maxDropSpeed)) {
+            throw new IllegalArgumentException("Max drop speed must be a finite number");
+        }
+        if (maxDropSpeed <= 0) {
+            throw new IllegalArgumentException("Max drop speed must be positive");
+        }
         this.maxDropSpeed = maxDropSpeed;
     }
 
     // Sets speed multiplier applied on each reset 
     public void setSpeedMultiplier(float speedMultiplier) {
+        if (!Float.isFinite(speedMultiplier)) {
+            throw new IllegalArgumentException("Speed multiplier must be a finite number");
+        }
+        if (speedMultiplier < 0) {
+            throw new IllegalArgumentException("Speed multiplier cannot be negative");
+        }
         this.speedMultiplier = speedMultiplier;
     }
 
     
     // Sets the acceleration affecting this entity 
     public void setAcceleration(float accelerationX, float accelerationY) {
+        if (!Float.isFinite(accelerationX) || !Float.isFinite(accelerationY)) {
+            throw new IllegalArgumentException("Acceleration values must be finite numbers");
+        }
         this.accelerationX = accelerationX;
         this.accelerationY = accelerationY;
     }
@@ -134,6 +161,9 @@ public class GravityMovement extends MovementComponent implements Acceleratable 
     
     // Sets gravity value 
     public void setGravity(float gravity) {
+        if (!Float.isFinite(gravity)) {
+            throw new IllegalArgumentException("Gravity must be a finite number");
+        }
         this.gravity = gravity;
     }
     

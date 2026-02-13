@@ -10,6 +10,9 @@ public abstract class MovementComponent {
     protected boolean enabled;
     
     public MovementComponent(Entity entity) {
+        if (entity == null) {
+            throw new IllegalArgumentException("Entity cannot be null");
+        }
         this.entity = entity;
         this.velocityX = DEFAULT_VELOCITY;
         this.velocityY = DEFAULT_VELOCITY;
@@ -21,6 +24,9 @@ public abstract class MovementComponent {
     
     // Sets the velocity of the entities 
     public void setVelocity(float velocityX, float velocityY) {
+        if (!Float.isFinite(velocityX) || !Float.isFinite(velocityY)) {
+            throw new IllegalArgumentException("Velocity values must be finite numbers");
+        }
         this.velocityX = velocityX;
         this.velocityY = velocityY;
     }

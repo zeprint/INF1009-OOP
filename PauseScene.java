@@ -27,8 +27,9 @@ public class PauseScene extends Scene {
 
     @Override
     public void update(float dt) {
-        // Press P or ESC to Resume
-        if (Gdx.input.isKeyJustPressed(Input.Keys.P) || Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+        // Press P to Resume
+        if (Gdx.input.isKeyJustPressed(Input.Keys.P)) {
+            Gdx.app.log("PauseScene", "Resume key pressed - switching to simulation");
             if (sceneManager != null) {
                 sceneManager.loadScene("simulation");
             }
@@ -62,7 +63,7 @@ public class PauseScene extends Scene {
 
         String text2 = "(Press P to Resume)";
         layout.setText(font, text2);
-        float w2 = layout.width;
+        float w2 = layout.width; // Updated: P key only
 
         font.draw(batch, text1, (viewport.getWorldWidth() - w1) / 2, (viewport.getWorldHeight() / 2) + h1 + 20);
         font.draw(batch, text2, (viewport.getWorldWidth() - w2) / 2, (viewport.getWorldHeight() / 2) - 20);

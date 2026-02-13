@@ -41,12 +41,6 @@ public class RotationComponent extends MovementComponent implements Rotatable {
         // Normalises rotation angle to 0-360 degrees
         normaliseRotationAngle();
         
-        // Updates entity's rotation angle representation
-        Entity entity = getEntity();
-        if (entity != null) {
-            ((RotatingShape) entity).setRotationAngle(rotationAngle);
-        }
-        
         // Applies velocity to position
         updateEntityPosition(deltaTime);
     }
@@ -70,6 +64,9 @@ public class RotationComponent extends MovementComponent implements Rotatable {
     
     // Sets entity's angular velocity 
     public void setAngularVelocity(float angularVelocity) {
+        if (!Float.isFinite(angularVelocity)) {
+            throw new IllegalArgumentException("Angular velocity must be a finite number");
+        }
         this.angularVelocity = angularVelocity;
     }
     
@@ -81,6 +78,9 @@ public class RotationComponent extends MovementComponent implements Rotatable {
     
     // Sets entity's rotation angle 
     public void setRotationAngle(float rotationAngle) {
+        if (!Float.isFinite(rotationAngle)) {
+            throw new IllegalArgumentException("Rotation angle must be a finite number");
+        }
         this.rotationAngle = rotationAngle;
         normaliseRotationAngle();
     }
@@ -93,6 +93,7 @@ public class RotationComponent extends MovementComponent implements Rotatable {
     // Sets velocity for component 
     @Override
     public void setVelocity(float velocityX, float velocityY) {
+        // Validation handled by parent class
         super.setVelocity(velocityX, velocityY);
     }
 }

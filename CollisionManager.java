@@ -3,7 +3,7 @@ package io.github.some_example_name.lwjgl3;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Array;
 
-public class CollisionManager {
+public class CollisionManager implements ICollisionSystem {
 
     private final Array<Collidable> collidables = new Array<>();
 

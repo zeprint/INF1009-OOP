@@ -1,21 +1,22 @@
 package io.github.some_example_name.lwjgl3;
 
-import java.util.HashMap;
-import java.util.Map;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.utils.ObjectMap;
 
 public class SceneManager {
     private Scene currentScene;
     private Scene backgroundScene; // Holds the game scene when paused
-    private Map<String, Scene> scenes;
+    private ObjectMap<String, Scene> scenes;
     public SpriteBatch batch;
+    private boolean sceneChangedThisFrame; // Track scene transitions
 
     public SceneManager() {
-        this.scenes = new HashMap<>();
+        this.scenes = new ObjectMap<>();
         this.currentScene = null;
         this.backgroundScene = null;
         this.batch = new SpriteBatch();
+        this.sceneChangedThisFrame = false;
     }
 
     public void addScene(String name, Scene scene) {
@@ -32,6 +33,12 @@ public class SceneManager {
             Gdx.app.error("SceneManager", "Scene not found: " + name);
             return;
         }
+
+        // Debug logging
+        Gdx.app.log("SceneManager", "Switching" + " to " + name);
+
+        // Mark that scene changed this frame
+        sceneChangedThisFrame = true;
 
         // 1. If switching TO pause, keep the current simulation visible in background
         if (name.equals("pause") && currentScene != null) {
@@ -54,7 +61,14 @@ public class SceneManager {
         return currentScene;
     }
 
+    public boolean hasSceneChangedThisFrame() {
+        return sceneChangedThisFrame;
+    }
+
     public void update(float dt) {
+        // Reset scene change flag at start of frame
+        sceneChangedThisFrame = false;
+        
         if (currentScene != null) {
             currentScene.update(dt);
         }

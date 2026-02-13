@@ -28,7 +28,7 @@ public class SimulationScene extends Scene {
     private TextureObject bucket;
     private Shapes staticCircle;
     private Shapes dynamicTriangle;
-    private RotatingShape rotatingSquare;
+    private Shapes rotatingSquare;
 
     // Droplet System
     private Array<TextureObject> activeDroplets;
@@ -167,8 +167,9 @@ public class SimulationScene extends Scene {
     }
 
     private void initializeRotatingSquare() {
-        rotatingSquare = new RotatingShape(350f, 450f, 25f, Color.YELLOW, false);
-        rotatingSquare.setIsSquare(true);
+        rotatingSquare = new Shapes(ShapeType.RECTANGLE, 350f, 450f, Color.YELLOW);
+        rotatingSquare.setDimensions("width", 50f);
+        rotatingSquare.setDimensions("height", 50f);
         entityManager.addEntity(rotatingSquare);
 
         RotationComponent rot = new RotationComponent(rotatingSquare, 0f);
@@ -178,7 +179,7 @@ public class SimulationScene extends Scene {
         Collidable col = new Collidable() {
             @Override
             public Rectangle getBounds() {
-                return new Rectangle(rotatingSquare.getX() - 25, rotatingSquare.getY() - 25, 50, 50);
+                return new Rectangle(rotatingSquare.getX(), rotatingSquare.getY(), 50, 50);
             }
 
             @Override
