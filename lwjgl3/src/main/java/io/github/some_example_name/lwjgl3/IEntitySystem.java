@@ -16,20 +16,20 @@ import com.badlogic.gdx.utils.Array;
 public interface IEntitySystem {
 
     /* Register an entity for management. */
-    void addEntity(Entity entity);
+    boolean addEntity(Entity entity);
 
     /* Remove an entity. */
-    void removeEntity(Entity entity, boolean identity);
+    boolean removeEntity(Entity entity, boolean identity);
 
     /** @return direct reference to the entity list. */
     Array<Entity> getEntityList();
 
     /* Update all managed entities. */
-    void update(float deltaTime);
+    boolean update(float deltaTime);
 
     /* Draw all entities using whichever renderer is currently active. */
-    void draw(SpriteBatch batch, ShapeRenderer shape);
+    boolean draw(SpriteBatch batch, ShapeRenderer shape);
 
     /* Dispose every entity then clear the list. */
-    void dispose();
+    boolean dispose();
 }

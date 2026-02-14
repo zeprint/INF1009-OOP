@@ -11,15 +11,11 @@ package io.github.some_example_name.lwjgl3;
 public interface IEntity {
 
     /* One-time setup after construction (e.g. load resources, configure state). */
-    void initialize();
+    boolean initialize();
 
-    /**
-     * Advance this object's internal state by one frame.
-     *
-     * @param deltaTime Seconds elapsed since the previous frame.
-     */
-    void update(float deltaTime);
+    /* Advance this object's internal state by one frame. */
+    boolean update(float deltaTime);
 
     /* Release native resources (textures, sounds, etc.). */
-    void dispose();
+    boolean dispose();
 }

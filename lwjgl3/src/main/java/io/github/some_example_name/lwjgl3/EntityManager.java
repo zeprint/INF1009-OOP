@@ -1,5 +1,6 @@
 package io.github.some_example_name.lwjgl3;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -10,7 +11,10 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
  * Rendering contract: SpriteBatch and ShapeRenderer cannot both be active
  * simultaneously. Callers begin/end renderers; EntityManager checks isDrawing().
  */
+
 public class EntityManager implements IEntitySystem {
+
+    private static final String TAG = "EntityManager";
 
     private final Array<Entity> entityList;
 
@@ -20,21 +24,33 @@ public class EntityManager implements IEntitySystem {
 
     // --- Lifecycle ---
 
-    /* Register an entity. Null entities are silently ignored. */
     @Override
-    public void addEntity(Entity entity) {
-        if (entity != null) {
-            entityList.add(entity);
+    public boolean addEntity(Entity entity) {
+        if (entity == null) {
+            Gdx.app.error(TAG, "addEntity rejected null entity");
+            return false;
         }
+        if (entityList.contains(entity, true)) {
+            Gdx.app.error(TAG, "addEntity rejected duplicate entity: " + entity);
+            return false;
+        }
+        entityList.add(entity);
+        return true;
     }
 
-    /* Remove an entity. identity=true uses reference equality. */
     @Override
-    public void removeEntity(Entity entity, boolean identity) {
-        entityList.removeValue(entity, identity);
+    public boolean removeEntity(Entity entity, boolean identity) {
+        if (entity == null) {
+            Gdx.app.error(TAG, "removeEntity rejected null entity");
+            return false;
+        }
+        boolean removed = entityList.removeValue(entity, identity);
+        if (!removed) {
+            Gdx.app.error(TAG, "removeEntity could not find entity: " + entity);
+        }
+        return removed;
     }
 
-    /* Direct reference to the entity list. */
     @Override
     public Array<Entity> getEntityList() {
         return entityList;
@@ -43,35 +59,67 @@ public class EntityManager implements IEntitySystem {
     // --- Per-frame update ---
 
     @Override
-    public void update(float deltaTime) {
-        for (Entity entity : entityList) {
-            entity.update(deltaTime);
+    public boolean update(float deltaTime) {
+        if (!Float.isFinite(deltaTime) || deltaTime < 0f) {
+            Gdx.app.error(TAG, "update rejected invalid deltaTime: " + deltaTime);
+            return false;
         }
+
+        boolean allSucceeded = true;
+        for (Entity entity : entityList) {
+            try {
+                if (!entity.update(deltaTime)) {
+                    allSucceeded = false;
+                }
+            } catch (Exception e) {
+                Gdx.app.error(TAG, "Exception updating entity: " + entity, e);
+                allSucceeded = false;
+            }
+        }
+        return allSucceeded;
     }
 
     // --- Rendering ---
 
-    /* Draw all entities using whichever renderer is currently active. */
     @Override
-    public void draw(SpriteBatch batch, ShapeRenderer shape) {
+    public boolean draw(SpriteBatch batch, ShapeRenderer shape) {
+        boolean allSucceeded = true;
         for (Entity entity : entityList) {
-            if (batch != null && batch.isDrawing()) {
-                entity.draw(batch);
-            }
-            if (shape != null && shape.isDrawing()) {
-                entity.draw(shape);
+            try {
+                if (batch != null && batch.isDrawing()) {
+                    if (!entity.draw(batch)) {
+                        allSucceeded = false;
+                    }
+                }
+                if (shape != null && shape.isDrawing()) {
+                    if (!entity.draw(shape)) {
+                        allSucceeded = false;
+                    }
+                }
+            } catch (Exception e) {
+                Gdx.app.error(TAG, "Exception drawing entity: " + entity, e);
+                allSucceeded = false;
             }
         }
+        return allSucceeded;
     }
 
     // --- Shutdown ---
 
-    /* Dispose every entity then clear the list. */
     @Override
-    public void dispose() {
+    public boolean dispose() {
+        boolean allSucceeded = true;
         for (Entity entity : entityList) {
-            entity.dispose();
+            try {
+                if (!entity.dispose()) {
+                    allSucceeded = false;
+                }
+            } catch (Exception e) {
+                Gdx.app.error(TAG, "Exception disposing entity: " + entity, e);
+                allSucceeded = false;
+            }
         }
         entityList.clear();
+        return allSucceeded;
     }
 }

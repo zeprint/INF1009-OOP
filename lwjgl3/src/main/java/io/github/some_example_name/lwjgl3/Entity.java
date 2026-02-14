@@ -1,5 +1,6 @@
 package io.github.some_example_name.lwjgl3;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -11,13 +12,20 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
  * EntityManager can iterate a single typed list for drawing and updating.
  * Subclasses override only the methods they need.
  */
+
 public abstract class Entity implements Renderable, IEntity {
+
+    private static final String TAG = "Entity";
 
     protected float posX;
     protected float posY;
     protected Color color;
 
     public Entity(float x, float y) {
+        if (!Float.isFinite(x) || !Float.isFinite(y)) {
+            throw new IllegalArgumentException(
+                "Entity position must be finite: x=" + x + ", y=" + y);
+        }
         this.posX = x;
         this.posY = y;
         this.color = Color.WHITE;
@@ -29,51 +37,78 @@ public abstract class Entity implements Renderable, IEntity {
         return posX;
     }
 
-    public void setX(float x) {
+    public boolean setX(float x) {
+        if (!Float.isFinite(x)) {
+            Gdx.app.error(TAG, "setX rejected non-finite value: " + x);
+            return false;
+        }
         posX = x;
+        return true;
     }
 
     public float getY() {
         return posY;
     }
 
-    public void  setY(float y) {
+    public boolean setY(float y) {
+        if (!Float.isFinite(y)) {
+            Gdx.app.error(TAG, "setY rejected non-finite value: " + y);
+            return false;
+        }
         posY = y;
+        return true;
     }
 
     // --- Color ---
 
-    public Color getColor() { 
+    public Color getColor() {
         return color;
     }
 
-    public void  setColor(Color c) {
+    public boolean setColor(Color c) {
+        if (c == null) {
+            Gdx.app.error(TAG, "setColor rejected null colour");
+            return false;
+        }
         color = c;
+        return true;
     }
 
-    // --- Renderable (no-op defaults) ---
+    // --- Renderable (safe no-op defaults) ---
 
     @Override
-    public void draw(SpriteBatch batch) {
+    public boolean draw(SpriteBatch batch) {
         /* override in texture subclasses */
+        return false;
     }
 
     @Override
-    public void draw(ShapeRenderer shape) {
+    public boolean draw(ShapeRenderer shape) {
         /* override in shape subclasses */
+        return false;
     }
 
-    // --- IEntity lifecycle (no-op defaults) ---
+    // --- IEntity lifecycle (safe no-op defaults) ---
 
-    @Override public void initialize() {
+    @Override
+    public boolean initialize() {
         /* override for one-time setup */
+        return true;
     }
 
-    @Override public void update(float deltaTime) { 
-        /* override if per-frame logic */
+    @Override
+    public boolean update(float deltaTime) {
+        if (!Float.isFinite(deltaTime) || deltaTime < 0f) {
+            Gdx.app.error(TAG, "update rejected invalid deltaTime: " + deltaTime);
+            return false;
+        }
+        /* override if per-frame logic is needed */
+        return true;
     }
 
-    @Override public void dispose() {
+      @Override
+    public boolean dispose() {
         /* override to release resources */
+        return true;
     }
 }

@@ -1,5 +1,6 @@
 package io.github.some_example_name.lwjgl3;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.ObjectMap;
@@ -10,20 +11,29 @@ import com.badlogic.gdx.utils.ObjectMap;
  * Dimensions are stored in a flexible String-keyed map so different
  * shape types can declare their own required keys (e.g. "radius", "width").
  */
+
 public class Shapes extends Entity {
+
+    private static final String TAG = "Shapes";
 
     private ShapeType shapeType;
     private final ObjectMap<String, Float> dimensions;
 
-    /* Default constructor (origin 0,0, no shape type set). */
     public Shapes() {
         super(0f, 0f);
         this.dimensions = new ObjectMap<>();
     }
 
-    /* Static shape at (x, y) with a given type and colour. */
     public Shapes(ShapeType shapeType, float x, float y, Color color) {
         super(x, y);
+
+        if (shapeType == null) {
+            throw new IllegalArgumentException("Shapes shapeType must not be null");
+        }
+        if (color == null) {
+            throw new IllegalArgumentException("Shapes colour must not be null");
+        }
+
         this.shapeType = shapeType;
         this.color = color;
         this.dimensions = new ObjectMap<>();
@@ -33,11 +43,24 @@ public class Shapes extends Entity {
         return shapeType;
     }
 
-    public void setDimensions(String key, float value) {
+    public boolean setDimensions(String key, float value) {
+        if (key == null || key.isEmpty()) {
+            Gdx.app.error(TAG, "setDimensions rejected null/empty key");
+            return false;
+        }
+        if (!Float.isFinite(value)) {
+            Gdx.app.error(TAG, "setDimensions rejected non-finite value for key '" + key + "': " + value);
+            return false;
+        }
         dimensions.put(key, value);
+        return true;
     }
 
     public float getDimension(String key) {
+        if (key == null || key.isEmpty()) {
+            Gdx.app.error(TAG, "getDimension called with null/empty key");
+            return 0f;
+        }
         Float v = dimensions.get(key);
         return (v != null) ? v : 0f;
     }
@@ -45,29 +68,46 @@ public class Shapes extends Entity {
     // --- Renderable ---
 
     @Override
-    public void draw(ShapeRenderer shape) {
-        if (shapeType == null) return;          // guard against uninitialised type
-        if (color != null) shape.setColor(color);
+    public boolean draw(ShapeRenderer shape) {
+        if (shape == null) {
+            return false;
+        }
+        if (shapeType == null) {
+            Gdx.app.error(TAG, "draw skipped: shapeType is null");
+            return false;
+        }
 
-        switch (shapeType) {
-            case CIRCLE:
-                shape.circle(getX(), getY(), getDimension("radius"));
-                break;
+        try {
+            if (color != null) {
+                shape.setColor(color);
+            }
 
-            case RECTANGLE:
-                shape.rect(getX(), getY(), getDimension("width"), getDimension("height"));
-                break;
+            switch (shapeType) {
+                case CIRCLE:
+                    shape.circle(getX(), getY(), getDimension("radius"));
+                    break;
 
-            case TRIANGLE:
-                float s = getDimension("size");
-                shape.triangle(
-                    getX(), getY(),
-                    getX() + s, getY(),
-                    getX() + (s / 2f), getY() + s
-                );
+                case RECTANGLE:
+                    shape.rect(getX(), getY(), getDimension("width"), getDimension("height"));
+                    break;
 
-                break;
-                
+                case TRIANGLE:
+                    float s = getDimension("size");
+                    shape.triangle(
+                        getX(), getY(),
+                        getX() + s, getY(),
+                        getX() + (s / 2f), getY() + s
+                    );
+                    break;
+
+                default:
+                    Gdx.app.error(TAG, "draw: unhandled ShapeType " + shapeType);
+                    return false;
+            }
+            return true;
+        } catch (Exception e) {
+            Gdx.app.error(TAG, "Exception during draw", e);
+            return false;
         }
     }
 }

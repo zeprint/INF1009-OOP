@@ -15,8 +15,8 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 public interface Renderable {
 
     /* Draw using a SpriteBatch (texture-based rendering). */
-    void draw(SpriteBatch batch);
+    boolean draw(SpriteBatch batch);
 
     /* Draw using a ShapeRenderer (primitive shape rendering). */
-    void draw(ShapeRenderer shape);
+    boolean draw(ShapeRenderer shape);
 }

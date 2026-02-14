@@ -1,5 +1,6 @@
 package io.github.some_example_name.lwjgl3;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
@@ -13,8 +14,12 @@ import com.badlogic.gdx.math.Rectangle;
  * Collision behaviour:
  *  - Bucket collision  → reset to top of screen (caught)
  *  - Any other entity  → bounce off (reverse fall velocity)
+ *
+ * Change: width and height parameters are now float to match TextureObject.
  */
 public class Droplet extends TextureObject implements Collidable {
+
+    private static final String TAG = "Droplet";
 
     private final CollisionType collisionType;
     private final float resetY;
@@ -24,8 +29,24 @@ public class Droplet extends TextureObject implements Collidable {
     /** Reference to the GravityMovement driving this droplet (for bounce). */
     private GravityMovement gravityMovement;
 
-    public Droplet(Texture texture, float x, float y, int width, int height, float resetY) {
+    /**
+     * Create a new droplet entity.
+     *
+     * @param texture Texture to render. Must not be {@code null}.
+     * @param x       Initial X position. Must be finite.
+     * @param y       Initial Y position. Must be finite.
+     * @param width   Width in pixels. Must be finite and positive.
+     * @param height  Height in pixels. Must be finite and positive.
+     * @param resetY  Y position to reset to when caught by the bucket. Must be finite.
+     * @throws IllegalArgumentException if any parameter is invalid.
+     */
+    public Droplet(Texture texture, float x, float y, float width, float height, float resetY) {
         super(texture, x, y, height, width);
+
+        if (!Float.isFinite(resetY)) {
+            throw new IllegalArgumentException("Droplet resetY must be finite: " + resetY);
+        }
+
         this.resetY        = resetY;
         this.collisionType = new CollisionType("droplet", false, true);
         this.bounds        = new Rectangle(x, y, width, height);
@@ -73,7 +94,7 @@ public class Droplet extends TextureObject implements Collidable {
             float vx = gravityMovement.getVelocityX();
             float vy = gravityMovement.getVelocityY();
 
-            // Energy damping — lose speed on each bounce (realistic)
+            // Energy damping – lose speed on each bounce (realistic)
             float damping = 0.65f;
 
             // Random horizontal kick for a natural-looking arc to one side

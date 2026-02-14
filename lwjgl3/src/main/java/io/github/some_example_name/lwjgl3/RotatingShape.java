@@ -1,5 +1,6 @@
 package io.github.some_example_name.lwjgl3;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
@@ -9,11 +10,11 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
  * OCP FIX: Uses ShapeType enum instead of boolean flags (isCircle, isSquare).
  * Adding a new shape type only requires a new enum value and a new case in draw(),
  * rather than adding another boolean and restructuring if-else chains.
- *
- * Also implements HasRotation so that RotationComponent can set the angle
- * via the interface rather than an unsafe cast (LSP fix).
  */
+
 public class RotatingShape extends Entity implements HasRotation {
+
+    private static final String TAG = "RotatingShape";
 
     private float radius;
     private ShapeType shapeType;
@@ -21,6 +22,18 @@ public class RotatingShape extends Entity implements HasRotation {
 
     public RotatingShape(float x, float y, float radius, Color color, ShapeType shapeType) {
         super(x, y);
+
+        if (!Float.isFinite(radius) || radius <= 0f) {
+            throw new IllegalArgumentException(
+                "RotatingShape radius must be finite and positive: " + radius);
+        }
+        if (color == null) {
+            throw new IllegalArgumentException("RotatingShape colour must not be null");
+        }
+        if (shapeType == null) {
+            throw new IllegalArgumentException("RotatingShape shapeType must not be null");
+        }
+
         this.radius = radius;
         this.color = color;
         this.shapeType = shapeType;
@@ -33,23 +46,38 @@ public class RotatingShape extends Entity implements HasRotation {
         return radius;
     }
 
-    public void setRadius(float r) {
+    public boolean setRadius(float r) {
+        if (!Float.isFinite(r) || r <= 0f) {
+            Gdx.app.error(TAG, "setRadius rejected invalid value: " + r);
+            return false;
+        }
         radius = r;
+        return true;
     }
 
     public ShapeType getShapeType() {
         return shapeType;
     }
 
-    public void setShapeType(ShapeType type) {
+    public boolean setShapeType(ShapeType type) {
+        if (type == null) {
+            Gdx.app.error(TAG, "setShapeType rejected null type");
+            return false;
+        }
         shapeType = type;
+        return true;
     }
 
     // --- HasRotation ---
 
     @Override
-    public void setRotationAngle(float angle) {
-        this.rotationAngle = angle;
+    public boolean setRotationAngle(float angle) {
+        if (!Float.isFinite(angle)) {
+            Gdx.app.error(TAG, "setRotationAngle rejected non-finite value: " + angle);
+            return false;
+        }
+        this.rotationAngle = ((angle % 360f) + 360f) % 360f;
+        return true;
     }
 
     @Override
@@ -60,22 +88,36 @@ public class RotatingShape extends Entity implements HasRotation {
     // --- Renderable ---
 
     @Override
-    public void draw(ShapeRenderer shape) {
-        if (shapeType == null) return;
-        shape.setColor(color);
+    public boolean draw(ShapeRenderer shape) {
+        if (shape == null) {
+            return false;
+        }
+        if (shapeType == null) {
+            Gdx.app.error(TAG, "draw skipped: shapeType is null");
+            return false;
+        }
 
-        switch (shapeType) {
-            case CIRCLE:
-                shape.circle(posX, posY, radius);
-                break;
-            case SQUARE:
-                drawSquare(shape);
-                break;
-            case TRIANGLE:
-                drawTriangle(shape);
-                break;
-            default:
-                break;
+        try {
+            shape.setColor(color);
+
+            switch (shapeType) {
+                case CIRCLE:
+                    shape.circle(posX, posY, radius);
+                    break;
+                case SQUARE:
+                    drawSquare(shape);
+                    break;
+                case TRIANGLE:
+                    drawTriangle(shape);
+                    break;
+                default:
+                    Gdx.app.error(TAG, "draw: unhandled ShapeType " + shapeType);
+                    return false;
+            }
+            return true;
+        } catch (Exception e) {
+            Gdx.app.error(TAG, "Exception during draw", e);
+            return false;
         }
     }
 

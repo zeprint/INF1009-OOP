@@ -1,69 +1,126 @@
 package io.github.some_example_name.lwjgl3;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 /**
  * TextureObject - Entity rendered via a SpriteBatch texture.
  *
- * FIX: Added dispose() to release the Texture, preventing GPU resource leaks.
  */
+
 public class TextureObject extends Entity {
 
-    private Texture texture;
-    private int height;
-    private int width;
+    private static final String TAG = "TextureObject";
 
-    public TextureObject(Texture t, float x, float y, int h, int w) {
+    private Texture texture;
+    private float height;
+    private float width;
+    private boolean disposed;
+
+    public TextureObject(Texture t, float x, float y, float h, float w) {
         super(x, y);
+
+        if (t == null) {
+            throw new IllegalArgumentException("TextureObject texture must not be null");
+        }
+        if (!Float.isFinite(h) || h <= 0f) {
+            throw new IllegalArgumentException(
+                "TextureObject height must be finite and positive: " + h);
+        }
+        if (!Float.isFinite(w) || w <= 0f) {
+            throw new IllegalArgumentException(
+                "TextureObject width must be finite and positive: " + w);
+        }
+
         this.texture = t;
         this.height = h;
         this.width = w;
+        this.disposed = false;
     }
-
-    // --- Accessors ---
 
     public Texture getTexture() {
         return texture;
     }
 
-    public void setTexture(Texture t) {
+    public boolean setTexture(Texture t) {
+        if (t == null) {
+            Gdx.app.error(TAG, "setTexture rejected null texture");
+            return false;
+        }
+        if (disposed) {
+            Gdx.app.error(TAG, "setTexture rejected: entity is disposed");
+            return false;
+        }
         texture = t;
+        return true;
     }
 
-    public int getHeight() {
+    public float getHeight() {
         return height;
     }
 
-    public void setHeight(int h) {
+    public boolean setHeight(float h) {
+        if (!Float.isFinite(h) || h <= 0f) {
+            Gdx.app.error(TAG, "setHeight rejected invalid value: " + h);
+            return false;
+        }
         height = h;
+        return true;
     }
 
-    public int getWidth() {
+    public float getWidth() {
         return width;
     }
 
-    public void setWidth(int w) {
+    public boolean setWidth(float w) {
+        if (!Float.isFinite(w) || w <= 0f) {
+            Gdx.app.error(TAG, "setWidth rejected invalid value: " + w);
+            return false;
+        }
         width = w;
+        return true;
     }
 
     // --- Renderable ---
 
     @Override
-    public void draw(SpriteBatch batch) {
-        if (texture != null && batch != null) {
+    public boolean draw(SpriteBatch batch) {
+        if (batch == null || texture == null) {
+            return false;
+        }
+        if (disposed) {
+            Gdx.app.error(TAG, "draw skipped: entity is disposed");
+            return false;
+        }
+
+        try {
             batch.draw(texture, posX, posY, width, height);
+            return true;
+        } catch (Exception e) {
+            Gdx.app.error(TAG, "Exception during draw", e);
+            return false;
         }
     }
 
-    // --- Resource cleanup (FIX: was missing, caused GPU leak) ---
-
     @Override
-    public void dispose() {
-        if (texture != null) {
-            texture.dispose();
-            texture = null;
+    public boolean dispose() {
+        if (disposed) {
+            Gdx.app.error(TAG, "dispose called on already-disposed entity");
+            return false;
         }
-        super.dispose();
+
+        try {
+            if (texture != null) {
+                texture.dispose();
+                texture = null;
+            }
+            disposed = true;
+            return super.dispose();
+        } catch (Exception e) {
+            Gdx.app.error(TAG, "Exception during dispose", e);
+            disposed = true;
+            return false;
+        }
     }
 }

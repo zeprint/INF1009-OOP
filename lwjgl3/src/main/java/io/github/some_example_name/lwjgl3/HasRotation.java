@@ -12,7 +12,7 @@ package io.github.some_example_name.lwjgl3;
 public interface HasRotation {
 
     /* Set the visual rotation angle in degrees. */
-    void setRotationAngle(float angle);
+    boolean setRotationAngle(float angle);
 
     /** @return current visual rotation angle in degrees. */
     float getRotationAngle();
