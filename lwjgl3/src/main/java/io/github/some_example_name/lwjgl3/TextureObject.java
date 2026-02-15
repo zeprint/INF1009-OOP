@@ -5,9 +5,9 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 /**
- * TextureObject - Entity rendered via a SpriteBatch texture.
- *
- */
+* TextureObject - Entity rendered via a SpriteBatch texture.
+*
+*/
 
 public class TextureObject extends Entity {
 

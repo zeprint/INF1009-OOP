@@ -7,39 +7,37 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 /**
- * GameMaster - Core engine coordinator (non-contextual).
- *
- * Owns and initialises all engine managers, delegates the game loop,
- * and manages shared rendering resources.
- *
- * DIP: All managers are stored and exposed as interfaces so the
- * concrete implementations can be swapped without changing this class.
- *
- * SCENES: Manages two scenes: GameScene (play) and PauseScene (pause).
- * The game scene is always rendered; when paused, the PauseScene overlay
- * is drawn on top with a semi-transparent background.
- */
+* GameMaster - Core engine coordinator
+* Owns and initialises all engine managers, delegates the game loop,
+* and manages shared rendering resources.
+*
+* All managers are stored and exposed as interfaces so the
+* concrete implementations can be swapped without changing this class.
+*
+* SCENES manages 2 scenes, GameScene (play) and PauseScene (pause).
+* The game scene is always rendered when paused,
+* the PauseScene overlay is drawn on top with a semi-transparent background.
+*/
 public class GameMaster extends ApplicationAdapter {
 
-    // Engine managers (DIP: stored as interfaces)
-    private ISceneSystem     sceneSystem;
-    private IEntitySystem    entitySystem;
-    private IMovementSystem  movementSystem;
+    // Engine managers, stored as interfaces for DIP compliance
+    private ISceneSystem sceneSystem;
+    private IEntitySystem entitySystem;
+    private IMovementSystem movementSystem;
     private ICollisionSystem collisionSystem;
-    private IInputSystem     inputSystem;
-    private IAudioSystem     audioSystem;
+    private IInputSystem inputSystem;
+    private IAudioSystem audioSystem;
 
     // Shared rendering resources
-    private SpriteBatch   spriteBatch;
+    private SpriteBatch spriteBatch;
     private ShapeRenderer shapeRenderer;
 
     // Scene references for overlay rendering
-    private GameScene  gameScene;
+    private GameScene gameScene;
     private PauseScene pauseScene;
-    private boolean    paused = false;
+    private boolean paused = false;
 
-    // --- ApplicationAdapter lifecycle ---
-
+    // ApplicationAdapter lifecycle
     @Override
     public void create() {
         initRendering();
@@ -77,12 +75,12 @@ public class GameMaster extends ApplicationAdapter {
             pauseScene.render();
         }
     }
-
+    // Forward to scenes if they need to react
     @Override
     public void resize(int width, int height) {
-        // Forward to scenes if they need to react
+        // scene has full control over how to handle resize
     }
-
+    // dispose() is called when application is destoryed, dispose all resources to prevent memory leaks issue
     @Override
     public void dispose() {
         sceneSystem.dispose();
@@ -90,42 +88,34 @@ public class GameMaster extends ApplicationAdapter {
         spriteBatch.dispose();
         shapeRenderer.dispose();
     }
-
-    // --- Initialisation helpers ---
-
+    // called in create() to set up the engine before the game loop starts
     private void initRendering() {
-        spriteBatch   = new SpriteBatch();
+        spriteBatch = new SpriteBatch();
         shapeRenderer = new ShapeRenderer();
     }
-
+    // called in create() to set up the engine before the game loop starts, create all managers and systems
     private void initManagers() {
-        entitySystem    = new EntityManager();   // concrete → stored as IEntitySystem
-        movementSystem  = new MovementManager();
+        entitySystem = new EntityManager();
+        movementSystem = new MovementManager();
         collisionSystem = new CollisionManager();
-        audioSystem     = new AudioManager();
-        sceneSystem     = new SceneManager();
+        audioSystem = new AudioManager();
+        sceneSystem = new SceneManager();
     }
-
+    // called in create() to set up the engine before the game loop starts, set up input bindings and input manager
     private void initInput() {
         InputBindings bindings = new InputBindings();
 
-        // Movement: A/D or Left/Right arrows
-        bindings.bindAxis(InputAxis.MOVE_X,
-                com.badlogic.gdx.Input.Keys.A,
-                com.badlogic.gdx.Input.Keys.D);
-        bindings.bindAxis(InputAxis.MOVE_X,
-                com.badlogic.gdx.Input.Keys.LEFT,
-                com.badlogic.gdx.Input.Keys.RIGHT);
+        // Movement: A/D or Left/Right arrows keys
+        bindings.bindAxis(InputAxis.MOVE_X, com.badlogic.gdx.Input.Keys.A, com.badlogic.gdx.Input.Keys.D);
+        bindings.bindAxis(InputAxis.MOVE_X, com.badlogic.gdx.Input.Keys.LEFT, com.badlogic.gdx.Input.Keys.RIGHT);
 
-        bindings.bindAxis(InputAxis.MOVE_Y,
-                com.badlogic.gdx.Input.Keys.S,
-                com.badlogic.gdx.Input.Keys.W);
+        bindings.bindAxis(InputAxis.MOVE_Y, com.badlogic.gdx.Input.Keys.S, com.badlogic.gdx.Input.Keys.W);
 
         // Actions
-        bindings.bindAction(InputAction.TOGGLE_MUTE,  com.badlogic.gdx.Input.Keys.M);
-        bindings.bindAction(InputAction.TOGGLE_DEBUG,  com.badlogic.gdx.Input.Keys.F1);
-        bindings.bindAction(InputAction.TOGGLE_PAUSE,  com.badlogic.gdx.Input.Keys.P);
-        bindings.bindAction(InputAction.TOGGLE_PAUSE,  com.badlogic.gdx.Input.Keys.ESCAPE);
+        bindings.bindAction(InputAction.TOGGLE_MUTE, com.badlogic.gdx.Input.Keys.M);
+        bindings.bindAction(InputAction.TOGGLE_DEBUG, com.badlogic.gdx.Input.Keys.F1);
+        bindings.bindAction(InputAction.TOGGLE_PAUSE, com.badlogic.gdx.Input.Keys.P);
+        bindings.bindAction(InputAction.TOGGLE_PAUSE, com.badlogic.gdx.Input.Keys.ESCAPE);
 
         inputSystem = new InputManager(bindings);
     }
@@ -133,13 +123,14 @@ public class GameMaster extends ApplicationAdapter {
     private void loadAssets() {
         try {
             audioSystem.loadSound("click", "click.wav");
-        } catch (Exception e) {
+        } 
+        catch (Exception e) {
             Gdx.app.error("GameMaster", "Asset load failed: " + e.getMessage());
         }
     }
 
     private void initScenes() {
-        // Scene 1: Game (play)
+        // Scene 1, main game scene with everything needed for gameplay
         gameScene = new GameScene(
                 entitySystem,
                 movementSystem,
@@ -149,20 +140,19 @@ public class GameMaster extends ApplicationAdapter {
                 spriteBatch,
                 shapeRenderer);
 
-        // Scene 2: Pause overlay
+        // Scene 2, to display pause overlay
         pauseScene = new PauseScene();
 
         // Register both with SceneManager for lifecycle management
         sceneSystem.addScene("simulation", gameScene);
-        sceneSystem.addScene("pause",      pauseScene);
+        sceneSystem.addScene("pause", pauseScene);
 
-        // Initial load of both scenes (creates resources)
+        // Initial load of both scenes, creates resources
         sceneSystem.loadScene("simulation");
         pauseScene.create();
     }
 
-    // --- Public accessors for Logic Engine (DIP: return interfaces) ---
-
+    // Public accessors for Logic Engine, DIP: return interfaces
     public ISceneSystem getSceneSystem() {
         return sceneSystem;
     }
