@@ -5,7 +5,8 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 
 /**
- * InputManager - Processes keyboard/mouse input each frame via configurable bindings (SRP).
+ * InputManager - Processes keyboard/mouse input each frame via configurable
+ * bindings (SRP).
  *
  * Implements IInputSystem so callers depend on the abstraction (DIP).
  * Axes produce a float in [-1, 1]; actions produce a boolean (just-pressed).
@@ -65,14 +66,16 @@ public class InputManager implements IInputSystem {
 
     @Override
     public float getAxis(InputAxis axis) {
-        if (axis == null) return 0f; // defensive
+        if (axis == null)
+            return 0f; // defensive
         Float v = axisValues.get(axis);
         return (v != null) ? v : 0f;
     }
 
     @Override
     public boolean isActionTriggered(InputAction action) {
-        if (action == null) return false; // defensive
+        if (action == null)
+            return false; // defensive
         Boolean b = actionTriggered.get(action);
         return b != null && b;
     }
@@ -93,7 +96,8 @@ public class InputManager implements IInputSystem {
 
     /* Convenience: raw key check. */
     public boolean isKeyDown(int keycode) {
-        if (keycode < 0) return false; // invalid keycode guard
+        if (keycode < 0)
+            return false; // invalid keycode guard
         return Gdx.input.isKeyPressed(keycode);
     }
 
@@ -105,7 +109,8 @@ public class InputManager implements IInputSystem {
     // --- Internal ---
 
     private float computeAxis(InputAxis axis) {
-        if (axis == null) return 0f;
+        if (axis == null)
+            return 0f;
 
         Array<InputBindings.AxisPair> pairs = bindings.getAxisPairs(axis);
         if (pairs == null || pairs.size == 0) {
@@ -117,31 +122,35 @@ public class InputManager implements IInputSystem {
 
         for (int i = 0; i < pairs.size; i++) {
             InputBindings.AxisPair pair = pairs.get(i);
-            if (pair == null) continue;
+            if (pair == null)
+                continue;
 
             // Keycode sanity (LibGDX uses non-negative keycodes)
             if (pair.negativeKey >= 0 && Gdx.input.isKeyPressed(pair.negativeKey)) {
                 v -= 1f;
             } else if (pair.negativeKey < 0 && DEBUG_INPUT) {
-    Gdx.app.log("InputManager", "Invalid negativeKey for axis " + axis + ": " + pair.negativeKey);
-}
+                Gdx.app.log("InputManager", "Invalid negativeKey for axis " + axis + ": " + pair.negativeKey);
+            }
 
-if (pair.positiveKey >= 0 && Gdx.input.isKeyPressed(pair.positiveKey)) {
-    v += 1f;
-} else if (pair.positiveKey < 0 && DEBUG_INPUT) {
-    Gdx.app.log("InputManager", "Invalid positiveKey for axis " + axis + ": " + pair.positiveKey);
-}
+            if (pair.positiveKey >= 0 && Gdx.input.isKeyPressed(pair.positiveKey)) {
+                v += 1f;
+            } else if (pair.positiveKey < 0 && DEBUG_INPUT) {
+                Gdx.app.log("InputManager", "Invalid positiveKey for axis " + axis + ": " + pair.positiveKey);
+            }
 
         }
 
         // Clamp to [-1, 1]
-        if (v > 1f) v = 1f;
-        if (v < -1f) v = -1f;
+        if (v > 1f)
+            v = 1f;
+        if (v < -1f)
+            v = -1f;
         return v;
     }
 
     private boolean computeActionJustPressed(InputAction action) {
-        if (action == null) return false;
+        if (action == null)
+            return false;
 
         Array<Integer> keys = bindings.getActionKeys(action);
         if (keys == null || keys.size == 0) {
@@ -151,7 +160,8 @@ if (pair.positiveKey >= 0 && Gdx.input.isKeyPressed(pair.positiveKey)) {
 
         for (int i = 0; i < keys.size; i++) {
             Integer key = keys.get(i);
-            if (key == null) continue;
+            if (key == null)
+                continue;
 
             int keycode = key;
             if (keycode < 0) {
@@ -161,7 +171,8 @@ if (pair.positiveKey >= 0 && Gdx.input.isKeyPressed(pair.positiveKey)) {
                 continue;
             }
 
-            if (Gdx.input.isKeyJustPressed(keycode)) return true;
+            if (Gdx.input.isKeyJustPressed(keycode))
+                return true;
         }
         return false;
     }
