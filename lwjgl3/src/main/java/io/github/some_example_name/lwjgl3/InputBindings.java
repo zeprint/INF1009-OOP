@@ -41,8 +41,7 @@ public class InputBindings {
             return;
         }
 
-        // LibGDX keycodes are non-negative (Input.Keys.*). Negative usually means
-        // invalid.
+        // LibGDX keycodes are non-negative (Input.Keys.*). Negative usually means invalid
         if (negativeKey < 0 || positiveKey < 0) {
             warn("bindAxis(" + axis + ") invalid keycode(s): neg=" + negativeKey + ", pos=" + positiveKey);
             return;

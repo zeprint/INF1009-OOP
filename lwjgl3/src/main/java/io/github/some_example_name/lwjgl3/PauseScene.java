@@ -9,7 +9,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 /**
 * PauseScene, a 50% transparent overlay with "PAUSED" at the center of the game in frozen state.
-* Run as a passive scene with no update logic to adhere to SRP
+* Run as a passive scene with no update logic
 * Achieve fast transition for consideration of user experience
 * Isolates resource disposal to prevent memory leaks issues
 */
@@ -21,7 +21,7 @@ public class PauseScene extends Scene {
     private GlyphLayout layout;
     private ShapeRenderer shapeRenderer;
 
-    // implmentation of Scene lifecycle methods
+    // Implmentation of Scene lifecycle methods
     @Override
     public boolean create() {
         try {
@@ -38,24 +38,24 @@ public class PauseScene extends Scene {
         }
     }
 
-    // no input handling or game logic update, just a static overlay
+    // No input handling or game logic update, just a static overlay
     @Override
     public boolean update(float dt) {
         if (!Float.isFinite(dt) || dt < 0f) {
             Gdx.app.error(TAG, "update rejected invalid deltaTime: " + dt);
             return false;
         }
-        // means passive scene, input handling belongs in the Logic Engine layer
+        // This means passive scene, input handling belongs in the Logic Engine layer
         return true;
     }
 
-    // render the half-transparent overlay and the centered PAUSED text
+    // Render the half-transparent overlay and the centered PAUSED text
     @Override
     public boolean render() {
         
         boolean allRenderSucceeded = true;
         
-        // half-transparent dark overlay
+        // Half-transparent dark overlay
         try {
             Gdx.gl.glEnable(Gdx.gl.GL_BLEND);
             Gdx.gl.glBlendFunc(Gdx.gl.GL_SRC_ALPHA, Gdx.gl.GL_ONE_MINUS_SRC_ALPHA);
@@ -76,12 +76,12 @@ public class PauseScene extends Scene {
                 Gdx.gl.glDisable(Gdx.gl.GL_BLEND);
             } 
             catch (Exception endEx) {
-                // do nothing, ignore
+                // Do nothing, ignore
             }
             allRenderSucceeded = false;
         }
 
-        // centered "PAUSED" text
+        // Centered "PAUSED" text
         try {
             final String text = "PAUSED";
             layout.setText(font, text);
@@ -99,7 +99,7 @@ public class PauseScene extends Scene {
                 }
             } 
             catch (Exception endException) {
-                // do nothing, ignore
+                // Do nothing, ignore
             }
             allRenderSucceeded = false;
         }
@@ -107,8 +107,8 @@ public class PauseScene extends Scene {
         return allRenderSucceeded;
     }
 
-// dispose resources, log down any exceptions and try to dispose as many resources as possible to prevent memory leaks issue
-@Override
+    // Dispose resources, log down any exceptions and try to dispose as many resources as possible to prevent memory leaks issue
+    @Override
     public boolean dispose() {
         boolean allDisposeSucceeded = true;
         

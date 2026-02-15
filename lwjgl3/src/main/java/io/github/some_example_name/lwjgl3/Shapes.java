@@ -65,7 +65,7 @@ public class Shapes extends Entity {
         return (v != null) ? v : 0f;
     }
 
-    // --- Renderable ---
+    // Renderable
 
     @Override
     public boolean draw(ShapeRenderer shape) {

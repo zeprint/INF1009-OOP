@@ -3,10 +3,7 @@ package io.github.some_example_name.lwjgl3;
 import com.badlogic.gdx.utils.Array;
 
 /**
- * MovementManager - Manages the lifecycle and per-frame updates
- * of all MovementComponent instances (SRP).
- *
- * Implements IMovementSystem so callers depend on the abstraction (DIP).
+ * MovementManager - Manages the lifecycle and per-frame updates of all MovementComponent instances.
  */
 public class MovementManager implements IMovementSystem {
 

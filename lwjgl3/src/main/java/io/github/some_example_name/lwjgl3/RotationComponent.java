@@ -2,9 +2,6 @@ package io.github.some_example_name.lwjgl3;
 
 /**
  * RotationComponent - Movement component with angular velocity.
- *
- * LSP: Uses HasRotation interface check instead of unsafe cast.
- * DRY: Uses inherited applyVelocity() for position updates.
  */
 public class RotationComponent extends MovementComponent implements Rotatable {
 
@@ -34,7 +31,7 @@ public class RotationComponent extends MovementComponent implements Rotatable {
         this.velocityY = velocityY;
     }
 
-    // --- Per-frame update ---
+    // Per-frame update
 
     @Override
     public void update(float deltaTime) {
@@ -59,7 +56,7 @@ public class RotationComponent extends MovementComponent implements Rotatable {
         if (rotationAngle < 0) rotationAngle += 360f;
     }
 
-    // --- Angular velocity ---
+    // Angular velocity
 
     public void  setAngularVelocity(float av) {
         this.angularVelocity = av;
@@ -70,8 +67,8 @@ public class RotationComponent extends MovementComponent implements Rotatable {
         return angularVelocity;
     }
 
-    // --- Rotation angle ---
-
+    // Rotation angle
+    
     public void setRotationAngle(float angle) {
         this.rotationAngle = angle;
         normaliseRotationAngle();

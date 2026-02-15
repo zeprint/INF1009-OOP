@@ -4,8 +4,6 @@ import com.badlogic.gdx.Gdx;
 
 /** Abstract base class
 * Defines the strict lifecycle contract using the Template Method pattern
-* adheres to SRP by managing state and lifecycle rather than game logic
-* Allows for polymorphic extension via OCP as the architectural root of all scenes
 * Ensures consistent behaviour across all scene implementations.
 */
 public abstract class Scene {
@@ -15,26 +13,26 @@ public abstract class Scene {
     protected boolean isPaused;
     protected IEntitySystem entitySystem;
 
-    // constructor with no parameters, all dependencies will be added by subclasses or added by GameMaster
+    // Constructor with no parameters, all dependencies will be added by subclasses or added by GameMaster
     public Scene() {
         this.name = "";
         this.isPaused = false;
-        this.entitySystem = null; // subclasses to set as needed
+        this.entitySystem = null; // Subclasses to set as needed
     }
 
     // Lifecycle, template methods to be override by subclasses
-    public abstract boolean create(); // initialise scene resources, called once when scene is first loaded
-    public abstract boolean update(float dt); // update scene logic per frame
-    public abstract boolean render(); // render the scene visually per frame
-    public abstract boolean dispose(); // clean up scene resources, called once when scene is removed
+    public abstract boolean create(); // Initialise scene resources, called once when scene is first loaded
+    public abstract boolean update(float dt); // Update scene logic per frame
+    public abstract boolean render(); // Render the scene visually per frame
+    public abstract boolean dispose(); // Clean up scene resources, called once when scene is removed
 
-    // pause scene updates, rendering continues
+    // Pause scene updates, rendering continues
     public boolean pause() {
         isPaused = true;
         return true;
     }
 
-    // resume scene updates after pause
+    // Resume scene updates after pause
     public boolean resume() {
         isPaused = false;
         return true;

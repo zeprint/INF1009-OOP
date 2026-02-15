@@ -5,12 +5,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 
 /**
- * InputManager - Processes keyboard/mouse input each frame via configurable
- * bindings (SRP).
- *
- * Implements IInputSystem so callers depend on the abstraction (DIP).
- * Axes produce a float in [-1, 1]; actions produce a boolean (just-pressed).
- *
+ * InputManager - Processes keyboard/mouse input each frame via configurable bindings.
  */
 public class InputManager implements IInputSystem {
 
@@ -57,7 +52,7 @@ public class InputManager implements IInputSystem {
         }
     }
 
-    // --- Queries ---
+    // Queries
 
     @Override
     public float getAxis(InputAxis axis) {
@@ -101,7 +96,7 @@ public class InputManager implements IInputSystem {
         /* no native resources */
     }
 
-    // --- Internal ---
+    // Internal
 
     private float computeAxis(InputAxis axis) {
         if (axis == null)

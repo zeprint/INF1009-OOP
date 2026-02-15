@@ -6,9 +6,6 @@ import com.badlogic.gdx.utils.ObjectMap;
 
 /**
  * AudioManager - Concrete implementation of IAudioSystem (DIP).
- *
- * Uses libGDX's Sound API for short one-shot effects.
- * Callers should depend on the IAudioSystem interface.
  */
 public class AudioManager implements IAudioSystem {
 
@@ -52,7 +49,6 @@ public class AudioManager implements IAudioSystem {
         sounds.clear();
     }
 
-    /** @return current master volume in [0.0, 1.0]. */
     public float getVolume() {
         return volume;
     }

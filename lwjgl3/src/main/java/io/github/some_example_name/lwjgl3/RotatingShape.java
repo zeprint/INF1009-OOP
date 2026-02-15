@@ -6,10 +6,6 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 /**
  * RotatingShape - Entity rendered as a rotating circle, triangle, or square.
- *
- * OCP FIX: Uses ShapeType enum instead of boolean flags (isCircle, isSquare).
- * Adding a new shape type only requires a new enum value and a new case in draw(),
- * rather than adding another boolean and restructuring if-else chains.
  */
 
 public class RotatingShape extends Entity implements HasRotation {
@@ -40,8 +36,6 @@ public class RotatingShape extends Entity implements HasRotation {
         this.rotationAngle = 0f;
     }
 
-    // --- Accessors ---
-
     public float getRadius() {
         return radius;
     }
@@ -68,7 +62,7 @@ public class RotatingShape extends Entity implements HasRotation {
         return true;
     }
 
-    // --- HasRotation ---
+    // HasRotation
 
     @Override
     public boolean setRotationAngle(float angle) {
@@ -85,7 +79,7 @@ public class RotatingShape extends Entity implements HasRotation {
         return rotationAngle;
     }
 
-    // --- Renderable ---
+    // Renderable
 
     @Override
     public boolean draw(ShapeRenderer shape) {

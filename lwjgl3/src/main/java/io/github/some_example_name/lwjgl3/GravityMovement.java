@@ -2,9 +2,6 @@ package io.github.some_example_name.lwjgl3;
 
 /**
  * GravityMovement - Movement component that simulates gravitational acceleration.
- *
- * DRY: Uses inherited applyVelocity() for position updates.
- * DIP: Uses DistributionType for horizontal randomisation on reset.
  */
 public class GravityMovement extends MovementComponent implements Acceleratable {
 
@@ -19,15 +16,13 @@ public class GravityMovement extends MovementComponent implements Acceleratable 
     private float speedMultiplier;
     private float maxDropSpeed;
 
-    // Vertical bounds (optional)
+    // Vertical bounds
     private float bottomBoundaryY;
     private float resetTopY;
     private boolean boundsConfigured;
 
-    // Horizontal reset randomisation (optional, DIP)
+    // Horizontal reset randomisation
     private DistributionType xDistribution;
-
-    // --- Constructors ---
 
     public GravityMovement(Entity entity) {
         this(entity, DEFAULT_GRAVITY);
@@ -44,17 +39,18 @@ public class GravityMovement extends MovementComponent implements Acceleratable 
         this.xDistribution = null;
     }
 
-    // --- Per-frame update ---
+    // Per-frame update
 
     @Override
     public void update(float deltaTime) {
-        if (!enabled) return;
+        if (!enabled)
+            return;
 
         velocityX += accelerationX * deltaTime;
         velocityY += accelerationY * deltaTime;
         velocityY += gravity * deltaTime;
 
-        applyVelocity(deltaTime);   // DRY: inherited from MovementComponent
+        applyVelocity(deltaTime);
         checkBounds();
     }
 
@@ -77,7 +73,7 @@ public class GravityMovement extends MovementComponent implements Acceleratable 
         }
     }
 
-    // --- Configuration ---
+    // Configuration
 
     public void setVerticalBounds(float bottomBoundaryY, float resetTopY) {
         this.bottomBoundaryY = bottomBoundaryY;
@@ -110,7 +106,7 @@ public class GravityMovement extends MovementComponent implements Acceleratable 
         this.accelerationY = ay;
     }
 
-    // --- Acceleratable ---
+    // Acceleratable
 
     @Override public float getAccelerationX() {
         return accelerationX;
@@ -120,8 +116,8 @@ public class GravityMovement extends MovementComponent implements Acceleratable 
         return accelerationY;
     }
 
-    // --- Getters ---
-
+    // Getters
+    
     public float getGravity() {
         return gravity;
     }

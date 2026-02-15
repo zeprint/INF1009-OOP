@@ -7,15 +7,6 @@ import com.badlogic.gdx.math.Rectangle;
 
 /**
  * Droplet - Logic Engine entity: a falling water droplet (contextual).
- *
- * Extends TextureObject for texture rendering, implements Collidable
- * so the CollisionManager can detect collisions with other entities.
- *
- * Collision behaviour:
- *  - Bucket collision  → reset to top of screen (caught)
- *  - Any other entity  → bounce off (reverse fall velocity)
- *
- * Change: width and height parameters are now float to match TextureObject.
  */
 public class Droplet extends TextureObject implements Collidable {
 
@@ -26,20 +17,8 @@ public class Droplet extends TextureObject implements Collidable {
     private final Rectangle bounds;
     private DistributionType xDistribution;
 
-    /** Reference to the GravityMovement driving this droplet (for bounce). */
     private GravityMovement gravityMovement;
 
-    /**
-     * Create a new droplet entity.
-     *
-     * @param texture Texture to render. Must not be {@code null}.
-     * @param x       Initial X position. Must be finite.
-     * @param y       Initial Y position. Must be finite.
-     * @param width   Width in pixels. Must be finite and positive.
-     * @param height  Height in pixels. Must be finite and positive.
-     * @param resetY  Y position to reset to when caught by the bucket. Must be finite.
-     * @throws IllegalArgumentException if any parameter is invalid.
-     */
     public Droplet(Texture texture, float x, float y, float width, float height, float resetY) {
         super(texture, x, y, height, width);
 
@@ -52,7 +31,7 @@ public class Droplet extends TextureObject implements Collidable {
         this.bounds        = new Rectangle(x, y, width, height);
     }
 
-    // --- Collidable ---
+    // Collidable
 
     @Override
     public Rectangle getBounds() {
@@ -118,19 +97,16 @@ public class Droplet extends TextureObject implements Collidable {
         }
     }
 
-    // --- Configuration ---
+    // Configuration
 
-    /** Set random X distribution for respawn position. */
     public void setXDistribution(DistributionType dist) {
         this.xDistribution = dist;
     }
 
-    /** Set the GravityMovement component so the droplet can reverse velocity on bounce. */
     public void setGravityMovement(GravityMovement gm) {
         this.gravityMovement = gm;
     }
 
-    /** @return the GravityMovement component driving this droplet, or null. */
     public GravityMovement getGravityMovement() {
         return gravityMovement;
     }

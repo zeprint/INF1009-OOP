@@ -6,7 +6,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 /**
- * EntityManager - Creates, manages, updates, and disposes all entities (SRP).
+ * EntityManager - Creates, manages, updates, and disposes all entities.
  *
  * Rendering contract: SpriteBatch and ShapeRenderer cannot both be active
  * simultaneously. Callers begin/end renderers; EntityManager checks isDrawing().
@@ -22,7 +22,7 @@ public class EntityManager implements IEntitySystem {
         entityList = new Array<Entity>();
     }
 
-    // --- Lifecycle ---
+    // Lifecycle
 
     @Override
     public boolean addEntity(Entity entity) {
@@ -56,7 +56,7 @@ public class EntityManager implements IEntitySystem {
         return entityList;
     }
 
-    // --- Per-frame update ---
+    // Per-frame update
 
     @Override
     public boolean update(float deltaTime) {
@@ -79,7 +79,7 @@ public class EntityManager implements IEntitySystem {
         return allSucceeded;
     }
 
-    // --- Rendering ---
+    // Rendering
 
     @Override
     public boolean draw(SpriteBatch batch, ShapeRenderer shape) {
@@ -104,7 +104,7 @@ public class EntityManager implements IEntitySystem {
         return allSucceeded;
     }
 
-    // --- Shutdown ---
+    // Shutdown
 
     @Override
     public boolean dispose() {

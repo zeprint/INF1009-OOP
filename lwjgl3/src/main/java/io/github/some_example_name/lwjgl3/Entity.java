@@ -31,7 +31,7 @@ public abstract class Entity implements Renderable, IEntity {
         this.color = Color.WHITE;
     }
 
-    // --- Position ---
+    // Position
 
     public float getX() {
         return posX;
@@ -59,7 +59,7 @@ public abstract class Entity implements Renderable, IEntity {
         return true;
     }
 
-    // --- Color ---
+    // Color
 
     public Color getColor() {
         return color;
@@ -74,25 +74,22 @@ public abstract class Entity implements Renderable, IEntity {
         return true;
     }
 
-    // --- Renderable (safe no-op defaults) ---
+    // Renderable (safe no-op defaults)
 
     @Override
     public boolean draw(SpriteBatch batch) {
-        /* override in texture subclasses */
         return false;
     }
 
     @Override
     public boolean draw(ShapeRenderer shape) {
-        /* override in shape subclasses */
         return false;
     }
 
-    // --- IEntity lifecycle (safe no-op defaults) ---
+    // IEntity lifecycle (safe no-op defaults)
 
     @Override
     public boolean initialize() {
-        /* override for one-time setup */
         return true;
     }
 
@@ -102,13 +99,11 @@ public abstract class Entity implements Renderable, IEntity {
             Gdx.app.error(TAG, "update rejected invalid deltaTime: " + deltaTime);
             return false;
         }
-        /* override if per-frame logic is needed */
         return true;
     }
 
       @Override
     public boolean dispose() {
-        /* override to release resources */
         return true;
     }
 }
