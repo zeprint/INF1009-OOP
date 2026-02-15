@@ -8,12 +8,11 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 /**
- * PauseScene - Semi-transparent overlay with a centred "PAUSED" label.
- *
- * Uses GlyphLayout for accurate text width measurement (not the font atlas width).
- */
+* PauseScene - Semi-transparent overlay with "PAUSED" at the center of the game.
+*/
 public class PauseScene extends Scene {
 
+    private static final String TAG = "PauseScene";
     private SpriteBatch batch;
     private BitmapFont font;
     private GlyphLayout layout;
@@ -21,61 +20,118 @@ public class PauseScene extends Scene {
 
     @Override
     public boolean create() {
-        batch = new SpriteBatch();
-        font = new BitmapFont();
-        layout = new GlyphLayout();
-        shapeRenderer = new ShapeRenderer();
-        font.setColor(Color.WHITE);
-        return true;
+        try {
+            batch = new SpriteBatch();
+            font = new BitmapFont();
+            layout = new GlyphLayout();
+            shapeRenderer = new ShapeRenderer();
+            font.setColor(Color.WHITE);
+            return true;
+        } 
+        catch (Exception e) {
+            Gdx.app.error(TAG, "Exception during create()!", e);
+            return false;
+        }
     }
 
     @Override
     public boolean update(float dt) {
+        if (!Float.isFinite(dt) || dt < 0f) {
+            Gdx.app.error(TAG, "update rejected invalid deltaTime: " + dt);
+            return false;
+        }
         // Passive scene; input handling belongs in the Logic Engine layer
         return true;
     }
 
     @Override
     public boolean render() {
+        
+        boolean allRenderSucceeded = true;
+        
         // Semi-transparent dark overlay
-        Gdx.gl.glEnable(Gdx.gl.GL_BLEND);
-        Gdx.gl.glBlendFunc(Gdx.gl.GL_SRC_ALPHA, Gdx.gl.GL_ONE_MINUS_SRC_ALPHA);
+        try {
+            Gdx.gl.glEnable(Gdx.gl.GL_BLEND);
+            Gdx.gl.glBlendFunc(Gdx.gl.GL_SRC_ALPHA, Gdx.gl.GL_ONE_MINUS_SRC_ALPHA);
 
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        shapeRenderer.setColor(0f, 0f, 0f, 0.55f);
-        shapeRenderer.rect(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        shapeRenderer.end();
+            shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+            shapeRenderer.setColor(0f, 0f, 0f, 0.55f);
+            shapeRenderer.rect(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+            shapeRenderer.end();
 
-        Gdx.gl.glDisable(Gdx.gl.GL_BLEND);
+            Gdx.gl.glDisable(Gdx.gl.GL_BLEND);
+        } 
+        catch (Exception e) {
+            Gdx.app.error(TAG, "Error rendering overlay!", e);
+            try {
+                if (shapeRenderer.isDrawing()) {
+                    shapeRenderer.end();
+                }
+                Gdx.gl.glDisable(Gdx.gl.GL_BLEND);
+            } 
+            catch (Exception endEx) {
+                // do nothing, ignore
+            }
+            allRenderSucceeded = false;
+        }
 
-        // Centred "PAUSED" text
-        final String text = "PAUSED";
-        layout.setText(font, text);
-        float x = (Gdx.graphics.getWidth()  - layout.width)  / 2f;
-        float y = (Gdx.graphics.getHeight() + layout.height) / 2f;
+        // centered "PAUSED" text
+        try {
+            final String text = "PAUSED";
+            layout.setText(font, text);
+            float x = (Gdx.graphics.getWidth()  - layout.width)  / 2f;
+            float y = (Gdx.graphics.getHeight() + layout.height) / 2f;
 
-        batch.begin();
-        font.draw(batch, text, x, y);
-        batch.end();
+            batch.begin();
+            font.draw(batch, text, x, y);
+            batch.end();
+        } catch (Exception e) {
+            Gdx.app.error(TAG, "Error rendering text!", e);
+            try {
+                if (batch.isDrawing()) {
+                    batch.end();
+                }
+            } 
+            catch (Exception endException) {
+                // do nothing, ignore
+            }
+            allRenderSucceeded = false;
+        }
 
-        return true;
+        return allRenderSucceeded;
     }
 
-    @Override
+@Override
     public boolean dispose() {
-        if (batch != null) {
-            batch.dispose();
+        boolean allDisposeSucceeded = true;
+        
+        try {
+            if (batch != null) {
+                batch.dispose();
+            }
+        } catch (Exception e) {
+            Gdx.app.error(TAG, "Error disposing batch", e);
+            allDisposeSucceeded = false;
         }
 
-        if (font != null) {
-            font.dispose();
+        try {
+            if (font != null) {
+                font.dispose();
+            }
+        } catch (Exception e) {
+            Gdx.app.error(TAG, "Error disposing font", e);
+            allDisposeSucceeded = false;
         }
         
-        if (shapeRenderer != null) {
-            shapeRenderer.dispose();
+        try {
+            if (shapeRenderer != null) {
+                shapeRenderer.dispose();
+            }
+        } catch (Exception e) {
+            Gdx.app.error(TAG, "Error disposing shapeRenderer", e);
+            allDisposeSucceeded = false;
         }
 
-        return true;
-        
+        return allDisposeSucceeded;
     }
 }

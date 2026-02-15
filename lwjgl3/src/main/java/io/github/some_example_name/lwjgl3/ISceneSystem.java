@@ -1,13 +1,13 @@
 package io.github.some_example_name.lwjgl3;
 
 /**
- * ISceneSystem - Contract for scene management (DIP).
- *
- * Callers depend on this interface rather than SceneManager directly,
- * allowing the scene system to be swapped without touching call sites.
- *
- * Implementing class: SceneManager
- */
+* ISceneSystem - Contract for scene management (DIP).
+*
+* Callers depend on this interface rather than SceneManager directly,
+* allowing the scene system to be swapped without touching call sites.
+*
+* Implementing class: SceneManager
+*/
 public interface ISceneSystem {
 
     /* Register a scene under a unique name. */
