@@ -77,7 +77,6 @@ public class SceneManager implements ISceneSystem {
     // scene switching with caching to prevent redundant amt of create() calls and improve performance
     @Override
     public boolean loadScene(String name) {
-        //if (!scenes.containsKey(name)) return false;
         if (name == null) {
             Gdx.app.error(TAG, "loadScene rejected null name!");
             return false;
