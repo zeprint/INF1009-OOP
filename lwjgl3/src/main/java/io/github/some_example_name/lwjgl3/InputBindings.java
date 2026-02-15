@@ -79,7 +79,7 @@ public class InputBindings {
             actionKeys.put(action, keys);
         }
 
-        // Avoid duplicates (optional, but reduces confusion)
+        
         for (int i = 0; i < keys.size; i++) {
             Integer existing = keys.get(i);
             if (existing != null && existing == key) {
