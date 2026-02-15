@@ -6,13 +6,13 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 /**
 * Coordinates the update pipeline to prevent physics or gravity bugs and logic errors
-* SimulationScene acts as the middle layer injecting dependencies for DIP compliance
+* SimulationScene acts as the middle layer injecting dependencies
 * Uses two-pass rendering to ensure clean state transitions using SpriteBatch and ShapeRenderer
-* Manages subsystem complexity while adhering to LSP
+* Manages subsystem complexity
 */
 public class SimulationScene extends Scene {
 
-    private static final String TAG = "SimulationScene"; // for logging
+    private static final String TAG = "SimulationScene"; // For logging
 
     private final IMovementSystem movementSystem;
     private final ICollisionSystem collisionSystem;
@@ -23,7 +23,7 @@ public class SimulationScene extends Scene {
     private final ShapeRenderer shapeRenderer;
 
     
-    // all manager references are injected by GameMaster.
+    // All manager references are injected by GameMaster.
     public SimulationScene(
             IEntitySystem entitySystem,
             IMovementSystem movementSystem,
@@ -43,13 +43,13 @@ public class SimulationScene extends Scene {
         this.shapeRenderer = shapeRenderer;
     }
 
-    // purpose to allow subclasses to override create() and add entities to entitySystem before update() and render() are called
+    // Purpose to allow subclasses to override create() and add entities to entitySystem before update() and render() are called
     @Override
     public boolean create() {
         return true;  // Logic Engine subclasses override to populate entities
     }
 
-    // update() is called by GameMaster after create() and before render()
+    // Update() is called by GameMaster after create() and before render()
     @Override
     public boolean update(float dt) {
         if (!Float.isFinite(dt) || dt < 0f) {
@@ -63,7 +63,7 @@ public class SimulationScene extends Scene {
 
         boolean allUpdateSucceeded = true;
 
-        // if movementSystem is null, still update entitySystem and collisionSystem to allow static entities and collision checks to function
+        // If movementSystem is null, still update entitySystem and collisionSystem to allow static entities and collision checks to function
         try {
             if (movementSystem != null) {
                 movementSystem.update(dt);
@@ -99,7 +99,7 @@ public class SimulationScene extends Scene {
         return allUpdateSucceeded;
     }
 
-    // render() is called by GameMaster after update()
+    // Render() is called by GameMaster after update()
     @Override
     public boolean render() {
         if (entitySystem == null) {
@@ -108,7 +108,7 @@ public class SimulationScene extends Scene {
         }
         boolean allRenderSucceeded = true;
 
-        // textures to be drawn with SpriteBatch
+        // Textures to be drawn with SpriteBatch
         try {
             spriteBatch.begin();
             if (!entitySystem.draw(spriteBatch, null)) {
@@ -124,12 +124,12 @@ public class SimulationScene extends Scene {
                 } 
             } 
             catch (Exception endEx) {
-                // do nothing, ignore
+                // Do nothing, ignore
             }
             allRenderSucceeded = false;
         }
 
-        // shapes to be drawn with ShapeRenderer.
+        // Shapes to be drawn with ShapeRenderer.
         try {
             shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
             if (!entitySystem.draw(null, shapeRenderer)) {
@@ -145,7 +145,7 @@ public class SimulationScene extends Scene {
                 }
             } 
             catch (Exception endEx) {
-                // do nothing, ignore
+                // Do nothing, ignore
             }
             allRenderSucceeded = false;
         }
@@ -153,7 +153,7 @@ public class SimulationScene extends Scene {
         return allRenderSucceeded;
     }
 
-    // dispose() is called by GameMasteer when switching scenes or exit engine.
+    // Dispose() is called by GameMasteer when switching scenes or exit engine.
     @Override
     public boolean dispose() {
         if (entitySystem != null) {

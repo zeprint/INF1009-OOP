@@ -4,9 +4,6 @@ import com.badlogic.gdx.math.MathUtils;
 
 /**
  * MobileRandom - Uniform random distribution over a configurable [min, max] range.
- *
- * Implements DistributionType so callers depend on the abstraction (DIP).
- * Uses libGDX's MathUtils.random().
  */
 public class MobileRandom implements DistributionType {
 

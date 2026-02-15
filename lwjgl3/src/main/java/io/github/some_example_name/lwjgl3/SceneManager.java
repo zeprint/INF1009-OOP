@@ -18,14 +18,14 @@ public class SceneManager implements ISceneSystem {
     private final ObjectMap<String, Boolean> createdScenes;
     private Scene currentScene;
 
-    // constructor initialise the scene manager with empty object maps and null current scene
+    // Constructor initialise the scene manager with empty object maps and null current scene
     public SceneManager() {
         scenes = new ObjectMap<>();
         createdScenes = new ObjectMap<>();
         currentScene = null;
     }
 
-    // ensure that scene names and scene objects are valid and prevent dups
+    // Ensure that scene names and scene objects are valid and prevent dups
 
     @Override
     public boolean addScene(String name, Scene scene) {
@@ -74,7 +74,7 @@ public class SceneManager implements ISceneSystem {
         return true;
     }
 
-    // scene switching with caching to prevent redundant amt of create() calls and improve performance
+    // Scene switching with caching to prevent redundant amt of create() calls and improve performance
     @Override
     public boolean loadScene(String name) {
         if (name == null) {
@@ -114,7 +114,7 @@ public class SceneManager implements ISceneSystem {
         return false;
     }
 
-    // update and render forward to current scene if it exist and is not paused, error handling to prevent engine crash
+    // Update and render forward to current scene if it exist and is not paused, error handling to prevent engine crash
     @Override
     public boolean update(float deltaTime) {
         if (!Float.isFinite(deltaTime) || deltaTime < 0f) {
@@ -134,7 +134,7 @@ public class SceneManager implements ISceneSystem {
         return false;
     }
 
-    // two-pass rendering to ensure clean state transition between SpriteBatch and ShapeRenderer
+    // Two-pass rendering to ensure clean state transition between SpriteBatch and ShapeRenderer
     @Override
     public boolean render() {
         if (currentScene != null) {
@@ -149,7 +149,7 @@ public class SceneManager implements ISceneSystem {
         return false;
     }
 
-    // dispose all scenes and clear caches
+    // Dispose all scenes and clear caches
 
     @Override
     public void dispose() {

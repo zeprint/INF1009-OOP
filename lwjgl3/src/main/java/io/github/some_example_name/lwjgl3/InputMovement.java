@@ -44,9 +44,6 @@ public class InputMovement extends MovementComponent {
 
     /**
      * Set horizontal bounds for clamping the entity's position.
-     *
-     * @param min Minimum X position (inclusive).
-     * @param max Maximum X position (inclusive).
      */
     public void setBounds(float min, float max) {
         this.minBound = min;
@@ -75,8 +72,6 @@ public class InputMovement extends MovementComponent {
 
         entity.setX(newX);
     }
-
-    // --- Accessors ---
 
     public float getSpeed() {
         return speed;

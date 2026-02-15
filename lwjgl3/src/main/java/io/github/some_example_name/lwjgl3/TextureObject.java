@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 /**
 * TextureObject - Entity rendered via a SpriteBatch texture.
-*
 */
 
 public class TextureObject extends Entity {
@@ -82,7 +81,7 @@ public class TextureObject extends Entity {
         return true;
     }
 
-    // --- Renderable ---
+    // Renderable
 
     @Override
     public boolean draw(SpriteBatch batch) {
