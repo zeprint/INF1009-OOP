@@ -9,10 +9,6 @@ import com.badlogic.gdx.utils.ObjectMap;
  *
  * Supports multiple key bindings per axis/action (e.g. A/D and Left/Right).
  *
- * Defensive error handling:
- * - Ignore null axis/action.
- * - Ignore invalid (negative) keycodes.
- * - Optional warning logs for misconfiguration.
  */
 public class InputBindings {
 
