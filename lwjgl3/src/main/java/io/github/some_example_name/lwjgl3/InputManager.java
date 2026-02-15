@@ -11,11 +11,6 @@ import com.badlogic.gdx.utils.ObjectMap;
  * Implements IInputSystem so callers depend on the abstraction (DIP).
  * Axes produce a float in [-1, 1]; actions produce a boolean (just-pressed).
  *
- * Error handling (defensive):
- * - Reject null InputBindings at construction (programmer/config error).
- * - Safe fallbacks for null axis/action queries.
- * - Safe handling if bindings return null/empty arrays.
- * - Guards against invalid keycodes (negative).
  */
 public class InputManager implements IInputSystem {
 
