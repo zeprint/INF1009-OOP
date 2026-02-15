@@ -45,7 +45,8 @@ public class InputBindings {
             return;
         }
 
-        // LibGDX keycodes are non-negative (Input.Keys.*). Negative usually means invalid.
+        // LibGDX keycodes are non-negative (Input.Keys.*). Negative usually means
+        // invalid.
         if (negativeKey < 0 || positiveKey < 0) {
             warn("bindAxis(" + axis + ") invalid keycode(s): neg=" + negativeKey + ", pos=" + positiveKey);
             return;
@@ -91,19 +92,22 @@ public class InputBindings {
     }
 
     public Array<AxisPair> getAxisPairs(InputAxis axis) {
-        if (axis == null) return new Array<>();
+        if (axis == null)
+            return new Array<>();
         Array<AxisPair> pairs = axisPairs.get(axis);
         return (pairs != null) ? pairs : new Array<>();
     }
 
     public Array<Integer> getActionKeys(InputAction action) {
-        if (action == null) return new Array<>();
+        if (action == null)
+            return new Array<>();
         Array<Integer> keys = actionKeys.get(action);
         return (keys != null) ? keys : new Array<>();
     }
 
     private void warn(String msg) {
-        if (!warningsEnabled) return;
+        if (!warningsEnabled)
+            return;
 
         // Safe logging: won't crash even if Gdx.app isn't ready
         try {
