@@ -2,8 +2,11 @@ package io.github.some_example_name.lwjgl3;
 
 import com.badlogic.gdx.Gdx;
 
-/**
-* Scene - Abstract base for all scenes in the simulation.
+/** Abstract base class
+* Defines the strict lifecycle contract using the Template Method pattern
+* adheres to SRP by managing state and lifecycle rather than game logic
+* Allows for polymorphic extension via OCP as the architectural root of all scenes
+* Ensures consistent behaviour across all scene implementations.
 */
 public abstract class Scene {
 
@@ -12,10 +15,11 @@ public abstract class Scene {
     protected boolean isPaused;
     protected IEntitySystem entitySystem;
 
+    // constructor with no parameters, all dependencies will be added by subclasses or added by GameMaster
     public Scene() {
         this.name = "";
         this.isPaused = false;
-        this.entitySystem = null; // subclasses set as needed
+        this.entitySystem = null; // subclasses to set as needed
     }
 
     // Lifecycle, template methods to be override by subclasses

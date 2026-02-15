@@ -8,7 +8,10 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 /**
-* PauseScene - Semi-transparent overlay with "PAUSED" at the center of the game.
+* PauseScene, a 50% transparent overlay with "PAUSED" at the center of the game in frozen state.
+* Run as a passive scene with no update logic to adhere to SRP
+* Achieve fast transition for consideration of user experience
+* Isolates resource disposal to prevent memory leaks issues
 */
 public class PauseScene extends Scene {
 
@@ -18,6 +21,7 @@ public class PauseScene extends Scene {
     private GlyphLayout layout;
     private ShapeRenderer shapeRenderer;
 
+    // implmentation of Scene lifecycle methods
     @Override
     public boolean create() {
         try {
@@ -34,22 +38,24 @@ public class PauseScene extends Scene {
         }
     }
 
+    // no input handling or game logic update, just a static overlay
     @Override
     public boolean update(float dt) {
         if (!Float.isFinite(dt) || dt < 0f) {
             Gdx.app.error(TAG, "update rejected invalid deltaTime: " + dt);
             return false;
         }
-        // Passive scene; input handling belongs in the Logic Engine layer
+        // means passive scene, input handling belongs in the Logic Engine layer
         return true;
     }
 
+    // render the half-transparent overlay and the centered PAUSED text
     @Override
     public boolean render() {
         
         boolean allRenderSucceeded = true;
         
-        // Semi-transparent dark overlay
+        // half-transparent dark overlay
         try {
             Gdx.gl.glEnable(Gdx.gl.GL_BLEND);
             Gdx.gl.glBlendFunc(Gdx.gl.GL_SRC_ALPHA, Gdx.gl.GL_ONE_MINUS_SRC_ALPHA);
@@ -101,6 +107,7 @@ public class PauseScene extends Scene {
         return allRenderSucceeded;
     }
 
+// dispose resources, log down any exceptions and try to dispose as many resources as possible to prevent memory leaks issue
 @Override
     public boolean dispose() {
         boolean allDisposeSucceeded = true;
@@ -109,7 +116,8 @@ public class PauseScene extends Scene {
             if (batch != null) {
                 batch.dispose();
             }
-        } catch (Exception e) {
+        } 
+        catch (Exception e) {
             Gdx.app.error(TAG, "Error disposing batch", e);
             allDisposeSucceeded = false;
         }
@@ -118,7 +126,8 @@ public class PauseScene extends Scene {
             if (font != null) {
                 font.dispose();
             }
-        } catch (Exception e) {
+        } 
+        catch (Exception e) {
             Gdx.app.error(TAG, "Error disposing font", e);
             allDisposeSucceeded = false;
         }
@@ -127,7 +136,8 @@ public class PauseScene extends Scene {
             if (shapeRenderer != null) {
                 shapeRenderer.dispose();
             }
-        } catch (Exception e) {
+        } 
+        catch (Exception e) {
             Gdx.app.error(TAG, "Error disposing shapeRenderer", e);
             allDisposeSucceeded = false;
         }

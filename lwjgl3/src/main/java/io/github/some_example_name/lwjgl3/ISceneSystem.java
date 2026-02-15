@@ -1,30 +1,28 @@
 package io.github.some_example_name.lwjgl3;
 
 /**
-* ISceneSystem - Contract for scene management (DIP).
-*
-* Callers depend on this interface rather than SceneManager directly,
-* allowing the scene system to be swapped without touching call sites.
-*
-* Implementing class: SceneManager
+* Defines the strict interface for scene management for DIP
+* Decouples the GameLoop from concrete SceneManager implementation
+* Promotes Interface Segregation by exposing only essential lifecycle operations
+* Facilitates testing and parallel development through loose coupling
 */
 public interface ISceneSystem {
 
-    /* Register a scene under a unique name. */
+    // register a scene under a unique name
     boolean addScene(String name, Scene scene);
 
-    /* Switch to the named scene. */
+    // Switch to the named scene
     boolean loadScene(String name);
 
-    /** @return the currently active scene. */
+    // @return the currently active scene. may be null if no scene is active or if the active scene was removed
     Scene getCurrentScene();
 
-    /* Update the current scene. */
+    // update the current scene
     boolean update(float deltaTime);
 
-    /* Render the current scene. */
+    // Render the current scene
     boolean render();
 
-    /* Dispose all scenes. */
+    // Dispose all scenes
     void dispose();
 }

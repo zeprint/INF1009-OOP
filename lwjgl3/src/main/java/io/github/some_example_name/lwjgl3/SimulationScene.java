@@ -5,19 +5,14 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 /**
-* SimulationScene - The main running scene of the simulation.
-*
-* Per-frame pipeline: movement â†’ entity update â†’ collision â†’ render
-*
-* DIP: Depends on interfaces (IMovementSystem, ICollisionSystem, IInputSystem,
-* IAudioSystem) instead of concrete managers, allowing any subsystem to be swapped.
-*
-* Note: Input polling is handled by GameMaster so it works even during pause.
-* This scene reads input state but does not call inputSystem.update().
+* Coordinates the update pipeline to prevent physics or gravity bugs and logic errors
+* SimulationScene acts as the middle layer injecting dependencies for DIP compliance
+* Uses two-pass rendering to ensure clean state transitions using SpriteBatch and ShapeRenderer
+* Manages subsystem complexity while adhering to LSP
 */
 public class SimulationScene extends Scene {
 
-    private static final String TAG = "SimulationScene";
+    private static final String TAG = "SimulationScene"; // for logging
 
     private final IMovementSystem movementSystem;
     private final ICollisionSystem collisionSystem;
@@ -27,10 +22,8 @@ public class SimulationScene extends Scene {
     private final SpriteBatch spriteBatch;
     private final ShapeRenderer shapeRenderer;
 
-    /**
-    * All manager references are injected by GameMaster.
-    * No game-specific entities are created here (Logic Engine territory).
-    */
+    
+    // all manager references are injected by GameMaster.
     public SimulationScene(
             IEntitySystem entitySystem,
             IMovementSystem movementSystem,
@@ -50,13 +43,13 @@ public class SimulationScene extends Scene {
         this.shapeRenderer = shapeRenderer;
     }
 
-    // Scene lifecycle
-
+    // purpose to allow subclasses to override create() and add entities to entitySystem before update() and render() are called
     @Override
     public boolean create() {
         return true;  // Logic Engine subclasses override to populate entities
     }
 
+    // update() is called by GameMaster after create() and before render()
     @Override
     public boolean update(float dt) {
         if (!Float.isFinite(dt) || dt < 0f) {
@@ -70,12 +63,13 @@ public class SimulationScene extends Scene {
 
         boolean allUpdateSucceeded = true;
 
-        // Input is already polled by GameMaster â€” subclasses read state directly
+        // if movementSystem is null, still update entitySystem and collisionSystem to allow static entities and collision checks to function
         try {
             if (movementSystem != null) {
                 movementSystem.update(dt);
             }
-        } catch (Exception e) {
+        } 
+        catch (Exception e) {
             Gdx.app.error(TAG, "Error updating movementSystem!", e);
             allUpdateSucceeded = false;
         }
@@ -86,7 +80,8 @@ public class SimulationScene extends Scene {
                     allUpdateSucceeded = false;
                 }
             }
-        } catch (Exception e) {
+        } 
+        catch (Exception e) {
             Gdx.app.error(TAG, "Error updating entitySystem!", e);
             allUpdateSucceeded = false;
         }
@@ -95,7 +90,8 @@ public class SimulationScene extends Scene {
             if (collisionSystem != null) {
                 collisionSystem.checkCollisions();
             }
-        } catch (Exception e) {
+        } 
+        catch (Exception e) {
             Gdx.app.error(TAG, "Error in collisionSystem!", e);
             allUpdateSucceeded = false;
         }
@@ -103,6 +99,7 @@ public class SimulationScene extends Scene {
         return allUpdateSucceeded;
     }
 
+    // render() is called by GameMaster after update()
     @Override
     public boolean render() {
         if (entitySystem == null) {
@@ -111,34 +108,41 @@ public class SimulationScene extends Scene {
         }
         boolean allRenderSucceeded = true;
 
-        // Pass 1: textures
+        // textures to be drawn with SpriteBatch
         try {
             spriteBatch.begin();
             if (!entitySystem.draw(spriteBatch, null)) {
                 allRenderSucceeded = false;
             }
             spriteBatch.end();
-        } catch (Exception e) {
+        } 
+        catch (Exception e) {
             Gdx.app.error(TAG, "Error during SpriteBatch rendering!", e);
             try {
-                if (spriteBatch.isDrawing()) spriteBatch.end();
-            } catch (Exception endEx) {
+                if (spriteBatch.isDrawing()){
+                    spriteBatch.end();
+                } 
+            } 
+            catch (Exception endEx) {
                 // do nothing, ignore
             }
             allRenderSucceeded = false;
         }
 
-        // Pass 2: shapes
+        // shapes to be drawn with ShapeRenderer.
         try {
             shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
             if (!entitySystem.draw(null, shapeRenderer)) {
                 allRenderSucceeded = false;
             }
             shapeRenderer.end();
-        } catch (Exception e) {
+        } 
+        catch (Exception e) {
             Gdx.app.error(TAG, "Error during ShapeRenderer rendering!", e);
             try {
-                if (shapeRenderer.isDrawing()) shapeRenderer.end();
+                if (shapeRenderer.isDrawing()) {
+                    shapeRenderer.end();
+                }
             } 
             catch (Exception endEx) {
                 // do nothing, ignore
@@ -149,6 +153,7 @@ public class SimulationScene extends Scene {
         return allRenderSucceeded;
     }
 
+    // dispose() is called by GameMasteer when switching scenes or exit engine.
     @Override
     public boolean dispose() {
         if (entitySystem != null) {
@@ -163,7 +168,7 @@ public class SimulationScene extends Scene {
         return true;
     }
 
-    // Accessors for Logic Engine subclasses
+    // Get accessors for engine subclasses
 
     public IMovementSystem getMovementSystem() {
         return movementSystem;

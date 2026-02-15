@@ -4,25 +4,28 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.ObjectMap;
 
 /**
-* SceneManager - Registers, switches and forwards updates to scenes (SRP).
-*
-* Implements ISceneSystem so callers depend on the abstraction (DIP).
+* Manage scene registration, switching and caching
+* Implement ISceneSystem to satisfy DIP and allows for dependency injection
+* Optimise game performance through caching and enforces SRP by delegating logic
+* and rendering to individual scenes
+* Prevents engine crashes with error handling.
 */
 public class SceneManager implements ISceneSystem {
 
-    private static final String TAG = "SceneManager";
+    private static final String TAG = "SceneManager"; // for logging
 
     private final ObjectMap<String, Scene> scenes;
     private final ObjectMap<String, Boolean> createdScenes;
     private Scene currentScene;
 
+    // constructor initialise the scene manager with empty object maps and null current scene
     public SceneManager() {
         scenes = new ObjectMap<>();
         createdScenes = new ObjectMap<>();
         currentScene = null;
     }
 
-    // Registration
+    // ensure that scene names and scene objects are valid and prevent dups
 
     @Override
     public boolean addScene(String name, Scene scene) {
@@ -71,8 +74,7 @@ public class SceneManager implements ISceneSystem {
         return true;
     }
 
-    // Scene switching
-
+    // scene switching with caching to prevent redundant amt of create() calls and improve performance
     @Override
     public boolean loadScene(String name) {
         //if (!scenes.containsKey(name)) return false;
@@ -113,8 +115,7 @@ public class SceneManager implements ISceneSystem {
         return false;
     }
 
-    // Per-frame delegation
-
+    // update and render forward to current scene if it exist and is not paused, error handling to prevent engine crash
     @Override
     public boolean update(float deltaTime) {
         if (!Float.isFinite(deltaTime) || deltaTime < 0f) {
@@ -134,6 +135,7 @@ public class SceneManager implements ISceneSystem {
         return false;
     }
 
+    // two-pass rendering to ensure clean state transition between SpriteBatch and ShapeRenderer
     @Override
     public boolean render() {
         if (currentScene != null) {
@@ -148,7 +150,7 @@ public class SceneManager implements ISceneSystem {
         return false;
     }
 
-    // Shutdown
+    // dispose all scenes and clear caches
 
     @Override
     public void dispose() {
@@ -170,8 +172,7 @@ public class SceneManager implements ISceneSystem {
         currentScene = null;
     }
 
-    // Query
-
+    // GameMaster get current scene and check if a scene exist by name for scene switching
     @Override
     public Scene getCurrentScene() {
         return currentScene;
