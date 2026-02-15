@@ -26,7 +26,7 @@ public class InputManager implements IInputSystem {
 
     private boolean mouseMode = false;
 
-    // Set true if you want console logs for misconfiguration (optional)
+    // Set true if you want console logs for misconfiguration 
     private static final boolean DEBUG_INPUT = false;
 
     public InputManager(InputBindings bindings) {
