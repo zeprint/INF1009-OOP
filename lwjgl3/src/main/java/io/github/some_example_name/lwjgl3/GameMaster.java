@@ -7,37 +7,33 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 /**
-* GameMaster - Core engine coordinator
-* Owns and initialises all engine managers, delegates the game loop,
-* and manages shared rendering resources.
-*
-* All managers are stored and exposed as interfaces so the
-* concrete implementations can be swapped without changing this class.
-*
-* SCENES manages 2 scenes, GameScene (play) and PauseScene (pause).
-* The game scene is always rendered when paused,
-* the PauseScene overlay is drawn on top with a semi-transparent background.
-*/
+ * GameMaster - Core engine coordinator (non-contextual).
+ * 
+ * Owns and initialises all engine managers, delegates the game loop,
+ * and manages shared rendering resources.
+ * All managers are stored and exposed as interfaces so the
+ * concrete implementations can be swapped without changing this class.
+ */
 public class GameMaster extends ApplicationAdapter {
 
-    // Engine managers, stored as interfaces for DIP compliance
-    private ISceneSystem sceneSystem;
-    private IEntitySystem entitySystem;
-    private IMovementSystem movementSystem;
+    // Engine managers (DIP: stored as interfaces)
+    private ISceneSystem     sceneSystem;
+    private IEntitySystem    entitySystem;
+    private IMovementSystem  movementSystem;
     private ICollisionSystem collisionSystem;
-    private IInputSystem inputSystem;
-    private IAudioSystem audioSystem;
+    private IInputSystem     inputSystem;
+    private IAudioSystem     audioSystem;
 
     // Shared rendering resources
-    private SpriteBatch spriteBatch;
+    private SpriteBatch   spriteBatch;
     private ShapeRenderer shapeRenderer;
 
-    // Scene references for overlay rendering
-    private GameScene gameScene;
-    private PauseScene pauseScene;
-    private boolean paused = false;
+    // Scene management: Logic Engine injection point
+    private Scene logicEngineScene;  // Injected by Logic Engine if present (null = fallback mode)
+    private SampleLogicScreen fallbackScreen;  // Error handling fallback when no Logic Engine
 
-    // ApplicationAdapter lifecycle
+    // --- ApplicationAdapter lifecycle ---
+
     @Override
     public void create() {
         initRendering();
@@ -54,33 +50,24 @@ public class GameMaster extends ApplicationAdapter {
 
         float dt = Gdx.graphics.getDeltaTime();
 
-        // Always poll input (even during pause, to detect unpause)
         inputSystem.update();
 
-        // Handle pause toggle (P key)
-        if (inputSystem.isActionTriggered(InputAction.TOGGLE_PAUSE)) {
-            paused = !paused;
-        }
-
-        // Update game logic only when not paused
-        if (!paused) {
-            gameScene.update(dt);
-        }
-
-        // Always render the game scene (frozen when paused)
-        gameScene.render();
-
-        // Render pause overlay on top when paused
-        if (paused) {
-            pauseScene.render();
+        // Check if Logic Engine is present
+        if (logicEngineScene != null) {
+            // Logic Engine is loaded: use its scene
+            logicEngineScene.update(dt);
+            logicEngineScene.render();
+        } else {
+            // Logic Engine NOT loaded: use fallback error handling screen
+            fallbackScreen.update(dt);
+            fallbackScreen.render();
         }
     }
-    // Forward to scenes if they need to react
+
     @Override
     public void resize(int width, int height) {
-        // scene has full control over how to handle resize
     }
-    // dispose() is called when application is destoryed, dispose all resources to prevent memory leaks issue
+
     @Override
     public void dispose() {
         sceneSystem.dispose();
@@ -88,34 +75,40 @@ public class GameMaster extends ApplicationAdapter {
         spriteBatch.dispose();
         shapeRenderer.dispose();
     }
-    // called in create() to set up the engine before the game loop starts
+
+    // --- Initialisation helpers ---
+
     private void initRendering() {
-        spriteBatch = new SpriteBatch();
+        spriteBatch   = new SpriteBatch();
         shapeRenderer = new ShapeRenderer();
     }
-    // called in create() to set up the engine before the game loop starts, create all managers and systems
+
     private void initManagers() {
-        entitySystem = new EntityManager();
-        movementSystem = new MovementManager();
+        entitySystem    = new EntityManager();
+        movementSystem  = new MovementManager();
         collisionSystem = new CollisionManager();
-        audioSystem = new AudioManager();
-        sceneSystem = new SceneManager();
+        audioSystem     = new AudioManager();
+        sceneSystem     = new SceneManager();
     }
-    // called in create() to set up the engine before the game loop starts, set up input bindings and input manager
+
     private void initInput() {
         InputBindings bindings = new InputBindings();
 
-        // Movement: A/D or Left/Right arrows keys
-        bindings.bindAxis(InputAxis.MOVE_X, com.badlogic.gdx.Input.Keys.A, com.badlogic.gdx.Input.Keys.D);
-        bindings.bindAxis(InputAxis.MOVE_X, com.badlogic.gdx.Input.Keys.LEFT, com.badlogic.gdx.Input.Keys.RIGHT);
+        // Movement: A/D or Left/Right arrows
+        bindings.bindAxis(InputAxis.MOVE_X,
+                com.badlogic.gdx.Input.Keys.A,
+                com.badlogic.gdx.Input.Keys.D);
+        bindings.bindAxis(InputAxis.MOVE_X,
+                com.badlogic.gdx.Input.Keys.LEFT,
+                com.badlogic.gdx.Input.Keys.RIGHT);
 
-        bindings.bindAxis(InputAxis.MOVE_Y, com.badlogic.gdx.Input.Keys.S, com.badlogic.gdx.Input.Keys.W);
+        bindings.bindAxis(InputAxis.MOVE_Y,
+                com.badlogic.gdx.Input.Keys.S,
+                com.badlogic.gdx.Input.Keys.W);
 
         // Actions
-        bindings.bindAction(InputAction.TOGGLE_MUTE, com.badlogic.gdx.Input.Keys.M);
-        bindings.bindAction(InputAction.TOGGLE_DEBUG, com.badlogic.gdx.Input.Keys.F1);
-        bindings.bindAction(InputAction.TOGGLE_PAUSE, com.badlogic.gdx.Input.Keys.P);
-        bindings.bindAction(InputAction.TOGGLE_PAUSE, com.badlogic.gdx.Input.Keys.ESCAPE);
+        bindings.bindAction(InputAction.TOGGLE_MUTE,  com.badlogic.gdx.Input.Keys.M);
+        bindings.bindAction(InputAction.TOGGLE_DEBUG,  com.badlogic.gdx.Input.Keys.F1);
 
         inputSystem = new InputManager(bindings);
     }
@@ -123,36 +116,24 @@ public class GameMaster extends ApplicationAdapter {
     private void loadAssets() {
         try {
             audioSystem.loadSound("click", "click.wav");
-        } 
-        catch (Exception e) {
+        } catch (Exception e) {
             Gdx.app.error("GameMaster", "Asset load failed: " + e.getMessage());
         }
     }
 
     private void initScenes() {
-        // Scene 1, main game scene with everything needed for gameplay
-        gameScene = new GameScene(
-                entitySystem,
-                movementSystem,
-                collisionSystem,
-                inputSystem,
-                audioSystem,
-                spriteBatch,
-                shapeRenderer);
-
-        // Scene 2, to display pause overlay
-        pauseScene = new PauseScene();
-
-        // Register both with SceneManager for lifecycle management
-        sceneSystem.addScene("simulation", gameScene);
-        sceneSystem.addScene("pause", pauseScene);
-
-        // Initial load of both scenes, creates resources
-        sceneSystem.loadScene("simulation");
-        pauseScene.create();
+        // Initialize fallback/error handling screen (displayed when no Logic Engine is loaded)
+        fallbackScreen = new SampleLogicScreen(spriteBatch, shapeRenderer);
+        fallbackScreen.create();
+        
+        // Logic Engine injection point: remains null until Logic Engine loads
+        logicEngineScene = null;
+        
+        Gdx.app.log("GameMaster", "Engine initialized. Waiting for Logic Engine...");
     }
 
-    // Public accessors for Logic Engine, DIP: return interfaces
+    // --- Public accessors for Logic Engine (DIP: return interfaces) ---
+
     public ISceneSystem getSceneSystem() {
         return sceneSystem;
     }
@@ -176,4 +157,18 @@ public class GameMaster extends ApplicationAdapter {
     public IAudioSystem getAudioSystem() {
         return audioSystem;
     }
-}
+
+    public void setLogicEngineScene(Scene scene) {
+        if (scene != null) {
+            logicEngineScene = scene;
+            logicEngineScene.create();
+            Gdx.app.log("GameMaster", "Logic Engine scene LOADED. Fallback screen disabled.");
+        } else {
+            logicEngineScene = null;
+            Gdx.app.log("GameMaster", "Logic Engine scene UNLOADED. Fallback screen ACTIVE.");
+        }
+    }
+
+    public boolean isLogicEngineLoaded() {
+        return logicEngineScene != null;
+    }}
