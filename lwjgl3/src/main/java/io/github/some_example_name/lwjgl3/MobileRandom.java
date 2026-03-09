@@ -31,7 +31,6 @@ public class MobileRandom implements DistributionType {
         return MathUtils.random(min, max);
     }
 
-    @Override
     public void setRange(float min, float max) {
         if (Float.isNaN(min) || Float.isInfinite(min) || Float.isNaN(max) || Float.isInfinite(max)) {
             throw new IllegalArgumentException("range values must be finite");
@@ -43,12 +42,10 @@ public class MobileRandom implements DistributionType {
         this.max = max;
     }
 
-    @Override
     public float getMin() {
         return min;
     }
 
-    @Override
     public float getMax() {
         return max;
     }

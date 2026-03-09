@@ -25,15 +25,30 @@ public class MovementManager implements IMovementSystem {
 
     @Override
     public void unregisterComponent(MovementComponent component) {
+        if (component == null) {
+            return;
+        }
         components.removeValue(component, true);
     }
 
     @Override
-    public MovementComponent getComponent(Entity entity) {
-        for (MovementComponent c : components) {
-            if (c.getEntity() == entity) return c;
+    public MovementComponent getComponent(Positionable entity) {
+        Array<MovementComponent> matches = getComponents(entity);
+        return matches.size > 0 ? matches.first() : null;
+    }
+
+    @Override
+    public Array<MovementComponent> getComponents(Positionable entity) {
+        if (entity == null) {
+            throw new IllegalArgumentException("entity cannot be null");
         }
-        return null;
+        Array<MovementComponent> matches = new Array<>();
+        for (MovementComponent c : components) {
+            if (c.getEntity() == entity) {
+                matches.add(c);
+            }
+        }
+        return matches;
     }
 
     @Override

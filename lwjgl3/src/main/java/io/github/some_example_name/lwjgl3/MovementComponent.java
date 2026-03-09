@@ -10,12 +10,15 @@ public abstract class MovementComponent {
 
     protected static final float DEFAULT_VELOCITY = 0f;
 
-    private final Entity entity;
+    private final Positionable entity;
     protected float velocityX;
     protected float velocityY;
     protected boolean enabled;
 
-    public MovementComponent(Entity entity) {
+    public MovementComponent(Positionable entity) {
+        if (entity == null) {
+            throw new IllegalArgumentException("entity cannot be null");
+        }
         this.entity = entity;
         this.velocityX = DEFAULT_VELOCITY;
         this.velocityY = DEFAULT_VELOCITY;
@@ -25,21 +28,27 @@ public abstract class MovementComponent {
     /** Subclasses implement their specific movement logic. */
     public abstract void update(float deltaTime);
 
-    /**
-     * Apply current velocity to the attached entity's position.
-     * Shared helper extracted from GravityMovement and RotationComponent
-     */
     protected void applyVelocity(float deltaTime) {
-        Entity e = getEntity();
-        if (e == null) return;
+        Positionable e = getEntity();
         e.setX(e.getX() + velocityX * deltaTime);
         e.setY(e.getY() + velocityY * deltaTime);
+    }
+
+    /** Shared guard to keep all movement updates consistent. */
+    protected final void validateDeltaTime(float deltaTime) {
+        if (!Float.isFinite(deltaTime) || deltaTime < 0f) {
+            throw new IllegalArgumentException("deltaTime must be a finite, non-negative value");
+        }
     }
 
     // --- Velocity ---
 
     public void  setVelocity(float vx, float vy) {
-        velocityX = vx; velocityY = vy;
+        if (!Float.isFinite(vx) || !Float.isFinite(vy)) {
+            throw new IllegalArgumentException("velocity values must be finite");
+        }
+        velocityX = vx;
+        velocityY = vy;
     }
 
     public float getVelocityX() {
@@ -66,7 +75,7 @@ public abstract class MovementComponent {
 
     // --- Entity reference ---
 
-    public Entity getEntity() {
+    public Positionable getEntity() {
         return entity;
     }
 }
