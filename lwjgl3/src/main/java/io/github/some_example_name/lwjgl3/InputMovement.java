@@ -3,12 +3,8 @@ package io.github.some_example_name.lwjgl3;
 /**
  * InputMovement - Movement component driven by the input system.
  *
- * SRP FIX: Moves entity-input handling out of GameScene and into a proper
- * MovementComponent, so the scene no longer directly manipulates entity
- * position. This also means the bucket's movement is managed by the
- * MovementManager like every other moving entity.
- *
- * DIP: Depends on IInputSystem interface, not InputManager.
+ * Moves input-driven translation into a reusable movement component so scenes
+ * do not directly manipulate entity position.
  */
 public class InputMovement extends MovementComponent {
 
@@ -21,13 +17,7 @@ public class InputMovement extends MovementComponent {
     private float minBound;
     private float maxBound;
 
-    /**
-     * @param entity      The entity to move.
-     * @param inputSystem The input system to read axis values from (DIP).
-     * @param axis        Which input axis drives this movement.
-     * @param speed       Movement speed in pixels per second.
-     */
-    public InputMovement(Entity entity, IInputSystem inputSystem,
+    public InputMovement(Positionable entity, IInputSystem inputSystem,
                          InputAxis axis, float speed) {
         super(entity);
         if (inputSystem == null) {
@@ -36,16 +26,25 @@ public class InputMovement extends MovementComponent {
         if (axis == null) {
             throw new IllegalArgumentException("axis cannot be null");
         }
-        this.inputSystem     = inputSystem;
-        this.axis            = axis;
-        this.speed           = speed;
+        if (!Float.isFinite(speed) || speed < 0f) {
+            throw new IllegalArgumentException("speed must be a finite, non-negative value");
+        }
+        this.inputSystem = inputSystem;
+        this.axis = axis;
+        this.speed = speed;
         this.boundsConfigured = false;
     }
 
     /**
-     * Set horizontal bounds for clamping the entity's position.
+     * Set bounds for the selected movement axis.
      */
     public void setBounds(float min, float max) {
+        if (!Float.isFinite(min) || !Float.isFinite(max)) {
+            throw new IllegalArgumentException("bounds must be finite");
+        }
+        if (min > max) {
+            throw new IllegalArgumentException("min must be less than or equal to max");
+        }
         this.minBound = min;
         this.maxBound = max;
         this.boundsConfigured = true;
@@ -53,24 +52,33 @@ public class InputMovement extends MovementComponent {
 
     @Override
     public void update(float deltaTime) {
-        if (!enabled || inputSystem == null) {
+        validateDeltaTime(deltaTime);
+
+        if (!enabled) {
             return;
         }
 
-        Entity entity = getEntity();
-        if (entity == null) {
-            return;
-        }
+        Positionable entity = getEntity();
 
         float axisValue = inputSystem.getAxis(axis);
-        float dx = axisValue * speed * deltaTime;
-        float newX = entity.getX() + dx;
+        float delta = axisValue * speed * deltaTime;
 
-        if (boundsConfigured) {
-            newX = Math.max(minBound, Math.min(maxBound, newX));
+        if (axis == InputAxis.MOVE_X) {
+            float newX = entity.getX() + delta;
+            if (boundsConfigured) {
+                newX = Math.max(minBound, Math.min(maxBound, newX));
+            }
+            entity.setX(newX);
+            return;
         }
 
-        entity.setX(newX);
+        if (axis == InputAxis.MOVE_Y) {
+            float newY = entity.getY() + delta;
+            if (boundsConfigured) {
+                newY = Math.max(minBound, Math.min(maxBound, newY));
+            }
+            entity.setY(newY);
+        }
     }
 
     public float getSpeed() {

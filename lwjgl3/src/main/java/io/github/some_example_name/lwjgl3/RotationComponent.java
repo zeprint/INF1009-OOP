@@ -3,7 +3,7 @@ package io.github.some_example_name.lwjgl3;
 /**
  * RotationComponent - Movement component with angular velocity.
  */
-public class RotationComponent extends MovementComponent implements Rotatable {
+public class RotationComponent extends MovementComponent {
 
     protected static final float DEFAULT_ROTATION = 0f;
     protected static final float DEFAULT_ANGULAR_VELOCITY = 0f;
@@ -11,30 +11,31 @@ public class RotationComponent extends MovementComponent implements Rotatable {
     private float rotationAngle;
     private float angularVelocity;
 
-    public RotationComponent(Entity entity) {
+    public RotationComponent(Positionable entity) {
         super(entity);
-        this.rotationAngle = DEFAULT_ROTATION;
-        this.angularVelocity = DEFAULT_ANGULAR_VELOCITY;
+        setRotationAngle(DEFAULT_ROTATION);
+        setAngularVelocity(DEFAULT_ANGULAR_VELOCITY);
     }
 
-    public RotationComponent(Entity entity, float rotationAngle) {
+    public RotationComponent(Positionable entity, float rotationAngle) {
         super(entity);
-        this.rotationAngle = rotationAngle;
-        this.angularVelocity = DEFAULT_ANGULAR_VELOCITY;
+        setRotationAngle(rotationAngle);
+        setAngularVelocity(DEFAULT_ANGULAR_VELOCITY);
     }
 
-    public RotationComponent(Entity entity, float rotationAngle, float velocityX, float velocityY) {
+    public RotationComponent(Positionable entity, float rotationAngle, float velocityX, float velocityY) {
         super(entity);
-        this.rotationAngle = rotationAngle;
-        this.angularVelocity = DEFAULT_ANGULAR_VELOCITY;
-        this.velocityX = velocityX;
-        this.velocityY = velocityY;
+        setRotationAngle(rotationAngle);
+        setAngularVelocity(DEFAULT_ANGULAR_VELOCITY);
+        setVelocity(velocityX, velocityY);
     }
 
     // Per-frame update
 
     @Override
     public void update(float deltaTime) {
+        validateDeltaTime(deltaTime);
+
         if (!enabled) {
             return;
         }
@@ -42,13 +43,12 @@ public class RotationComponent extends MovementComponent implements Rotatable {
         rotationAngle += angularVelocity * deltaTime;
         normaliseRotationAngle();
 
-        // LSP: check interface instead of unsafe cast to RotatingShape
-        Entity entity = getEntity();
+        Positionable entity = getEntity();
         if (entity instanceof HasRotation) {
             ((HasRotation) entity).setRotationAngle(rotationAngle);
         }
 
-        applyVelocity(deltaTime);   // DRY: inherited from MovementComponent
+        applyVelocity(deltaTime);
     }
 
     private void normaliseRotationAngle() {
@@ -59,10 +59,12 @@ public class RotationComponent extends MovementComponent implements Rotatable {
     // Angular velocity
 
     public void  setAngularVelocity(float av) {
+        if (!Float.isFinite(av)) {
+            throw new IllegalArgumentException("angularVelocity must be finite");
+        }
         this.angularVelocity = av;
     }
 
-    @Override
     public float getAngularVelocity() {
         return angularVelocity;
     }
@@ -70,6 +72,9 @@ public class RotationComponent extends MovementComponent implements Rotatable {
     // Rotation angle
     
     public void setRotationAngle(float angle) {
+        if (!Float.isFinite(angle)) {
+            throw new IllegalArgumentException("rotation angle must be finite");
+        }
         this.rotationAngle = angle;
         normaliseRotationAngle();
     }

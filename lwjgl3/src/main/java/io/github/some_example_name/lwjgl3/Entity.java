@@ -13,7 +13,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
  * Subclasses override only the methods they need.
  */
 
-public abstract class Entity implements Renderable, IEntity {
+public abstract class Entity implements Renderable, IEntity, Positionable {
 
     private static final String TAG = "Entity";
 
