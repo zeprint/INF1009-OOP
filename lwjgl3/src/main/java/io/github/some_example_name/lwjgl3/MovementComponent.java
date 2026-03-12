@@ -2,9 +2,6 @@ package io.github.some_example_name.lwjgl3;
 
 /**
  * MovementComponent - Abstract base for all movement components.
- *
- * Provides velocity state, enable/disable, and a shared applyVelocity()
- * helper so subclasses don't duplicate position-update logic.
  */
 public abstract class MovementComponent {
 
