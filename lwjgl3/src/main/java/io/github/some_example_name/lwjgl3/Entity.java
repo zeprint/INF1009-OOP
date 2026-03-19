@@ -1,109 +1,131 @@
 package io.github.some_example_name.lwjgl3;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.utils.ObjectMap;
 
 /**
  * Entity - Abstract base for every object managed by the engine.
- *
- * Implements Renderable and IEntity with no-op defaults so that
- * EntityManager can iterate a single typed list for drawing and updating.
- * Subclasses override only the methods they need.
+ * Uses a component-based architecture for flexible composition.
  */
 
-public abstract class Entity implements Renderable, IEntity, Positionable {
+public abstract class Entity {
 
-    private static final String TAG = "Entity";
+    private final String id;
+    private boolean active;
+    private final ObjectMap<Class<? extends Component>, Component> components;
 
-    protected float posX;
-    protected float posY;
-    protected Color color;
+    // Creates a new Entity with an auto-generated unique ID.
+    public Entity() {
+        this(generateId());
+    }
 
-    public Entity(float x, float y) {
-        if (!Float.isFinite(x) || !Float.isFinite(y)) {
-            throw new IllegalArgumentException(
-                "Entity position must be finite: x=" + x + ", y=" + y);
+    // Creates a new Entity with the given ID.
+    public Entity(String id) {
+        if (id == null || id.isEmpty()) {
+            throw new IllegalArgumentException("Entity ID cannot be null or empty.");
         }
-        this.posX = x;
-        this.posY = y;
-        this.color = Color.WHITE;
+        this.id = id;
+        this.active = true;
+        this.components = new ObjectMap<>();
     }
 
-    // Position
-
-    public float getX() {
-        return posX;
+    // Generates a unique ID using libGDX's MathUtils and system time.
+    private static String generateId() {
+        return "entity_" + System.nanoTime() + "_" + MathUtils.random(0, 999999);
     }
 
-    public boolean setX(float x) {
-        if (!Float.isFinite(x)) {
-            Gdx.app.error(TAG, "setX rejected non-finite value: " + x);
-            return false;
+    // ---- Component Management ----
+
+    // Adds a component to this entity. Only one component of each type can exist on an entity at a time.
+    public <T extends Component> Entity addComponent(T component) {
+        if (component == null) {
+            throw new IllegalArgumentException("Component cannot be null.");
         }
-        posX = x;
-        return true;
-    }
 
-    public float getY() {
-        return posY;
-    }
+        Class<? extends Component> type = component.getClass();
 
-    public boolean setY(float y) {
-        if (!Float.isFinite(y)) {
-            Gdx.app.error(TAG, "setY rejected non-finite value: " + y);
-            return false;
+        // Dispose old component of same type if it exists
+        Component existing = components.get(type);
+        if (existing != null) {
+            existing.dispose();
         }
-        posY = y;
-        return true;
+
+        components.put(type, component);
+        component.init(this);
+        return this;
     }
 
-    // Color
-
-    public Color getColor() {
-        return color;
+    // Retrieves a component of the specified type from this entity.
+    @SuppressWarnings("unchecked")
+    public <T extends Component> T getComponent(Class<T> type) {
+        return (T) components.get(type);
     }
 
-    public boolean setColor(Color c) {
-        if (c == null) {
-            Gdx.app.error(TAG, "setColor rejected null colour");
-            return false;
+    // Checks whether this entity has a component of the given type.
+    public boolean hasComponent(Class<? extends Component> type) {
+        return components.containsKey(type);
+    }
+
+    // Removes a component of the given type from this entity. The removed component is disposed before removal.
+    @SuppressWarnings("unchecked")
+    public <T extends Component> T removeComponent(Class<T> type) {
+        Component removed = components.remove(type);
+        if (removed != null) {
+            removed.dispose();
         }
-        color = c;
-        return true;
+        return (T) removed;
     }
 
-    // Renderable (safe no-op defaults)
+    // ---- Lifecycle Methods ----
+
+    // Called every frame to update this entity's state.
+    public void update(float deltaTime) {
+        if (!active) return;
+
+        for (Component component : components.values()) {
+            component.update(deltaTime);
+        }
+    }
+
+    // Called when this entity is being removed from the simulation. Disposes all attached components and releases resources.
+    public void dispose() {
+        for (Component component : components.values()) {
+            component.dispose();
+        }
+        components.clear();
+    }
+
+    // ---- Getters and Setters ----
+
+    // Returns this entity's unique identifier.
+    public String getId() {
+        return id;
+    }
+
+    // Returns whether this entity is active. Inactive entities are skipped during update and render.
+    public boolean isActive() {
+        return active;
+    }
+
+    // Sets whether this entity is active.
+    public void setActive(boolean active) {
+        this.active = active;
+    }
 
     @Override
-    public boolean draw(SpriteBatch batch) {
-        return false;
+    public String toString() {
+        return getClass().getSimpleName() + "[id=" + id + ", active=" + active + "]";
     }
 
     @Override
-    public boolean draw(ShapeRenderer shape) {
-        return false;
-    }
-
-    // IEntity lifecycle (safe no-op defaults)
-
-    @Override
-    public boolean initialize() {
-        return true;
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof Entity)) return false;
+        return this.id.equals(((Entity) obj).id);
     }
 
     @Override
-    public boolean update(float deltaTime) {
-        if (!Float.isFinite(deltaTime) || deltaTime < 0f) {
-            Gdx.app.error(TAG, "update rejected invalid deltaTime: " + deltaTime);
-            return false;
-        }
-        return true;
-    }
-
-      @Override
-    public boolean dispose() {
-        return true;
+    public int hashCode() {
+        return id.hashCode();
     }
 }

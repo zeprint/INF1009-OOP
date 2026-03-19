@@ -1,125 +1,171 @@
 package io.github.some_example_name.lwjgl3;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectMap;
 
 /**
  * EntityManager - Creates, manages, updates, and disposes all entities.
- *
- * Rendering contract: SpriteBatch and ShapeRenderer cannot both be active
- * simultaneously. Callers begin/end renderers; EntityManager checks isDrawing().
+ * Uses deferred queues to safely add and remove entities during updates.
  */
 
-public class EntityManager implements IEntitySystem {
+public class EntityManager {
 
-    private static final String TAG = "EntityManager";
-
+    private final ObjectMap<String, Entity> entitiesById;
     private final Array<Entity> entityList;
 
+    // Deferred queues — processed at the start of each update cycle
+    private final Array<Entity> pendingAdd;
+    private final Array<Entity> pendingRemove;
+
+    // Creates a new, empty EntityManager.
     public EntityManager() {
-        entityList = new Array<Entity>();
+        this.entitiesById = new ObjectMap<>();
+        this.entityList = new Array<>();
+        this.pendingAdd = new Array<>();
+        this.pendingRemove = new Array<>();
     }
 
-    // Lifecycle
+    // ---- Entity Lifecycle ----
 
-    @Override
-    public boolean addEntity(Entity entity) {
+    // Queues an entity to be added at the start of the next update cycle.
+    public void addEntity(Entity entity) {
         if (entity == null) {
-            Gdx.app.error(TAG, "addEntity rejected null entity");
-            return false;
+            throw new IllegalArgumentException("Cannot add a null entity.");
         }
-        if (entityList.contains(entity, true)) {
-            Gdx.app.error(TAG, "addEntity rejected duplicate entity: " + entity);
-            return false;
+        if (entitiesById.containsKey(entity.getId())) {
+            throw new IllegalArgumentException(
+                "An entity with ID '" + entity.getId() + "' already exists."
+            );
         }
-        entityList.add(entity);
-        return true;
+        pendingAdd.add(entity);
     }
 
-    @Override
-    public boolean removeEntity(Entity entity, boolean identity) {
-        if (entity == null) {
-            Gdx.app.error(TAG, "removeEntity rejected null entity");
-            return false;
+    // Queues an entity to be removed at the start of the next update cycle.
+    public void removeEntity(Entity entity) {
+        if (entity != null) {
+            pendingRemove.add(entity);
         }
-        boolean removed = entityList.removeValue(entity, identity);
-        if (!removed) {
-            Gdx.app.error(TAG, "removeEntity could not find entity: " + entity);
-        }
-        return removed;
     }
 
-    @Override
-    public Array<Entity> getEntityList() {
-        return entityList;
+    // Queues an entity for removal by its ID.
+    public void removeEntity(String id) {
+        Entity entity = entitiesById.get(id);
+        if (entity != null) {
+            pendingRemove.add(entity);
+        }
     }
 
-    // Per-frame update
+    // Processes pending additions and removals, then updates all active entities.
+    public void update(float deltaTime) {
+        // Process deferred operations first
+        processPending();
 
-    @Override
-    public boolean update(float deltaTime) {
-        if (!Float.isFinite(deltaTime) || deltaTime < 0f) {
-            Gdx.app.error(TAG, "update rejected invalid deltaTime: " + deltaTime);
-            return false;
-        }
-
-        boolean allSucceeded = true;
-        for (Entity entity : entityList) {
-            try {
-                if (!entity.update(deltaTime)) {
-                    allSucceeded = false;
-                }
-            } catch (Exception e) {
-                Gdx.app.error(TAG, "Exception updating entity: " + entity, e);
-                allSucceeded = false;
+        // Update all active entities
+        for (int i = 0; i < entityList.size; i++) {
+            Entity entity = entityList.get(i);
+            if (entity.isActive()) {
+                entity.update(deltaTime);
             }
         }
-        return allSucceeded;
     }
 
-    // Rendering
+    // Renders all active entities that have both a Transform and Renderable component.
+    public void render(SpriteBatch batch) {
+        for (int i = 0; i < entityList.size; i++) {
+            Entity entity = entityList.get(i);
+            if (!entity.isActive()) continue;
 
-    @Override
-    public boolean draw(SpriteBatch batch, ShapeRenderer shape) {
-        boolean allSucceeded = true;
-        for (Entity entity : entityList) {
-            try {
-                if (batch != null && batch.isDrawing()) {
-                    if (!entity.draw(batch)) {
-                        allSucceeded = false;
-                    }
-                }
-                if (shape != null && shape.isDrawing()) {
-                    if (!entity.draw(shape)) {
-                        allSucceeded = false;
-                    }
-                }
-            } catch (Exception e) {
-                Gdx.app.error(TAG, "Exception drawing entity: " + entity, e);
-                allSucceeded = false;
+            Renderable renderable = entity.getComponent(Renderable.class);
+            Transform transform = entity.getComponent(Transform.class);
+
+            if (renderable != null && transform != null) {
+                renderable.render(batch, transform);
             }
         }
-        return allSucceeded;
     }
 
-    // Shutdown
+    // Disposes all entities and clears the manager.
+    public void dispose() {
+        // Also dispose anything in the pending queue
+        for (int i = 0; i < pendingAdd.size; i++) {
+            pendingAdd.get(i).dispose();
+        }
+        pendingAdd.clear();
+        pendingRemove.clear();
 
-    @Override
-    public boolean dispose() {
-        boolean allSucceeded = true;
-        for (Entity entity : entityList) {
-            try {
-                if (!entity.dispose()) {
-                    allSucceeded = false;
-                }
-            } catch (Exception e) {
-                Gdx.app.error(TAG, "Exception disposing entity: " + entity, e);
-                allSucceeded = false;
-            }
+        for (int i = 0; i < entityList.size; i++) {
+            entityList.get(i).dispose();
         }
         entityList.clear();
-        return allSucceeded;
+        entitiesById.clear();
+    }
+
+    // Retrieves an entity by its unique ID.
+    public Entity getEntity(String id) {
+        return entitiesById.get(id);
+    }
+
+    // Returns all entities of a given type (class or subclass).
+    @SuppressWarnings("unchecked")
+    public <T> Array<T> getEntitiesByType(Class<T> type) {
+        Array<T> result = new Array<>();
+        for (int i = 0; i < entityList.size; i++) {
+            Entity entity = entityList.get(i);
+            if (type.isInstance(entity)) {
+                result.add((T) entity);
+            }
+        }
+        return result;
+    }
+
+    // Returns all entities that have a specific component type.
+    public Array<Entity> getEntitiesWithComponent(Class<? extends Component> componentType) {
+        Array<Entity> result = new Array<>();
+        for (int i = 0; i < entityList.size; i++) {
+            Entity entity = entityList.get(i);
+            if (entity.hasComponent(componentType)) {
+                result.add(entity);
+            }
+        }
+        return result;
+    }
+
+    // Returns the total number of managed entities (excluding pending).
+    public int getEntityCount() {
+        return entityList.size;
+    }
+
+    // Returns a copy of all entities.
+    public Array<Entity> getAllEntities() {
+        return new Array<>(entityList);
+    }
+
+    // ---- Internal ----
+
+    // Processes the deferred add and remove queues.
+    private void processPending() {
+        // Process removals
+        if (pendingRemove.size > 0) {
+            for (int i = 0; i < pendingRemove.size; i++) {
+                Entity entity = pendingRemove.get(i);
+                if (entitiesById.containsKey(entity.getId())) {
+                    entityList.removeValue(entity, true);
+                    entitiesById.remove(entity.getId());
+                    entity.dispose();
+                }
+            }
+            pendingRemove.clear();
+        }
+
+        // Process additions
+        if (pendingAdd.size > 0) {
+            for (int i = 0; i < pendingAdd.size; i++) {
+                Entity entity = pendingAdd.get(i);
+                entitiesById.put(entity.getId(), entity);
+                entityList.add(entity);
+            }
+            pendingAdd.clear();
+        }
     }
 }
