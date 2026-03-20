@@ -70,6 +70,19 @@ public class InputManager implements IInputSystem {
         return b != null && b;
     }
 
+    @Override
+    public boolean isActionHeld(InputAction action) {
+        if (action == null)
+            return false; // defensive
+        Array<Integer> keys = bindings.getActionKeys(action);
+        for (int i = 0; i < keys.size; i++) {
+            if (Gdx.input.isKeyPressed(keys.get(i))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public boolean isMouseMode() {
         return mouseMode;
     }

@@ -11,9 +11,7 @@ public interface IMovementSystem {
 
     void unregisterComponent(MovementComponent component);
 
-    MovementComponent getComponent(Positionable entity);
-
-    Array<MovementComponent> getComponents(Positionable entity);
-
     void update(float deltaTime);
+
+    Array<MovementComponent> getAllComponents();
 }
