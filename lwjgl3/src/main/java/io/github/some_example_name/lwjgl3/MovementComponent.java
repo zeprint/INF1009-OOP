@@ -7,16 +7,15 @@ public abstract class MovementComponent {
 
     protected static final float DEFAULT_VELOCITY = 0f;
 
-    private final Positionable entity;
+    private float positionX;
+    private float positionY;
     protected float velocityX;
     protected float velocityY;
     protected boolean enabled;
 
-    public MovementComponent(Positionable entity) {
-        if (entity == null) {
-            throw new IllegalArgumentException("entity cannot be null");
-        }
-        this.entity = entity;
+    public MovementComponent() {
+        this.positionX = 0f;
+        this.positionY = 0f;
         this.velocityX = DEFAULT_VELOCITY;
         this.velocityY = DEFAULT_VELOCITY;
         this.enabled = true;
@@ -26,9 +25,8 @@ public abstract class MovementComponent {
     public abstract void update(float deltaTime);
 
     protected void applyVelocity(float deltaTime) {
-        Positionable e = getEntity();
-        e.setX(e.getX() + velocityX * deltaTime);
-        e.setY(e.getY() + velocityY * deltaTime);
+        positionX += velocityX * deltaTime;
+        positionY += velocityY * deltaTime;
     }
 
     /** Shared guard to keep all movement updates consistent. */
@@ -40,7 +38,7 @@ public abstract class MovementComponent {
 
     // --- Velocity ---
 
-    public void  setVelocity(float vx, float vy) {
+    public void setVelocity(float vx, float vy) {
         if (!Float.isFinite(vx) || !Float.isFinite(vy)) {
             throw new IllegalArgumentException("velocity values must be finite");
         }
@@ -70,9 +68,21 @@ public abstract class MovementComponent {
         return enabled;
     }
 
-    // --- Entity reference ---
+    // --- Position state ---
 
-    public Positionable getEntity() {
-        return entity;
+    public void setPosition(float x, float y) {
+        if (!Float.isFinite(x) || !Float.isFinite(y)) {
+            throw new IllegalArgumentException("position values must be finite");
+        }
+        this.positionX = x;
+        this.positionY = y;
+    }
+
+    public float getPositionX() {
+        return positionX;
+    }
+
+    public float getPositionY() {
+        return positionY;
     }
 }

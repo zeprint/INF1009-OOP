@@ -9,6 +9,8 @@ public interface IInputSystem {
 
     boolean isActionTriggered(InputAction action);
 
+    boolean isActionHeld(InputAction action);
+
     void update();
 
     void dispose();

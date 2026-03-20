@@ -29,26 +29,6 @@ public class MovementManager implements IMovementSystem {
     }
 
     @Override
-    public MovementComponent getComponent(Positionable entity) {
-        Array<MovementComponent> matches = getComponents(entity);
-        return matches.size > 0 ? matches.first() : null;
-    }
-
-    @Override
-    public Array<MovementComponent> getComponents(Positionable entity) {
-        if (entity == null) {
-            throw new IllegalArgumentException("entity cannot be null");
-        }
-        Array<MovementComponent> matches = new Array<>();
-        for (MovementComponent c : components) {
-            if (c.getEntity() == entity) {
-                matches.add(c);
-            }
-        }
-        return matches;
-    }
-
-    @Override
     public void update(float deltaTime) {
         if (Float.isNaN(deltaTime) || Float.isInfinite(deltaTime) || deltaTime < 0f) {
             throw new IllegalArgumentException("deltaTime must be a finite, non-negative value");
@@ -68,6 +48,7 @@ public class MovementManager implements IMovementSystem {
         components.clear();
     }
 
+    @Override
     public Array<MovementComponent> getAllComponents() {
         return new Array<>(components);
     }
