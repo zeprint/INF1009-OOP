@@ -1,4 +1,4 @@
-package io.github.some_example_name.lwjgl3;
+package io.github.some_example_name.lwjgl3.AbstractEngine.entity;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;

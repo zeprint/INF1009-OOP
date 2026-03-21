@@ -1,17 +1,13 @@
-package io.github.some_example_name.lwjgl3;
+package io.github.some_example_name.lwjgl3.logic.entity;
 
+import io.github.some_example_name.lwjgl3.AbstractEngine.entity.Entity;
 import com.badlogic.gdx.math.Rectangle;
 
-/**
- * Character - The player-controlled entity in a Subway-Surfers-style game.
- *
- * Supports three-lane horizontal movement (left / right) and jumping.
- * Gravity is applied every frame; when the character lands on the floor
- * it is considered grounded and can jump again.
- *
- * The Character implements {@link Collidable} so the engine's
- * {@link CollisionManager} can detect hits with obstacles and the floor.
- */
+import io.github.some_example_name.lwjgl3.Collidable;
+import io.github.some_example_name.lwjgl3.CollisionManager;
+import io.github.some_example_name.lwjgl3.CollisionResult;
+import io.github.some_example_name.lwjgl3.CollisionType;
+
 public class Character extends Entity implements Collidable {
 
     // ---- Dimensions ----
@@ -132,7 +128,7 @@ public class Character extends Entity implements Collidable {
     }
 
     @Override
-    public void onCollision(Entity other) {
+    public void onCollision(CollisionResult result) {
         // Collision response is handled by the game scene / logic engine.
     }
 

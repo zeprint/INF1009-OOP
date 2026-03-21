@@ -1,4 +1,6 @@
-package io.github.some_example_name.lwjgl3;
+package io.github.some_example_name.lwjgl3.logic.entity;
+
+import io.github.some_example_name.lwjgl3.AbstractEngine.entity.Entity;
 
 /**
  * Floor - An infinite scrolling ground entity that the Character runs on.
