@@ -1,7 +1,5 @@
 package io.github.some_example_name.lwjgl3;
 
-import com.badlogic.gdx.math.Rectangle;
-
 /**
  * Floor - An infinite scrolling ground entity that the Character runs on.
  *
@@ -11,11 +9,11 @@ import com.badlogic.gdx.math.Rectangle;
  * off-screen on the left it is repositioned to the right of the other
  * tile, creating a seamless infinite-floor illusion.
  *
- * For collision purposes the floor reports a bounding box that spans
- * far beyond the visible area so that the Character is always supported
- * regardless of horizontal position.
+ * The Floor is purely visual — ground detection is handled analytically
+ * by {@link io.github.some_example_name.lwjgl3.logic.movement.JumpMovement}
+ * using the floor surface y-coordinate, so no collision is needed.
  */
-public class Floor extends Entity implements Collidable {
+public class Floor extends Entity {
 
     private final float tileWidth;
     private final float height;
@@ -25,8 +23,6 @@ public class Floor extends Entity implements Collidable {
     /** Left edge of each tile segment. */
     private float tileAX;
     private float tileBX;
-
-    private final CollisionType collisionType;
 
     /**
      * Creates an infinite Floor.
@@ -46,8 +42,6 @@ public class Floor extends Entity implements Collidable {
         // Place tile A at the origin and tile B directly to its right
         this.tileAX = 0f;
         this.tileBX = tileWidth;
-
-        this.collisionType = new CollisionType("floor", true, false);
     }
 
     // ---- Update (scrolling logic) ----
@@ -69,32 +63,6 @@ public class Floor extends Entity implements Collidable {
         }
 
         super.update(deltaTime);
-    }
-
-    // ---- Collidable ----
-
-    /**
-     * Returns a collision bounds that spans well beyond the visible area
-     * so the Character is always supported.  The y and height are exact;
-     * x and width are oversized on purpose.
-     */
-    @Override
-    public Rectangle getBounds() {
-        return new Rectangle(-10000f, y, 20000f, height);
-    }
-
-    @Override
-    public void onCollision(Entity other) {
-        // Floor is passive; it does not react to collisions.
-    }
-
-    @Override
-    public boolean isCollidable() {
-        return true;
-    }
-
-    public CollisionType getType() {
-        return collisionType;
     }
 
     // ---- Accessors ----
