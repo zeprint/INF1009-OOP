@@ -1,5 +1,12 @@
-package io.github.some_example_name.lwjgl3;
+package io.github.some_example_name.lwjgl3.logic.Collision;
 
+import io.github.some_example_name.lwjgl3.AbstractEngine.entity.Entity;
+import io.github.some_example_name.lwjgl3.Collidable;
+import io.github.some_example_name.lwjgl3.CollisionResult;
+import io.github.some_example_name.lwjgl3.IAudioSystem;
+import io.github.some_example_name.lwjgl3.logic.entity.Character;
+import io.github.some_example_name.lwjgl3.logic.entity.SmallObstacle;
+import io.github.some_example_name.lwjgl3.logic.entity.TallObstacle;
 /**
  * CollisionDispatcher - Concrete implementation of CollisionHandler.
  *

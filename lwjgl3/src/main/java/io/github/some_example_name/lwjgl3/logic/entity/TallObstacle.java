@@ -6,7 +6,7 @@ import com.badlogic.gdx.math.Rectangle;
 
 import io.github.some_example_name.lwjgl3.Collidable;
 import io.github.some_example_name.lwjgl3.CollisionResult;
-import io.github.some_example_name.lwjgl3.CollisionType;
+import io.github.some_example_name.lwjgl3.logic.Collision.CollisionHandler;
 
 /**
  * TallObstacle - A full-height obstacle equal to the Character's height.
@@ -27,7 +27,9 @@ public class TallObstacle extends Entity implements Collidable {
     private final float width;
     private final float height;
     private float scrollSpeed;
-    private final CollisionType collisionType;
+
+    // ---- Collision handler (Observer pattern) ----
+    private CollisionHandler collisionHandler;
 
     /**
      * Creates a TallObstacle.
@@ -55,7 +57,7 @@ public class TallObstacle extends Entity implements Collidable {
         this.x = x;
         this.y = floorY;
         this.scrollSpeed = scrollSpeed;
-        this.collisionType = new CollisionType("tall_obstacle", true, true);
+        this.collisionHandler = null;
     }
 
     // ---- Update ----
@@ -79,7 +81,10 @@ public class TallObstacle extends Entity implements Collidable {
 
     @Override
     public void onCollision(CollisionResult result) {
-        // Collision response delegated to game scene.
+        // Delegate to the CollisionHandler (Observer pattern).
+        if (collisionHandler != null) {
+            collisionHandler.onObstacleCollision(this, result);
+        }
     }
 
     @Override
@@ -87,8 +92,20 @@ public class TallObstacle extends Entity implements Collidable {
         return isActive();
     }
 
-    public CollisionType getType() {
-        return collisionType;
+    // ---- Collision handler injection ----
+
+    /**
+     * Sets the CollisionHandler that will receive collision callbacks.
+     * Called by GameScene at scene creation time.
+     *
+     * @param handler the CollisionHandler (typically a CollisionDispatcher)
+     */
+    public void setCollisionHandler(CollisionHandler handler) {
+        this.collisionHandler = handler;
+    }
+
+    public CollisionHandler getCollisionHandler() {
+        return collisionHandler;
     }
 
     // ---- Accessors ----

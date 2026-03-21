@@ -1,5 +1,8 @@
-package io.github.some_example_name.lwjgl3;
+package io.github.some_example_name.lwjgl3.logic.Collision;
 
+import io.github.some_example_name.lwjgl3.AbstractEngine.entity.Entity;
+import io.github.some_example_name.lwjgl3.CollisionResult;
+import io.github.some_example_name.lwjgl3.logic.entity.Character;
 /**
  * CollisionHandler - Observer interface for game-layer collision events.
  *

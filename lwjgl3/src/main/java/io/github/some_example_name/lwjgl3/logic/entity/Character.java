@@ -4,9 +4,8 @@ import io.github.some_example_name.lwjgl3.AbstractEngine.entity.Entity;
 import com.badlogic.gdx.math.Rectangle;
 
 import io.github.some_example_name.lwjgl3.Collidable;
-import io.github.some_example_name.lwjgl3.CollisionManager;
 import io.github.some_example_name.lwjgl3.CollisionResult;
-import io.github.some_example_name.lwjgl3.CollisionType;
+import io.github.some_example_name.lwjgl3.logic.Collision.CollisionHandler;
 
 public class Character extends Entity implements Collidable {
 
@@ -23,6 +22,9 @@ public class Character extends Entity implements Collidable {
     private static final int   LANE_COUNT    = 3;
     private static final float LANE_SPACING  = 80f;       // distance between lane centres
 
+    // ---- Hit flash ----
+    private static final float HIT_FLASH_DURATION = 0.15f;
+
     // ---- State ----
     private float x;
     private float y;
@@ -35,7 +37,12 @@ public class Character extends Entity implements Collidable {
     private int   currentLane;     // 0 = left, 1 = centre, 2 = right
     private float laneCentreX;     // x of lane 0 (leftmost lane)
 
-    private final CollisionType collisionType;
+    // ---- Collision handler (Observer pattern) ----
+    private CollisionHandler collisionHandler;
+
+    // ---- Hit flash state ----
+    private boolean hitFlashing;
+    private float hitFlashTimer;
 
     /**
      * Creates a Character in the centre lane.
@@ -58,7 +65,9 @@ public class Character extends Entity implements Collidable {
         this.velocityY = 0f;
         this.grounded  = true;
 
-        this.collisionType = new CollisionType("character", true, true);
+        this.collisionHandler = null;
+        this.hitFlashing = false;
+        this.hitFlashTimer = 0f;
     }
 
     // ---- Update (called every frame) ----
@@ -91,6 +100,15 @@ public class Character extends Entity implements Collidable {
             }
         } else {
             x = targetX;
+        }
+
+        // --- Hit flash countdown ---
+        if (hitFlashing) {
+            hitFlashTimer -= deltaTime;
+            if (hitFlashTimer <= 0f) {
+                hitFlashing = false;
+                hitFlashTimer = 0f;
+            }
         }
 
         super.update(deltaTime);
@@ -129,7 +147,11 @@ public class Character extends Entity implements Collidable {
 
     @Override
     public void onCollision(CollisionResult result) {
-        // Collision response is handled by the game scene / logic engine.
+        // Delegate to the CollisionHandler (Observer pattern).
+        // The handler decides what gameplay effects the collision has.
+        if (collisionHandler != null) {
+            collisionHandler.onCharacterCollision(this, result);
+        }
     }
 
     @Override
@@ -137,8 +159,37 @@ public class Character extends Entity implements Collidable {
         return isActive();
     }
 
-    public CollisionType getType() {
-        return collisionType;
+    // ---- Collision handler injection ----
+
+    /**
+     * Sets the CollisionHandler that will receive collision callbacks.
+     * Called by GameScene at scene creation time.
+     *
+     * @param handler the CollisionHandler (typically a CollisionDispatcher)
+     */
+    public void setCollisionHandler(CollisionHandler handler) {
+        this.collisionHandler = handler;
+    }
+
+    public CollisionHandler getCollisionHandler() {
+        return collisionHandler;
+    }
+
+    // ---- Hit flash ----
+
+    /**
+     * Triggers a brief visual hit flash on the character.
+     * Called by CollisionDispatcher when the character takes damage.
+     * The rendering layer should check isHitFlashing() to apply the visual effect.
+     */
+    public void triggerHitFlash() {
+        this.hitFlashing = true;
+        this.hitFlashTimer = HIT_FLASH_DURATION;
+    }
+
+    /** Returns whether the character is currently in a hit-flash state. */
+    public boolean isHitFlashing() {
+        return hitFlashing;
     }
 
     // ---- Helpers ----
