@@ -2,17 +2,9 @@ package io.github.some_example_name.lwjgl3.logic.movement;
 
 import java.util.function.BooleanSupplier;
 
-/**
- * GravityJumpMovement - Handles vertical jump and gravity for the Character.
- *
- * When the jump input fires and the character is grounded, an upward velocity
- * is applied.  Every frame gravity pulls the character back down.  Landing is
- * detected when the y-position falls to the floor surface.
- *
- * Registered with MovementManager; the manager calls {@link #update(float)}
- * every frame.
- */
-public class GravityJumpMovement extends io.github.some_example_name.lwjgl3.MovementComponent {
+// Handles jump movement of character
+
+public class JumpMovement extends io.github.some_example_name.lwjgl3.MovementComponent {
 
     private final CoordinateTarget target;
     private final MotionState state;
@@ -22,20 +14,12 @@ public class GravityJumpMovement extends io.github.some_example_name.lwjgl3.Move
     private final float jumpVelocity;
     private final float gravity;
 
-    /**
-     * @param target                receives the final position each frame
-     * @param state                 shared motion state (position, vertical velocity, grounded)
-     * @param jumpTriggeredSupplier returns true on the frame the jump key is pressed
-     * @param floorY                y-coordinate of the floor surface
-     * @param jumpVelocity          initial upward velocity when jumping (positive)
-     * @param gravity               downward acceleration (negative value, e.g. -1200)
-     */
-    public GravityJumpMovement(CoordinateTarget target,
-                               MotionState state,
-                               BooleanSupplier jumpTriggeredSupplier,
-                               float floorY,
-                               float jumpVelocity,
-                               float gravity) {
+    public JumpMovement(CoordinateTarget target,
+                        MotionState state,
+                        BooleanSupplier jumpTriggeredSupplier,
+                        float floorY,
+                        float jumpVelocity,
+                        float gravity) {
         super();
         if (target == null || state == null || jumpTriggeredSupplier == null) {
             throw new IllegalArgumentException("target/state/jumpTriggeredSupplier cannot be null");
@@ -55,13 +39,13 @@ public class GravityJumpMovement extends io.github.some_example_name.lwjgl3.Move
     public void update(float deltaTime) {
         validateDeltaTime(deltaTime);
 
-        // ---- Trigger jump if grounded and input fires ----
+        // Trigger jump movement
         if (state.isGrounded() && jumpTriggeredSupplier.getAsBoolean()) {
             state.setVerticalVelocity(jumpVelocity);
             state.setGrounded(false);
         }
 
-        // ---- Apply gravity while airborne ----
+        // Adding gravity while character is airborne
         if (!state.isGrounded()) {
             float nextVy = state.getVerticalVelocity() + gravity * deltaTime;
             float nextY  = state.getY() + nextVy * deltaTime;
@@ -77,7 +61,6 @@ public class GravityJumpMovement extends io.github.some_example_name.lwjgl3.Move
             state.setY(nextY);
         }
 
-        // ---- Propagate to base class and target ----
         setPosition(state.getX(), state.getY());
         target.setX(state.getX());
         target.setY(state.getY());
