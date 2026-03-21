@@ -6,6 +6,5 @@ public enum InputAction {
     TOGGLE_DEBUG,
     TOGGLE_MUTE,
     TOGGLE_PAUSE,
-    JUMP,
-    DODGE
+    JUMP
 }
