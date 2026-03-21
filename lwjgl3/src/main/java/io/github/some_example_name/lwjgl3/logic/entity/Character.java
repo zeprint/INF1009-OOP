@@ -2,43 +2,43 @@ package io.github.some_example_name.lwjgl3.logic.entity;
 
 import io.github.some_example_name.lwjgl3.AbstractEngine.entity.Entity;
 import io.github.some_example_name.lwjgl3.AbstractEngine.entity.Transform;
-import io.github.some_example_name.lwjgl3.AbstractEngine.entity.PhysicsBody;
 
 import com.badlogic.gdx.math.Rectangle;
 
 import io.github.some_example_name.lwjgl3.Collidable;
 import io.github.some_example_name.lwjgl3.CollisionResult;
 import io.github.some_example_name.lwjgl3.logic.Collision.CollisionHandler;
+import io.github.some_example_name.lwjgl3.logic.movement.CoordinateTarget;
+import io.github.some_example_name.lwjgl3.logic.movement.MotionState;
 
-public class Character extends Entity implements Collidable {
+/**
+ * Character - The player entity in a lane-based infinite runner.
+ *
+ * Movement (lane switching, jumping, gravity) is no longer handled here.
+ * It is delegated to LaneSwitchMovement and GravityJumpMovement, which are
+ * registered with the MovementManager and write position back via the
+ * CoordinateTarget interface.
+ *
+ * Character retains ownership of:
+ * - dimensions (width / height)
+ * - collision (Collidable)
+ * - hit-flash visual state
+ * - a reference to the shared MotionState for grounded queries
+ */
+public class Character extends Entity implements Collidable, CoordinateTarget {
 
     // ---- Dimensions ----
     private static final float DEFAULT_WIDTH  = 50f;
     private static final float DEFAULT_HEIGHT = 100f;
 
-    // ---- Physics tunables ----
-    private static final float JUMP_VELOCITY = 500f;
-    private static final float GRAVITY       = -1200f;
-    private static final float LANE_SWITCH_SPEED = 600f;  // pixels / sec towards target lane
-
-    // ---- Lane setup (three lanes like Subway Surfers) ----
-    private static final int   LANE_COUNT    = 3;
-    private static final float LANE_SPACING  = 80f;       // distance between lane centres
-
     // ---- Hit flash ----
     private static final float HIT_FLASH_DURATION = 0.15f;
 
-    // ---- Dimensions (not spatial — kept as fields) ----
     private float width;
     private float height;
 
-    // ---- Grounded state (vertical logic) ----
-    private boolean grounded;
-    private float floorY;          // y-coordinate of the floor surface
-
-    // ---- Lane state (horizontal logic) ----
-    private int   currentLane;     // 0 = left, 1 = centre, 2 = right
-    private float laneCentreX;     // x of lane 0 (leftmost lane)
+    // ---- Shared motion state (owned by the game scene, read here) ----
+    private MotionState motionState;
 
     // ---- Collision handler (Observer pattern) ----
     private CollisionHandler collisionHandler;
@@ -48,7 +48,7 @@ public class Character extends Entity implements Collidable {
     private float hitFlashTimer;
 
     /**
-     * Creates a Character in the centre lane.
+     * Creates a Character at the given position.
      *
      * @param centreX  x-coordinate of the centre lane
      * @param floorY   y-coordinate of the floor surface (character stands on top)
@@ -58,62 +58,36 @@ public class Character extends Entity implements Collidable {
         this.width  = DEFAULT_WIDTH;
         this.height = DEFAULT_HEIGHT;
 
-        // Lane geometry: lane 0 is one LANE_SPACING to the left of centre
-        this.laneCentreX = centreX - LANE_SPACING;
-        this.currentLane = 1;  // start in the middle lane
-        this.floorY = floorY;
-
-        this.grounded  = true;
-
+        this.motionState = null;
         this.collisionHandler = null;
         this.hitFlashing = false;
         this.hitFlashTimer = 0f;
 
-        // ---- Attach engine components ----
-        // Transform holds position (x, y)
-        addComponent(new Transform(getLaneX(currentLane), floorY));
-        // PhysicsBody holds velocity (used for vertical velocity / gravity)
-        addComponent(new PhysicsBody(0f, 0f, 1f));
+        // Transform holds position — the only engine component needed now
+        addComponent(new Transform(centreX, floorY));
     }
 
-    // ---- Update (called every frame) ----
+    // ---- CoordinateTarget (movement components write position here) ----
+
+    @Override
+    public float getX() { return getComponent(Transform.class).getX(); }
+
+    @Override
+    public float getY() { return getComponent(Transform.class).getY(); }
+
+    @Override
+    public void setX(float x) { getComponent(Transform.class).setX(x); }
+
+    @Override
+    public void setY(float y) { getComponent(Transform.class).setY(y); }
+
+    // ---- Update (only non-movement logic remains) ----
 
     @Override
     public void update(float deltaTime) {
         if (!isActive()) return;
 
-        Transform transform = getComponent(Transform.class);
-        PhysicsBody body    = getComponent(PhysicsBody.class);
-
-        // --- Gravity ---
-        if (!grounded) {
-            // Apply gravity to vertical velocity
-            body.setVelocity(body.getVelocity().x, body.getVelocity().y + GRAVITY * deltaTime);
-            transform.translate(0f, body.getVelocity().y * deltaTime);
-
-            // Landing check
-            if (transform.getY() <= floorY) {
-                transform.setY(floorY);
-                body.setVelocity(body.getVelocity().x, 0f);
-                grounded = true;
-            }
-        }
-
-        // --- Smooth lane interpolation ---
-        float targetX = getLaneX(currentLane);
-        if (Math.abs(transform.getX() - targetX) > 1f) {
-            float direction = Math.signum(targetX - transform.getX());
-            transform.translate(direction * LANE_SWITCH_SPEED * deltaTime, 0f);
-            // Clamp so we don't overshoot
-            if ((direction > 0 && transform.getX() > targetX) ||
-                (direction < 0 && transform.getX() < targetX)) {
-                transform.setX(targetX);
-            }
-        } else {
-            transform.setX(targetX);
-        }
-
-        // --- Hit flash countdown ---
+        // Hit flash countdown
         if (hitFlashing) {
             hitFlashTimer -= deltaTime;
             if (hitFlashTimer <= 0f) {
@@ -123,31 +97,6 @@ public class Character extends Entity implements Collidable {
         }
 
         super.update(deltaTime);
-    }
-
-    // ---- Controls ----
-
-    /** Move one lane to the left (if not already in lane 0). */
-    public void moveLeft() {
-        if (currentLane > 0) {
-            currentLane--;
-        }
-    }
-
-    /** Move one lane to the right (if not already in the rightmost lane). */
-    public void moveRight() {
-        if (currentLane < LANE_COUNT - 1) {
-            currentLane++;
-        }
-    }
-
-    /** Jump (only if currently on the ground). */
-    public void jump() {
-        if (grounded) {
-            PhysicsBody body = getComponent(PhysicsBody.class);
-            body.setVelocity(body.getVelocity().x, JUMP_VELOCITY);
-            grounded = false;
-        }
     }
 
     // ---- Collidable ----
@@ -160,8 +109,6 @@ public class Character extends Entity implements Collidable {
 
     @Override
     public void onCollision(CollisionResult result) {
-        // Delegate to the CollisionHandler (Observer pattern).
-        // The handler decides what gameplay effects the collision has.
         if (collisionHandler != null) {
             collisionHandler.onCharacterCollision(this, result);
         }
@@ -174,12 +121,6 @@ public class Character extends Entity implements Collidable {
 
     // ---- Collision handler injection ----
 
-    /**
-     * Sets the CollisionHandler that will receive collision callbacks.
-     * Called by GameScene at scene creation time.
-     *
-     * @param handler the CollisionHandler (typically a CollisionDispatcher)
-     */
     public void setCollisionHandler(CollisionHandler handler) {
         this.collisionHandler = handler;
     }
@@ -188,42 +129,40 @@ public class Character extends Entity implements Collidable {
         return collisionHandler;
     }
 
-    // ---- Hit flash ----
+    // ---- Shared MotionState ----
 
     /**
-     * Triggers a brief visual hit flash on the character.
-     * Called by CollisionDispatcher when the character takes damage.
-     * The rendering layer should check isHitFlashing() to apply the visual effect.
+     * Injects the shared MotionState created by the game scene.
+     * Used to query grounded state for rendering / collision purposes.
      */
+    public void setMotionState(MotionState motionState) {
+        this.motionState = motionState;
+    }
+
+    public MotionState getMotionState() {
+        return motionState;
+    }
+
+    public boolean isGrounded() {
+        return motionState != null && motionState.isGrounded();
+    }
+
+    // ---- Hit flash ----
+
     public void triggerHitFlash() {
         this.hitFlashing = true;
         this.hitFlashTimer = HIT_FLASH_DURATION;
     }
 
-    /** Returns whether the character is currently in a hit-flash state. */
     public boolean isHitFlashing() {
         return hitFlashing;
     }
 
-    // ---- Helpers ----
+    // ---- Accessors ----
 
-    /** Returns the world-x of the given lane index. */
-    private float getLaneX(int lane) {
-        return laneCentreX + lane * LANE_SPACING;
-    }
-
-    // ---- Accessors (delegate to Transform / PhysicsBody) ----
-
-    public float getX()      { return getComponent(Transform.class).getX(); }
-    public float getY()      { return getComponent(Transform.class).getY(); }
     public float getWidth()  { return width; }
     public float getHeight() { return height; }
-    public int   getCurrentLane() { return currentLane; }
-    public boolean isGrounded()   { return grounded; }
 
-    public void setX(float x) { getComponent(Transform.class).setX(x); }
-    public void setY(float y) { getComponent(Transform.class).setY(y); }
     public void setWidth(float w)  { this.width = w; }
     public void setHeight(float h) { this.height = h; }
-    public void setGrounded(boolean g) { this.grounded = g; }
 }

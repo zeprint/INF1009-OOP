@@ -2,24 +2,26 @@ package io.github.some_example_name.lwjgl3.logic.entity;
 
 import io.github.some_example_name.lwjgl3.AbstractEngine.entity.Entity;
 import io.github.some_example_name.lwjgl3.AbstractEngine.entity.Transform;
-import io.github.some_example_name.lwjgl3.AbstractEngine.entity.PhysicsBody;
 
 import com.badlogic.gdx.math.Rectangle;
 
 import io.github.some_example_name.lwjgl3.Collidable;
 import io.github.some_example_name.lwjgl3.CollisionResult;
 import io.github.some_example_name.lwjgl3.logic.Collision.CollisionHandler;
+import io.github.some_example_name.lwjgl3.logic.movement.CoordinateTarget;
 
 /**
  * TallObstacle - A full-height obstacle equal to the Character's height.
  *
- * Because it matches the character's height, jumping will <b>not</b> clear it.
- * The player must dodge <b>left or right</b> into an adjacent lane to avoid
+ * Because it matches the character's height, jumping will not clear it.
+ * The player must switch left or right into an adjacent lane to avoid
  * a collision.
  *
- * Each TallObstacle occupies exactly one lane.
+ * Movement (scrolling leftward) is now delegated to ObstacleScrollMovement,
+ * which is registered with the MovementManager and writes position back
+ * via the CoordinateTarget interface.
  */
-public class TallObstacle extends Entity implements Collidable {
+public class TallObstacle extends Entity implements Collidable, CoordinateTarget {
 
     private static final float DEFAULT_CHARACTER_HEIGHT = 100f;
     private static final float DEFAULT_WIDTH = 50f;
@@ -33,12 +35,11 @@ public class TallObstacle extends Entity implements Collidable {
     /**
      * Creates a TallObstacle.
      *
-     * @param x           spawn x-coordinate (lane centre)
-     * @param floorY      floor surface y-coordinate
-     * @param scrollSpeed approach speed (pixels / sec)
+     * @param x      spawn x-coordinate (lane centre)
+     * @param floorY floor surface y-coordinate
      */
-    public TallObstacle(float x, float floorY, float scrollSpeed) {
-        this(x, floorY, scrollSpeed, DEFAULT_CHARACTER_HEIGHT);
+    public TallObstacle(float x, float floorY) {
+        this(x, floorY, DEFAULT_CHARACTER_HEIGHT);
     }
 
     /**
@@ -46,35 +47,33 @@ public class TallObstacle extends Entity implements Collidable {
      *
      * @param x               spawn x-coordinate
      * @param floorY          floor surface y
-     * @param scrollSpeed     approach speed (pixels / sec)
      * @param characterHeight character height this obstacle should match
      */
-    public TallObstacle(float x, float floorY, float scrollSpeed, float characterHeight) {
+    public TallObstacle(float x, float floorY, float characterHeight) {
         super();
         this.width  = DEFAULT_WIDTH;
-        this.height = characterHeight;  // full character height
+        this.height = characterHeight;
         this.collisionHandler = null;
 
-        // ---- Attach engine components ----
-        // Transform holds position (x, y)
+        // Transform holds position — the only engine component needed now
         addComponent(new Transform(x, floorY));
-        // PhysicsBody holds velocity (scrolling leftward)
-        addComponent(new PhysicsBody(-scrollSpeed, 0f, 1f));
     }
 
-    // ---- Update ----
+    // ---- CoordinateTarget (ObstacleScrollMovement writes position here) ----
 
     @Override
-    public void update(float deltaTime) {
-        if (!isActive()) return;
+    public float getX() { return getComponent(Transform.class).getX(); }
 
-        // Move using PhysicsBody velocity
-        Transform transform = getComponent(Transform.class);
-        PhysicsBody body    = getComponent(PhysicsBody.class);
-        transform.translate(body.getVelocity().x * deltaTime, body.getVelocity().y * deltaTime);
+    @Override
+    public float getY() { return getComponent(Transform.class).getY(); }
 
-        super.update(deltaTime);
-    }
+    @Override
+    public void setX(float x) { getComponent(Transform.class).setX(x); }
+
+    @Override
+    public void setY(float y) { getComponent(Transform.class).setY(y); }
+
+    // No update() override — ObstacleScrollMovement handles scrolling via MovementManager
 
     // ---- Collidable ----
 
@@ -86,7 +85,6 @@ public class TallObstacle extends Entity implements Collidable {
 
     @Override
     public void onCollision(CollisionResult result) {
-        // Delegate to the CollisionHandler (Observer pattern).
         if (collisionHandler != null) {
             collisionHandler.onObstacleCollision(this, result);
         }
@@ -99,12 +97,6 @@ public class TallObstacle extends Entity implements Collidable {
 
     // ---- Collision handler injection ----
 
-    /**
-     * Sets the CollisionHandler that will receive collision callbacks.
-     * Called by GameScene at scene creation time.
-     *
-     * @param handler the CollisionHandler (typically a CollisionDispatcher)
-     */
     public void setCollisionHandler(CollisionHandler handler) {
         this.collisionHandler = handler;
     }
@@ -113,22 +105,8 @@ public class TallObstacle extends Entity implements Collidable {
         return collisionHandler;
     }
 
-    // ---- Accessors (delegate to Transform / PhysicsBody) ----
+    // ---- Accessors ----
 
-    public float getX()      { return getComponent(Transform.class).getX(); }
-    public float getY()      { return getComponent(Transform.class).getY(); }
     public float getWidth()  { return width; }
     public float getHeight() { return height; }
-
-    public float getScrollSpeed() {
-        return -getComponent(PhysicsBody.class).getVelocity().x;
-    }
-
-    public void setX(float x) { getComponent(Transform.class).setX(x); }
-    public void setY(float y) { getComponent(Transform.class).setY(y); }
-
-    public void setScrollSpeed(float speed) {
-        PhysicsBody body = getComponent(PhysicsBody.class);
-        body.setVelocity(-speed, body.getVelocity().y);
-    }
 }
