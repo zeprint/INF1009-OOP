@@ -4,38 +4,74 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Array;
 
 /**
- * CollisionManager - Collision detection with light fault tolerance.
+ * CollisionManager - Generic AABB collision detection and notification.
+ *
+ * Responsibilities:
+ *   - Maintain a registry of active Collidable objects
+ *   - Detect overlaps each frame using axis-aligned bounding boxes
+ *   - Resolve overlap geometry and notify both parties via onCollision()
+ *   - Self-clean invalid or null entries with fault tolerance
+ *
+ * This class is fully context-free. It knows nothing about game-specific
+ * entity types, game rules, or how collisions should affect gameplay.
+ * All game responses belong in the Logic Engine's onCollision() implementations.
  */
-public class CollisionManager implements ICollisionSystem {
+public class CollisionManager {
 
     private final Array<Collidable> collidables = new Array<>();
-    private final Array<Collidable> toRemove = new Array<>();
+    private final Array<Collidable> toRemove    = new Array<>();
 
-    @Override
+    // ---- Registry ----
+
+    /**
+     * Registers a Collidable for collision checks.
+     * Null objects, duplicates, and objects with invalid bounds are silently rejected.
+     */
     public void addObject(Collidable obj) {
-        if (obj == null || collidables.contains(obj, true)) {
-            return;
-        }
+        if (obj == null || collidables.contains(obj, true)) return;
 
-        // Basic validation
         if (!isValid(obj)) {
-            System.err.println("[Collision] Invalid object rejected");
+            System.err.println("[CollisionManager] Invalid object rejected on add");
             return;
         }
 
         collidables.add(obj);
     }
 
-    @Override
+    /**
+     * Removes a Collidable from the registry.
+     */
     public void removeObject(Collidable obj) {
         collidables.removeValue(obj, true);
     }
 
+    /**
+     * Returns the current list of registered Collidables (read-only intent).
+     */
     public Array<Collidable> getCollidables() {
         return collidables;
     }
 
-    @Override
+    /**
+     * Clears all registered Collidables.
+     */
+    public void clear() {
+        collidables.clear();
+        toRemove.clear();
+    }
+
+    // ---- Per-frame check ----
+
+    /**
+     * Runs one full pass of collision detection and notification.
+     *
+     * For every overlapping pair (a, b):
+     *   - Computes overlap geometry and direction for each perspective
+     *   - Calls a.onCollision(result) and b.onCollision(result)
+     *
+     * Objects that fail validation mid-frame are deferred for removal
+     * after the loop to avoid modifying the list during iteration.
+     */
     public void checkCollisions() {
         toRemove.clear();
 
@@ -47,71 +83,72 @@ public class CollisionManager implements ICollisionSystem {
 
                 if (a == null || b == null) continue;
 
-                // Validate before processing
-                if (!isValid(a)) {
-                    toRemove.add(a);
-                    continue;
-                }
-                if (!isValid(b)) {
-                    toRemove.add(b);
-                    continue;
-                }
+                if (!isValid(a)) { toRemove.add(a); continue; }
+                if (!isValid(b)) { toRemove.add(b); continue; }
+
+                if (!a.isCollidable() || !b.isCollidable()) continue;
 
                 try {
                     if (detectCollision(a, b)) {
-                        applyBehaviourSafely(a, resolveCollision(a, b));
-                        applyBehaviourSafely(b, resolveCollision(b, a));
+                        notifySafely(a, resolveCollision(a, b));
+                        notifySafely(b, resolveCollision(b, a));
                     }
                 } catch (Exception e) {
-                    System.err.println("[Collision Error] " + e.getMessage());
+                    System.err.println("[CollisionManager] Detection error: " + e.getMessage());
                 }
             }
         }
 
-        // Clean up invalid objects
-        for (Collidable obj : toRemove) {
-            collidables.removeValue(obj, true);
-        }
-
+        // Deferred removal of invalid objects
         if (toRemove.size > 0) {
-            System.err.println("[Collision] Removed " + toRemove.size + " invalid objects");
+            for (Collidable obj : toRemove) {
+                collidables.removeValue(obj, true);
+            }
+            System.err.println("[CollisionManager] Removed " + toRemove.size + " invalid object(s)");
+            toRemove.clear();
         }
     }
 
+    // ---- Internal helpers ----
+
+    /**
+     * Validates a Collidable's bounds for NaN, Infinity, and negative dimensions.
+     */
     private boolean isValid(Collidable obj) {
         if (obj == null) return false;
-
         try {
-            Rectangle bounds = obj.getBounds();
-            if (bounds == null) return false;
-
-            // Check for NaN/Infinity
-            if (Float.isNaN(bounds.x) || Float.isInfinite(bounds.x)) return false;
-            if (Float.isNaN(bounds.y) || Float.isInfinite(bounds.y)) return false;
-            if (bounds.width < 0 || bounds.height < 0) return false;
-
-            if (obj.getType() == null) return false;
-
+            Rectangle b = obj.getBounds();
+            if (b == null)                          return false;
+            if (Float.isNaN(b.x)  || Float.isInfinite(b.x))  return false;
+            if (Float.isNaN(b.y)  || Float.isInfinite(b.y))  return false;
+            if (b.width < 0 || b.height < 0)        return false;
             return true;
         } catch (Exception e) {
             return false;
         }
     }
 
+    /**
+     * Returns true if the bounding boxes of a and b overlap.
+     */
     private boolean detectCollision(Collidable a, Collidable b) {
         Rectangle ra = a.getBounds();
         Rectangle rb = b.getBounds();
-
         if (ra == null || rb == null) return false;
-
         return ra.overlaps(rb);
     }
 
+    /**
+     * Computes a CollisionResult describing the overlap from a's perspective.
+     *
+     * @param a  the entity receiving the result
+     * @param b  the other entity (stored as CollisionResult.other)
+     */
     private CollisionResult resolveCollision(Collidable a, Collidable b) {
         Rectangle ra = a.getBounds();
         Rectangle rb = b.getBounds();
 
-        float overlapX = Math.min(ra.x + ra.width - rb.x, rb.x + rb.width - ra.x);
+        float overlapX = Math.min(ra.x + ra.width  - rb.x, rb.x + rb.width  - ra.x);
         float overlapY = Math.min(ra.y + ra.height - rb.y, rb.y + rb.height - ra.y);
 
         CollisionDirection direction;
@@ -124,18 +161,15 @@ public class CollisionManager implements ICollisionSystem {
         return new CollisionResult(b, overlapX, overlapY, direction);
     }
 
-    private void applyBehaviourSafely(Collidable obj, CollisionResult result) {
+    /**
+     * Notifies a Collidable of a collision, catching any exception thrown
+     * by the Logic Engine's implementation to keep the engine stable.
+     */
+    private void notifySafely(Collidable obj, CollisionResult result) {
         try {
-            if (obj.getType() != null && obj.getType().triggersEvent()) {
-                obj.onCollision(result);
-            }
+            obj.onCollision(result);
         } catch (Exception e) {
-            System.err.println("[Collision Error] Callback failed: " + e.getMessage());
+            System.err.println("[CollisionManager] onCollision callback failed: " + e.getMessage());
         }
-    }
-
-    public void clear() {
-        collidables.clear();
-        toRemove.clear();
     }
 }

@@ -12,7 +12,7 @@ public interface Collidable {
     Rectangle getBounds();
 
     // Called by the Collision Manager when this entity collides with another.
-    void onCollision(Entity other);
+    void onCollision(CollisionResult result);
 
     // Returns whether this entity is currently able to collide.
     boolean isCollidable();
