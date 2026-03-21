@@ -4,7 +4,7 @@ import java.util.function.BooleanSupplier;
 
 // Handles jump movement of character
 
-public class JumpMovement extends io.github.some_example_name.lwjgl3.MovementComponent {
+public class JumpMovement extends io.github.some_example_name.lwjgl3.AbstractEngine.movement.MovementComponent {
 
     private final CoordinateTarget target;
     private final MotionState state;

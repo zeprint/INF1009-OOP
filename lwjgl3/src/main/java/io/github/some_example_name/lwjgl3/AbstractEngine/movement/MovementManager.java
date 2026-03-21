@@ -1,4 +1,4 @@
-package io.github.some_example_name.lwjgl3;
+package io.github.some_example_name.lwjgl3.AbstractEngine.movement;
 
 import com.badlogic.gdx.utils.Array;
 

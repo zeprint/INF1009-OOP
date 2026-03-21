@@ -2,7 +2,7 @@ package io.github.some_example_name.lwjgl3.logic.movement;
 
 // Scrolls an obsacle leftward a floor's speed
 
-public class ObstacleScrollMovement extends io.github.some_example_name.lwjgl3.MovementComponent {
+public class ObstacleScrollMovement extends io.github.some_example_name.lwjgl3.AbstractEngine.movement.MovementComponent {
 
     private final CoordinateTarget target;
     private float scrollSpeed;       // pixels per second (positive = leftward)

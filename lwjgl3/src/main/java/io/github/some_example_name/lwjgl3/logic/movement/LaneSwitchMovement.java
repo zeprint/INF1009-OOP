@@ -4,7 +4,7 @@ import java.util.function.BooleanSupplier;
 
 // Handles left/right lane switching for character
 
-public class LaneSwitchMovement extends io.github.some_example_name.lwjgl3.MovementComponent {
+public class LaneSwitchMovement extends io.github.some_example_name.lwjgl3.AbstractEngine.movement.MovementComponent {
 
     private final CoordinateTarget target;
     private final MotionState state;

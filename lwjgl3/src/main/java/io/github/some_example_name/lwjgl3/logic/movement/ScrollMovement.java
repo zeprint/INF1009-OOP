@@ -2,7 +2,7 @@ package io.github.some_example_name.lwjgl3.logic.movement;
 
 // Infinite horizontal scrolling for Floor entity
 
-public class ScrollMovement extends io.github.some_example_name.lwjgl3.MovementComponent {
+public class ScrollMovement extends io.github.some_example_name.lwjgl3.AbstractEngine.movement.MovementComponent {
 
     private final float tileWidth;
     private float scrollSpeed;    // pixels per second (positive = leftward)
