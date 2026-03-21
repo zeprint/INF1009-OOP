@@ -1,6 +1,12 @@
-package io.github.some_example_name.lwjgl3;
+package io.github.some_example_name.lwjgl3.logic.entity;
+
+import io.github.some_example_name.lwjgl3.AbstractEngine.entity.Entity;
 
 import com.badlogic.gdx.math.Rectangle;
+
+import io.github.some_example_name.lwjgl3.Collidable;
+import io.github.some_example_name.lwjgl3.CollisionResult;
+import io.github.some_example_name.lwjgl3.CollisionType;
 
 /**
  * TallObstacle - A full-height obstacle equal to the Character's height.
@@ -72,7 +78,7 @@ public class TallObstacle extends Entity implements Collidable {
     }
 
     @Override
-    public void onCollision(Entity other) {
+    public void onCollision(CollisionResult result) {
         // Collision response delegated to game scene.
     }
 

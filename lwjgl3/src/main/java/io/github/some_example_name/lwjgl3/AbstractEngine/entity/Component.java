@@ -1,4 +1,4 @@
-package io.github.some_example_name.lwjgl3;
+package io.github.some_example_name.lwjgl3.AbstractEngine.entity;
 
 /**
  * Component - Base interface for all components that can be attached to an Entity.

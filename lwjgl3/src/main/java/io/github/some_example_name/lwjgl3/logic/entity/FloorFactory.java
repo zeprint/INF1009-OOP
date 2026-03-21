@@ -1,4 +1,4 @@
-package io.github.some_example_name.lwjgl3;
+package io.github.some_example_name.lwjgl3.logic.entity;
 
 /**
  * FloorFactory - Creates infinite-scrolling Floor entities via GenericFactory.

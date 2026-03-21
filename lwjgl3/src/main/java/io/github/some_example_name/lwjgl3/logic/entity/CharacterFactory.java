@@ -1,4 +1,4 @@
-package io.github.some_example_name.lwjgl3;
+package io.github.some_example_name.lwjgl3.logic.entity;
 
 /**
  * CharacterFactory - Creates the player Character via GenericFactory.
