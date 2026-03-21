@@ -1,6 +1,8 @@
 package io.github.some_example_name.lwjgl3.logic.entity;
 
 import io.github.some_example_name.lwjgl3.AbstractEngine.entity.Entity;
+import io.github.some_example_name.lwjgl3.AbstractEngine.entity.Transform;
+import io.github.some_example_name.lwjgl3.AbstractEngine.entity.PhysicsBody;
 
 import com.badlogic.gdx.math.Rectangle;
 
@@ -23,11 +25,8 @@ public class SmallObstacle extends Entity implements Collidable {
     private static final float DEFAULT_CHARACTER_HEIGHT = 100f;
     private static final float DEFAULT_WIDTH = 50f;
 
-    private float x;
-    private float y;
     private final float width;
     private final float height;
-    private float scrollSpeed;
 
     // ---- Collision handler (Observer pattern) ----
     private CollisionHandler collisionHandler;
@@ -55,10 +54,13 @@ public class SmallObstacle extends Entity implements Collidable {
         super();
         this.width  = DEFAULT_WIDTH;
         this.height = characterHeight * HEIGHT_RATIO;
-        this.x = x;
-        this.y = floorY;
-        this.scrollSpeed = scrollSpeed;
         this.collisionHandler = null;
+
+        // ---- Attach engine components ----
+        // Transform holds position (x, y)
+        addComponent(new Transform(x, floorY));
+        // PhysicsBody holds velocity (scrolling leftward)
+        addComponent(new PhysicsBody(-scrollSpeed, 0f, 1f));
     }
 
     // ---- Update ----
@@ -67,8 +69,10 @@ public class SmallObstacle extends Entity implements Collidable {
     public void update(float deltaTime) {
         if (!isActive()) return;
 
-        // Scroll towards the player (leftward)
-        x -= scrollSpeed * deltaTime;
+        // Move using PhysicsBody velocity
+        Transform transform = getComponent(Transform.class);
+        PhysicsBody body    = getComponent(PhysicsBody.class);
+        transform.translate(body.getVelocity().x * deltaTime, body.getVelocity().y * deltaTime);
 
         super.update(deltaTime);
     }
@@ -77,7 +81,8 @@ public class SmallObstacle extends Entity implements Collidable {
 
     @Override
     public Rectangle getBounds() {
-        return new Rectangle(x - width / 2f, y, width, height);
+        Transform transform = getComponent(Transform.class);
+        return new Rectangle(transform.getX() - width / 2f, transform.getY(), width, height);
     }
 
     @Override
@@ -109,15 +114,22 @@ public class SmallObstacle extends Entity implements Collidable {
         return collisionHandler;
     }
 
-    // ---- Accessors ----
+    // ---- Accessors (delegate to Transform / PhysicsBody) ----
 
-    public float getX()      { return x; }
-    public float getY()      { return y; }
+    public float getX()      { return getComponent(Transform.class).getX(); }
+    public float getY()      { return getComponent(Transform.class).getY(); }
     public float getWidth()  { return width; }
     public float getHeight() { return height; }
-    public float getScrollSpeed() { return scrollSpeed; }
 
-    public void setX(float x) { this.x = x; }
-    public void setY(float y) { this.y = y; }
-    public void setScrollSpeed(float speed) { this.scrollSpeed = speed; }
+    public float getScrollSpeed() {
+        return -getComponent(PhysicsBody.class).getVelocity().x;
+    }
+
+    public void setX(float x) { getComponent(Transform.class).setX(x); }
+    public void setY(float y) { getComponent(Transform.class).setY(y); }
+
+    public void setScrollSpeed(float speed) {
+        PhysicsBody body = getComponent(PhysicsBody.class);
+        body.setVelocity(-speed, body.getVelocity().y);
+    }
 }

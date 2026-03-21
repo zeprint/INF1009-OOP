@@ -1,26 +1,29 @@
 package io.github.some_example_name.lwjgl3.logic.entity;
 
 import io.github.some_example_name.lwjgl3.AbstractEngine.entity.Entity;
+import io.github.some_example_name.lwjgl3.AbstractEngine.entity.Transform;
+import io.github.some_example_name.lwjgl3.AbstractEngine.entity.PhysicsBody;
 
 /**
  * Floor - An infinite scrolling ground entity that the Character runs on.
  *
  * Internally the floor uses two tile segments, each as wide as
  * {@code tileWidth} (typically the screen width).  Every frame the tiles
- * scroll to the left at {@code scrollSpeed}.  When a tile moves entirely
- * off-screen on the left it is repositioned to the right of the other
- * tile, creating a seamless infinite-floor illusion.
+ * scroll to the left at the speed stored in this entity's PhysicsBody.
+ * When a tile moves entirely off-screen on the left it is repositioned
+ * to the right of the other tile, creating a seamless infinite-floor illusion.
  *
  * The Floor is purely visual — ground detection is handled analytically
  * by {@link io.github.some_example_name.lwjgl3.logic.movement.JumpMovement}
  * using the floor surface y-coordinate, so no collision is needed.
+ *
+ * Transform stores the floor's y-coordinate (bottom edge).
+ * PhysicsBody stores the horizontal scroll velocity (negative = leftward).
  */
 public class Floor extends Entity {
 
     private final float tileWidth;
     private final float height;
-    private final float y;
-    private float scrollSpeed;
 
     /** Left edge of each tile segment. */
     private float tileAX;
@@ -36,14 +39,18 @@ public class Floor extends Entity {
      */
     public Floor(float y, float tileWidth, float height, float scrollSpeed) {
         super();
-        this.y = y;
         this.tileWidth = tileWidth;
         this.height = height;
-        this.scrollSpeed = scrollSpeed;
 
         // Place tile A at the origin and tile B directly to its right
         this.tileAX = 0f;
         this.tileBX = tileWidth;
+
+        // ---- Attach engine components ----
+        // Transform stores the floor's y-position (x is unused for the floor itself)
+        addComponent(new Transform(0f, y));
+        // PhysicsBody stores the scroll velocity (negative x = leftward scroll)
+        addComponent(new PhysicsBody(-scrollSpeed, 0f, 1f));
     }
 
     // ---- Update (scrolling logic) ----
@@ -52,7 +59,8 @@ public class Floor extends Entity {
     public void update(float deltaTime) {
         if (!isActive()) return;
 
-        float offset = scrollSpeed * deltaTime;
+        PhysicsBody body = getComponent(PhysicsBody.class);
+        float offset = -body.getVelocity().x * deltaTime;  // positive offset = leftward movement
         tileAX -= offset;
         tileBX -= offset;
 
@@ -69,11 +77,15 @@ public class Floor extends Entity {
 
     // ---- Accessors ----
 
-    /** Y-coordinate of the floor bottom edge. */
-    public float getY()         { return y; }
+    /** Y-coordinate of the floor bottom edge (from Transform). */
+    public float getY() {
+        return getComponent(Transform.class).getY();
+    }
 
     /** Y-coordinate of the floor surface (top edge). */
-    public float getSurfaceY()  { return y + height; }
+    public float getSurfaceY() {
+        return getComponent(Transform.class).getY() + height;
+    }
 
     public float getHeight()    { return height; }
     public float getTileWidth() { return tileWidth; }
@@ -84,6 +96,12 @@ public class Floor extends Entity {
     /** Left-edge x of tile B (useful for rendering). */
     public float getTileBX()    { return tileBX; }
 
-    public float getScrollSpeed() { return scrollSpeed; }
-    public void  setScrollSpeed(float speed) { this.scrollSpeed = speed; }
+    public float getScrollSpeed() {
+        return -getComponent(PhysicsBody.class).getVelocity().x;
+    }
+
+    public void setScrollSpeed(float speed) {
+        PhysicsBody body = getComponent(PhysicsBody.class);
+        body.setVelocity(-speed, body.getVelocity().y);
+    }
 }

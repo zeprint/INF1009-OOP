@@ -1,6 +1,9 @@
 package io.github.some_example_name.lwjgl3.logic.entity;
 
 import io.github.some_example_name.lwjgl3.AbstractEngine.entity.Entity;
+import io.github.some_example_name.lwjgl3.AbstractEngine.entity.Transform;
+import io.github.some_example_name.lwjgl3.AbstractEngine.entity.PhysicsBody;
+
 import com.badlogic.gdx.math.Rectangle;
 
 import io.github.some_example_name.lwjgl3.Collidable;
@@ -25,15 +28,15 @@ public class Character extends Entity implements Collidable {
     // ---- Hit flash ----
     private static final float HIT_FLASH_DURATION = 0.15f;
 
-    // ---- State ----
-    private float x;
-    private float y;
+    // ---- Dimensions (not spatial — kept as fields) ----
     private float width;
     private float height;
-    private float velocityY;
+
+    // ---- Grounded state (vertical logic) ----
     private boolean grounded;
     private float floorY;          // y-coordinate of the floor surface
 
+    // ---- Lane state (horizontal logic) ----
     private int   currentLane;     // 0 = left, 1 = centre, 2 = right
     private float laneCentreX;     // x of lane 0 (leftmost lane)
 
@@ -58,16 +61,19 @@ public class Character extends Entity implements Collidable {
         // Lane geometry: lane 0 is one LANE_SPACING to the left of centre
         this.laneCentreX = centreX - LANE_SPACING;
         this.currentLane = 1;  // start in the middle lane
-        this.x = getLaneX(currentLane);
         this.floorY = floorY;
-        this.y = floorY;
 
-        this.velocityY = 0f;
         this.grounded  = true;
 
         this.collisionHandler = null;
         this.hitFlashing = false;
         this.hitFlashTimer = 0f;
+
+        // ---- Attach engine components ----
+        // Transform holds position (x, y)
+        addComponent(new Transform(getLaneX(currentLane), floorY));
+        // PhysicsBody holds velocity (used for vertical velocity / gravity)
+        addComponent(new PhysicsBody(0f, 0f, 1f));
     }
 
     // ---- Update (called every frame) ----
@@ -76,30 +82,35 @@ public class Character extends Entity implements Collidable {
     public void update(float deltaTime) {
         if (!isActive()) return;
 
+        Transform transform = getComponent(Transform.class);
+        PhysicsBody body    = getComponent(PhysicsBody.class);
+
         // --- Gravity ---
         if (!grounded) {
-            velocityY += GRAVITY * deltaTime;
-            y += velocityY * deltaTime;
+            // Apply gravity to vertical velocity
+            body.setVelocity(body.getVelocity().x, body.getVelocity().y + GRAVITY * deltaTime);
+            transform.translate(0f, body.getVelocity().y * deltaTime);
 
             // Landing check
-            if (y <= floorY) {
-                y = floorY;
-                velocityY = 0f;
+            if (transform.getY() <= floorY) {
+                transform.setY(floorY);
+                body.setVelocity(body.getVelocity().x, 0f);
                 grounded = true;
             }
         }
 
         // --- Smooth lane interpolation ---
         float targetX = getLaneX(currentLane);
-        if (Math.abs(x - targetX) > 1f) {
-            float direction = Math.signum(targetX - x);
-            x += direction * LANE_SWITCH_SPEED * deltaTime;
+        if (Math.abs(transform.getX() - targetX) > 1f) {
+            float direction = Math.signum(targetX - transform.getX());
+            transform.translate(direction * LANE_SWITCH_SPEED * deltaTime, 0f);
             // Clamp so we don't overshoot
-            if ((direction > 0 && x > targetX) || (direction < 0 && x < targetX)) {
-                x = targetX;
+            if ((direction > 0 && transform.getX() > targetX) ||
+                (direction < 0 && transform.getX() < targetX)) {
+                transform.setX(targetX);
             }
         } else {
-            x = targetX;
+            transform.setX(targetX);
         }
 
         // --- Hit flash countdown ---
@@ -133,7 +144,8 @@ public class Character extends Entity implements Collidable {
     /** Jump (only if currently on the ground). */
     public void jump() {
         if (grounded) {
-            velocityY = JUMP_VELOCITY;
+            PhysicsBody body = getComponent(PhysicsBody.class);
+            body.setVelocity(body.getVelocity().x, JUMP_VELOCITY);
             grounded = false;
         }
     }
@@ -142,7 +154,8 @@ public class Character extends Entity implements Collidable {
 
     @Override
     public Rectangle getBounds() {
-        return new Rectangle(x - width / 2f, y, width, height);
+        Transform transform = getComponent(Transform.class);
+        return new Rectangle(transform.getX() - width / 2f, transform.getY(), width, height);
     }
 
     @Override
@@ -199,17 +212,17 @@ public class Character extends Entity implements Collidable {
         return laneCentreX + lane * LANE_SPACING;
     }
 
-    // ---- Accessors ----
+    // ---- Accessors (delegate to Transform / PhysicsBody) ----
 
-    public float getX()      { return x; }
-    public float getY()      { return y; }
+    public float getX()      { return getComponent(Transform.class).getX(); }
+    public float getY()      { return getComponent(Transform.class).getY(); }
     public float getWidth()  { return width; }
     public float getHeight() { return height; }
     public int   getCurrentLane() { return currentLane; }
     public boolean isGrounded()   { return grounded; }
 
-    public void setX(float x) { this.x = x; }
-    public void setY(float y) { this.y = y; }
+    public void setX(float x) { getComponent(Transform.class).setX(x); }
+    public void setY(float y) { getComponent(Transform.class).setY(y); }
     public void setWidth(float w)  { this.width = w; }
     public void setHeight(float h) { this.height = h; }
     public void setGrounded(boolean g) { this.grounded = g; }
