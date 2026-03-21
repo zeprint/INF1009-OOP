@@ -1,6 +1,6 @@
 package io.github.some_example_name.lwjgl3.logic.movement;
 
-// This is a shared storage to store movement data from the Horizontal Movement and Jump Movement
+// This is a shared storage to store movement data from the Lane Switching Movement and Jump Movement
 
 public class MotionState {
 

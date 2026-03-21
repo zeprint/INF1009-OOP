@@ -2,7 +2,7 @@ package io.github.some_example_name.lwjgl3;
 
 import com.badlogic.gdx.utils.Array;
 
-public class MovementManager implements IMovementSystem {
+public class MovementManager {
 
     private final Array<MovementComponent> components;
 
@@ -10,7 +10,6 @@ public class MovementManager implements IMovementSystem {
         this.components = new Array<>();
     }
 
-    @Override
     public void registerComponent(MovementComponent component) {
         if (component == null) {
             throw new IllegalArgumentException("component cannot be null");
@@ -20,7 +19,6 @@ public class MovementManager implements IMovementSystem {
         }
     }
 
-    @Override
     public void unregisterComponent(MovementComponent component) {
         if (component == null) {
             return;
@@ -28,7 +26,6 @@ public class MovementManager implements IMovementSystem {
         components.removeValue(component, true);
     }
 
-    @Override
     public void update(float deltaTime) {
         if (Float.isNaN(deltaTime) || Float.isInfinite(deltaTime) || deltaTime < 0f) {
             throw new IllegalArgumentException("deltaTime must be a finite, non-negative value");
@@ -48,7 +45,6 @@ public class MovementManager implements IMovementSystem {
         components.clear();
     }
 
-    @Override
     public Array<MovementComponent> getAllComponents() {
         return new Array<>(components);
     }

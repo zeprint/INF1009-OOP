@@ -13,7 +13,7 @@ import io.github.some_example_name.lwjgl3.logic.movement.ScrollMovement;
  * queries needed by the rendering layer.
  *
  * The Floor is purely visual — ground detection is handled analytically
- * by GravityJumpMovement using the floor surface y-coordinate.
+ * by JumpMovement using the floor surface y-coordinate.
  */
 public class Floor extends Entity {
 

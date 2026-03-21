@@ -15,7 +15,7 @@ import io.github.some_example_name.lwjgl3.logic.movement.MotionState;
  * Character - The player entity in a lane-based infinite runner.
  *
  * Movement (lane switching, jumping, gravity) is no longer handled here.
- * It is delegated to LaneSwitchMovement and GravityJumpMovement, which are
+ * It is delegated to LaneSwitchMovement and JumpMovement, which are
  * registered with the MovementManager and write position back via the
  * CoordinateTarget interface.
  *

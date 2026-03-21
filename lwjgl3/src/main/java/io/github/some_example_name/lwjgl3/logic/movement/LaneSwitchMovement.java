@@ -2,16 +2,8 @@ package io.github.some_example_name.lwjgl3.logic.movement;
 
 import java.util.function.BooleanSupplier;
 
-/**
- * LaneSwitchMovement - Handles discrete left/right lane switching for the Character.
- *
- * Unlike free-form horizontal movement, this operates on a fixed set of lanes
- * (like Subway Surfers).  When a lane-switch input fires, the target lane
- * changes and the character smoothly interpolates towards it each frame.
- *
- * Registered with MovementManager; the manager calls {@link #update(float)}
- * every frame.
- */
+// Handles left/right lane switching for character
+
 public class LaneSwitchMovement extends io.github.some_example_name.lwjgl3.MovementComponent {
 
     private final CoordinateTarget target;
@@ -31,16 +23,6 @@ public class LaneSwitchMovement extends io.github.some_example_name.lwjgl3.Movem
     private boolean leftWasPressed;
     private boolean rightWasPressed;
 
-    /**
-     * @param target           receives the final position each frame
-     * @param state            shared motion state (position + grounded flag)
-     * @param moveLeftSupplier returns true while the "move left" key is held
-     * @param moveRightSupplier returns true while the "move right" key is held
-     * @param centreX          x-coordinate of the centre lane
-     * @param laneCount        total number of lanes (e.g. 3)
-     * @param laneSpacing      distance in pixels between adjacent lane centres
-     * @param laneSwitchSpeed  interpolation speed in pixels per second
-     */
     public LaneSwitchMovement(CoordinateTarget target,
                               MotionState state,
                               BooleanSupplier moveLeftSupplier,
@@ -80,7 +62,7 @@ public class LaneSwitchMovement extends io.github.some_example_name.lwjgl3.Movem
     public void update(float deltaTime) {
         validateDeltaTime(deltaTime);
 
-        // ---- Edge detection: switch lane only on the frame the key is first pressed ----
+        // switch lane only on the frame the key is first pressed
         boolean leftNow = moveLeftSupplier.getAsBoolean();
         boolean rightNow = moveRightSupplier.getAsBoolean();
 
@@ -94,7 +76,6 @@ public class LaneSwitchMovement extends io.github.some_example_name.lwjgl3.Movem
         leftWasPressed = leftNow;
         rightWasPressed = rightNow;
 
-        // ---- Smooth interpolation towards the target lane ----
         float targetX = getLaneX(currentLane);
         float currentX = state.getX();
 
@@ -102,7 +83,7 @@ public class LaneSwitchMovement extends io.github.some_example_name.lwjgl3.Movem
             float direction = Math.signum(targetX - currentX);
             float nextX = currentX + direction * laneSwitchSpeed * deltaTime;
 
-            // Clamp so we don't overshoot
+            // Clamp so we will not overshoot
             if ((direction > 0 && nextX > targetX) || (direction < 0 && nextX < targetX)) {
                 nextX = targetX;
             }
@@ -111,13 +92,11 @@ public class LaneSwitchMovement extends io.github.some_example_name.lwjgl3.Movem
             state.setX(targetX);
         }
 
-        // ---- Propagate to base class and target ----
         setPosition(state.getX(), state.getY());
         target.setX(state.getX());
         target.setY(state.getY());
     }
 
-    /** Returns the world-x of the given lane index. */
     private float getLaneX(int lane) {
         return baseLaneX + lane * laneSpacing;
     }
