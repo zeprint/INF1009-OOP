@@ -4,28 +4,35 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.ObjectMap;
 
 /**
-* Manage scene registration, switching and caching
-* Implement ISceneSystem to satisfy DIP and allows for dependency injection
-* Optimise game performance through caching and enforces SRP by delegating logic
-* and rendering to individual scenes
-* Prevents engine crashes with error handling.
-*/
-public class SceneManager implements ISceneSystem {
+ * SceneManager - Manages scene registration, switching, and caching.
+ *
+ * Implements ISceneManager so concrete scenes depend on the interface,
+ * not this class (DIP).
+ *
+ * Responsibilities (SRP):
+ *   - Register and unregister named Scene instances
+ *   - Switch between scenes with lazy initialisation (create-on-first-load)
+ *   - Forward update() and render() calls to the current active scene
+ *   - Dispose all scenes on shutdown
+ *
+ * Optimises game performance through caching and prevents engine crashes
+ * with comprehensive error handling on every public entry point.
+ */
+public class SceneManager implements ISceneManager {
 
-    private static final String TAG = "SceneManager"; // for logging
+    private static final String TAG = "SceneManager";
 
     private final ObjectMap<String, Scene> scenes;
     private final ObjectMap<String, Boolean> createdScenes;
     private Scene currentScene;
 
-    // Constructor initialise the scene manager with empty object maps and null current scene
     public SceneManager() {
         scenes = new ObjectMap<>();
         createdScenes = new ObjectMap<>();
         currentScene = null;
     }
 
-    // Ensure that scene names and scene objects are valid and prevent dups
+    // ---- ISceneManager implementation ----
 
     @Override
     public boolean addScene(String name, Scene scene) {
@@ -46,7 +53,7 @@ public class SceneManager implements ISceneSystem {
         return true;
     }
 
-    // Unregister and dispose a scene. Clears currentScene if it matches
+    @Override
     public boolean removeScene(String name) {
         if (name == null) {
             Gdx.app.error(TAG, "removeScene rejected null name!");
@@ -59,13 +66,12 @@ public class SceneManager implements ISceneSystem {
 
         Scene removed = scenes.get(name);
 
-        if (removed == currentScene) { 
+        if (removed == currentScene) {
             currentScene = null;
         }
         try {
             removed.dispose();
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             Gdx.app.error(TAG, "Error disposing scene: " + name, e);
         }
 
@@ -74,7 +80,6 @@ public class SceneManager implements ISceneSystem {
         return true;
     }
 
-    // Scene switching with caching to prevent redundant amt of create() calls and improve performance
     @Override
     public boolean loadScene(String name) {
         if (name == null) {
@@ -92,7 +97,7 @@ public class SceneManager implements ISceneSystem {
         currentScene = scenes.get(name);
 
         if (currentScene != null) {
-            // Only call create() the first time a scene is loaded
+            // Only call create() the first time a scene is loaded (caching)
             if (!createdScenes.containsKey(name)) {
                 try {
                     if (!currentScene.create()) {
@@ -100,8 +105,7 @@ public class SceneManager implements ISceneSystem {
                         currentScene = null;
                         return false;
                     }
-                } 
-                catch (Exception e) {
+                } catch (Exception e) {
                     Gdx.app.error(TAG, "Exception creating scene: " + name, e);
                     currentScene = null;
                     return false;
@@ -114,19 +118,17 @@ public class SceneManager implements ISceneSystem {
         return false;
     }
 
-    // Update and render forward to current scene if it exist and is not paused, error handling to prevent engine crash
     @Override
     public boolean update(float deltaTime) {
         if (!Float.isFinite(deltaTime) || deltaTime < 0f) {
             Gdx.app.error(TAG, "update rejected invalid deltaTime: " + deltaTime);
             return false;
         }
-        
+
         if (currentScene != null && !currentScene.isPaused()) {
             try {
                 return currentScene.update(deltaTime);
-            } 
-            catch (Exception e) {
+            } catch (Exception e) {
                 Gdx.app.error(TAG, "Error updating scene!", e);
                 return false;
             }
@@ -134,14 +136,12 @@ public class SceneManager implements ISceneSystem {
         return false;
     }
 
-    // Two-pass rendering to ensure clean state transition between SpriteBatch and ShapeRenderer
     @Override
     public boolean render() {
         if (currentScene != null) {
             try {
                 return currentScene.render();
-            } 
-            catch (Exception e) {
+            } catch (Exception e) {
                 Gdx.app.error(TAG, "Error rendering scene!", e);
                 return false;
             }
@@ -149,21 +149,15 @@ public class SceneManager implements ISceneSystem {
         return false;
     }
 
-    // Dispose all scenes and clear caches
-
     @Override
     public void dispose() {
-        boolean allDisposeSucceeded = true; 
         for (Scene scene : scenes.values()) {
             try {
                 if (scene != null) {
-                    if (!scene.dispose()) {
-                        allDisposeSucceeded = false;
-                    }
+                    scene.dispose();
                 }
             } catch (Exception e) {
                 Gdx.app.error(TAG, "Exception disposing scene: " + scene, e);
-                allDisposeSucceeded = false;
             }
         }
         scenes.clear();
@@ -171,12 +165,18 @@ public class SceneManager implements ISceneSystem {
         currentScene = null;
     }
 
-    // GameMaster get current scene and check if a scene exist by name for scene switching
     @Override
     public Scene getCurrentScene() {
         return currentScene;
     }
 
+    @Override
+    public Scene getScene(String name) {
+        if (name == null) return null;
+        return scenes.get(name);
+    }
+
+    @Override
     public boolean hasScene(String name) {
         return name != null && scenes.containsKey(name);
     }
