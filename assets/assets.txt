@@ -1,0 +1,15 @@
+bgm.mp3
+bucket.png
+character.png
+click.wav
+correct.wav
+death.wav
+droplet.png
+health.png
+jump.wav
+libgdx.png
+mute.png
+questions.json
+shield.png
+unmute.png
+wrong.wav
