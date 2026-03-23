@@ -8,19 +8,16 @@ import com.badlogic.gdx.graphics.Texture;
  */
 public class AnswerBlockFactory {
 
-    private final Texture correctTexture;
-    private final Texture wrongTexture;
+    private final Texture blockTexture;
     private float scrollSpeed;
 
-    public AnswerBlockFactory(Texture correctTexture, Texture wrongTexture, float scrollSpeed) {
-        this.correctTexture = correctTexture;
-        this.wrongTexture = wrongTexture;
+    public AnswerBlockFactory(Texture blockTexture, float scrollSpeed) {
+        this.blockTexture = blockTexture;
         this.scrollSpeed = scrollSpeed;
     }
 
     public AnswerBlock create(float x, float y, int answerValue, boolean correct) {
-        Texture tex = correct ? correctTexture : wrongTexture;
-        return new AnswerBlock(tex, x, y, scrollSpeed, answerValue, correct);
+        return new AnswerBlock(blockTexture, x, y, scrollSpeed, answerValue, correct);
     }
 
     public void setScrollSpeed(float speed) {

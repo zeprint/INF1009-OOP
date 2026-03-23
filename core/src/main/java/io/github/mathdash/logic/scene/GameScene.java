@@ -73,8 +73,7 @@ public class GameScene extends Scene implements CollisionDispatcher.GameEventLis
     private Texture obstacleTexSaw;
     private Texture obstacleTexSpike;
     private Texture obstacleTexSlime;
-    private Texture answerCorrectTex;
-    private Texture answerWrongTex;
+    private Texture answerBlockTex;
     private Texture playerWalkA, playerWalkB, playerIdle, playerHit;
 
     // Fonts
@@ -141,8 +140,7 @@ public class GameScene extends Scene implements CollisionDispatcher.GameEventLis
         obstacleTexSpike = new Texture(Gdx.files.internal(ASSET_BASE + "Sprites/Tiles/Default/block_spikes.png"));
         obstacleTexSlime = new Texture(Gdx.files.internal(ASSET_BASE + "Sprites/Enemies/Default/slime_spike_rest.png"));
 
-        answerCorrectTex = new Texture(Gdx.files.internal(ASSET_BASE + "Sprites/Tiles/Default/block_green.png"));
-        answerWrongTex = new Texture(Gdx.files.internal(ASSET_BASE + "Sprites/Tiles/Default/block_red.png"));
+        answerBlockTex = new Texture(Gdx.files.internal(ASSET_BASE + "Sprites/Tiles/Default/block_green.png"));
 
         playerWalkA = new Texture(Gdx.files.internal(ASSET_BASE + "Sprites/Characters/Default/character_green_walk_a.png"));
         playerWalkB = new Texture(Gdx.files.internal(ASSET_BASE + "Sprites/Characters/Default/character_green_walk_b.png"));
@@ -189,7 +187,7 @@ public class GameScene extends Scene implements CollisionDispatcher.GameEventLis
     private void setupFactories() {
         playerFactory = new PlayerFactory(playerWalkA, playerWalkB, playerIdle, playerHit);
         obstacleFactory = new ObstacleFactory(scrollSpeed, obstacleTexSaw, obstacleTexSpike, obstacleTexSlime);
-        answerBlockFactory = new AnswerBlockFactory(answerCorrectTex, answerWrongTex, scrollSpeed);
+        answerBlockFactory = new AnswerBlockFactory(answerBlockTex, scrollSpeed);
     }
 
     private void spawnPlayer() {
@@ -261,13 +259,36 @@ public class GameScene extends Scene implements CollisionDispatcher.GameEventLis
         cleanupEntities();
     }
 
+    private static final float ANSWER_SAFE_DISTANCE = 100f;
+
     private void spawnObstacle() {
-        // Choose a random lane, avoid placing obstacle where answers are
+        float spawnX = WORLD_WIDTH + 50f;
+
+        // Don't spawn if any active answer block is within safe distance
+        for (int i = 0; i < activeAnswers.size; i++) {
+            AnswerBlock block = activeAnswers.get(i);
+            if (!block.isActive()) continue;
+            Transform bt = block.getComponent(Transform.class);
+            if (bt != null && Math.abs(bt.getX() - spawnX) < ANSWER_SAFE_DISTANCE) {
+                return;
+            }
+        }
+
+        // Don't spawn if answer blocks are about to spawn soon
+        if (!answersOnScreen) {
+            float answerInterval = SPAWN_INTERVAL_BASE * (BASE_SCROLL_SPEED / scrollSpeed);
+            float timeUntilAnswers = answerInterval - answerSpawnTimer;
+            // Convert safe distance to time: how long it takes to scroll 100px
+            float safeTime = ANSWER_SAFE_DISTANCE / scrollSpeed;
+            if (timeUntilAnswers <= safeTime) {
+                return;
+            }
+        }
+
         int lane = MathUtils.random(0, 2);
-        float x = WORLD_WIDTH + 50f;
         float y = Player.LANE_Y[lane];
 
-        Obstacle obs = obstacleFactory.create(x, y);
+        Obstacle obs = obstacleFactory.create(spawnX, y);
         obs.setCollisionHandler(collisionDispatcher);
         obs.setScrollSpeed(scrollSpeed);
         entityManager.addEntity(obs);
@@ -497,8 +518,7 @@ public class GameScene extends Scene implements CollisionDispatcher.GameEventLis
         disposeTexture(obstacleTexSaw);
         disposeTexture(obstacleTexSpike);
         disposeTexture(obstacleTexSlime);
-        disposeTexture(answerCorrectTex);
-        disposeTexture(answerWrongTex);
+        disposeTexture(answerBlockTex);
         disposeTexture(playerWalkA);
         disposeTexture(playerWalkB);
         disposeTexture(playerIdle);
