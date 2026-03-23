@@ -29,6 +29,7 @@ kenney_new-platformer-pack-1.1/Sprites/Backgrounds/Default/background_solid_dirt
 kenney_new-platformer-pack-1.1/Sprites/Backgrounds/Default/background_solid_grass.png
 kenney_new-platformer-pack-1.1/Sprites/Backgrounds/Default/background_solid_sand.png
 kenney_new-platformer-pack-1.1/Sprites/Backgrounds/Default/background_solid_sky.png
+kenney_new-platformer-pack-1.1/Sprites/Backgrounds/Default/cobble.png
 kenney_new-platformer-pack-1.1/Sprites/Backgrounds/Double/background_clouds.png
 kenney_new-platformer-pack-1.1/Sprites/Backgrounds/Double/background_color_desert.png
 kenney_new-platformer-pack-1.1/Sprites/Backgrounds/Double/background_color_hills.png

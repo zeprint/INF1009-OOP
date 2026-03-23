@@ -1,4 +1,4 @@
-package io.github.mathdash.logic.component;
+package io.github.mathdash.logic.movement;
 
 import io.github.mathdash.AbstractEngine.entity.PhysicsBody;
 import io.github.mathdash.AbstractEngine.entity.Transform;

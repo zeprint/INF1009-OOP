@@ -51,6 +51,21 @@ public class GameScene extends Scene implements CollisionDispatcher.GameEventLis
     private static final float SPAWN_INTERVAL_BASE = 3.0f;
     private static final float OBSTACLE_SPAWN_INTERVAL = 2.0f;
 
+    // Lane background band definitions [yStart, height]
+    // Dirt = lane fill (where player runs), Grass = gaps between lanes
+    private static final float[][] DIRT_BANDS = {
+        {50f, 100f},   // Lane 1 (center=100)
+        {200f, 100f},  // Lane 2 (center=250)
+        {350f, 100f},  // Lane 3 (center=400)
+    };
+    private static final float[][] GRASS_BANDS = {
+        {0f, 50f},     // Below lane 1
+        {150f, 50f},   // Between lane 1 and 2
+        {300f, 50f},   // Between lane 2 and 3
+        {450f, 30f},   // Above lane 3
+    };
+    private static final float SKY_Y = 480f;
+
     private final SceneManager sceneManager;
     private final int level;
 
@@ -67,8 +82,8 @@ public class GameScene extends Scene implements CollisionDispatcher.GameEventLis
 
     // Textures
     private Texture bgTexture;
-    private Texture terrainTopTexture;
-    private Texture terrainFillTexture;
+    private Texture grassBgTexture;
+    private Texture dirtBgTexture;
     private Texture heartTexture;
     private Texture heartEmptyTexture;
     private Texture obstacleTexSaw;
@@ -76,6 +91,8 @@ public class GameScene extends Scene implements CollisionDispatcher.GameEventLis
     private Texture obstacleTexSlime;
     private Texture answerBlockTex;
     private Texture playerWalkA, playerWalkB, playerIdle, playerHit;
+    private Texture decoGrassTex;
+    private Texture decoBushTex;
 
     // Fonts
     private BitmapFont font;
@@ -104,6 +121,11 @@ public class GameScene extends Scene implements CollisionDispatcher.GameEventLis
 
     // Track active answer blocks
     private Array<AnswerBlock> activeAnswers = new Array<>();
+
+    // Decorations (grass/bush sprites on grass bands) — each float[] = {x, y, textureIndex (0=grass, 1=bush)}
+    private Array<float[]> decorations = new Array<>();
+    private static final float DECO_SPAWN_INTERVAL = 80f; // pixels between decorations
+    private float decoSpawnAccum = 0f;
     private Array<Obstacle> activeObstacles = new Array<>();
 
     public GameScene(SceneManager sceneManager, int level) {
@@ -127,6 +149,14 @@ public class GameScene extends Scene implements CollisionDispatcher.GameEventLis
         setupFactories();
         spawnPlayer();
         generateNewQuestion();
+
+        // Pre-populate decorations across the screen
+        for (float x = 0; x < WORLD_WIDTH; x += DECO_SPAWN_INTERVAL) {
+            float[] band = GRASS_BANDS[MathUtils.random(GRASS_BANDS.length - 1)];
+            float y = band[0] + MathUtils.random(0f, Math.max(0f, band[1] - 48f));
+            float texIdx = MathUtils.randomBoolean() ? 0f : 1f;
+            decorations.add(new float[]{x + MathUtils.random(-20f, 20f), y, texIdx});
+        }
     }
 
     private Texture loadTex(String path) {
@@ -138,8 +168,10 @@ public class GameScene extends Scene implements CollisionDispatcher.GameEventLis
     private void loadTextures() {
         bgTexture = loadTex(ASSET_BASE + "Sprites/Backgrounds/Default/background_color_trees.png");
         bgTexture.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.ClampToEdge);
-        terrainTopTexture = loadTex(ASSET_BASE + "Sprites/Tiles/Default/terrain_grass_block_top.png");
-        terrainFillTexture = loadTex(ASSET_BASE + "Sprites/Tiles/Default/terrain_grass_block_center.png");
+        grassBgTexture = loadTex(ASSET_BASE + "Sprites/Backgrounds/Default/background_solid_grass.png");
+        grassBgTexture.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.ClampToEdge);
+        dirtBgTexture = loadTex(ASSET_BASE + "Sprites/Backgrounds/Default/cobble.png");
+        dirtBgTexture.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.ClampToEdge);
         heartTexture = loadTex(ASSET_BASE + "Sprites/Tiles/Default/hud_heart.png");
         heartEmptyTexture = loadTex(ASSET_BASE + "Sprites/Tiles/Default/hud_heart_empty.png");
 
@@ -153,6 +185,9 @@ public class GameScene extends Scene implements CollisionDispatcher.GameEventLis
         playerWalkB = loadTex(ASSET_BASE + "Sprites/Characters/Default/character_green_walk_b.png");
         playerIdle = loadTex(ASSET_BASE + "Sprites/Characters/Default/character_green_idle.png");
         playerHit = loadTex(ASSET_BASE + "Sprites/Characters/Default/character_green_hit.png");
+
+        decoGrassTex = loadTex(ASSET_BASE + "Sprites/Tiles/Default/grass.png");
+        decoBushTex = loadTex(ASSET_BASE + "Sprites/Tiles/Default/bush.png");
 
         font = FontGenerator.create(24, Color.WHITE);
         questionFont = FontGenerator.create(32, Color.YELLOW, Color.DARK_GRAY, 1f);
@@ -238,6 +273,25 @@ public class GameScene extends Scene implements CollisionDispatcher.GameEventLis
         // Scroll background
         bgScrollX += scrollSpeed * 0.3f * deltaTime;
         floorScrollX += scrollSpeed * deltaTime;
+
+        // Update decorations — move left with floor speed, remove off-screen, spawn new
+        float decoMove = scrollSpeed * deltaTime;
+        for (int i = decorations.size - 1; i >= 0; i--) {
+            float[] d = decorations.get(i);
+            d[0] -= decoMove;
+            if (d[0] < -50f) {
+                decorations.removeIndex(i);
+            }
+        }
+        decoSpawnAccum += decoMove;
+        while (decoSpawnAccum >= DECO_SPAWN_INTERVAL) {
+            decoSpawnAccum -= DECO_SPAWN_INTERVAL;
+            // Spawn a decoration on a random grass band
+            float[] band = GRASS_BANDS[MathUtils.random(GRASS_BANDS.length - 1)];
+            float y = band[0] + MathUtils.random(0f, Math.max(0f, band[1] - 48f)); // 24px sprite height margin
+            float texIdx = MathUtils.randomBoolean() ? 0f : 1f;
+            decorations.add(new float[]{WORLD_WIDTH + MathUtils.random(0f, 40f), y, texIdx});
+        }
 
         // Spawn obstacles
         obstacleSpawnTimer += deltaTime;
@@ -372,23 +426,34 @@ public class GameScene extends Scene implements CollisionDispatcher.GameEventLis
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
 
-        // Draw scrolling background
+        // Draw sky background (upper portion only, with parallax)
         float bgWidth = WORLD_WIDTH;
         float bgOffset = bgScrollX % bgWidth;
-        batch.draw(bgTexture, -bgOffset, 0, bgWidth, WORLD_HEIGHT);
-        batch.draw(bgTexture, bgWidth - bgOffset, 0, bgWidth, WORLD_HEIGHT);
+        batch.draw(bgTexture, -bgOffset, SKY_Y, bgWidth, WORLD_HEIGHT - SKY_Y);
+        batch.draw(bgTexture, bgWidth - bgOffset, SKY_Y, bgWidth, WORLD_HEIGHT - SKY_Y);
 
-        // Draw scrolling floor
-        float tileSize = 48f;
-        int tilesNeeded = (int)(WORLD_WIDTH / tileSize) + 2;
-        float floorOffset = floorScrollX % tileSize;
-        for (int i = 0; i < tilesNeeded; i++) {
-            float tileX = i * tileSize - floorOffset;
-            batch.draw(terrainTopTexture, tileX, 32, tileSize, tileSize);
-            batch.draw(terrainFillTexture, tileX, 0, tileSize, 32);
+        // Draw scrolling lane bands — grass background then dirt lane fills
+        float laneOffset = floorScrollX % bgWidth;
+        for (float[] band : GRASS_BANDS) {
+            batch.draw(grassBgTexture, -laneOffset, band[0], bgWidth, band[1]);
+            batch.draw(grassBgTexture, bgWidth - laneOffset, band[0], bgWidth, band[1]);
+        }
+        float dirtTileW = 100f; // tile width to preserve aspect ratio
+        int dirtTilesNeeded = (int)(WORLD_WIDTH / dirtTileW) + 2;
+        float dirtOffset = floorScrollX % dirtTileW;
+        for (float[] band : DIRT_BANDS) {
+            for (int i = 0; i < dirtTilesNeeded; i++) {
+                float dx = i * dirtTileW - dirtOffset;
+                batch.draw(dirtBgTexture, dx, band[0], dirtTileW, band[1]);
+            }
+        }
+        // Draw decorations (grass/bush) on grass bands
+        for (int i = 0; i < decorations.size; i++) {
+            float[] d = decorations.get(i);
+            Texture tex = d[2] == 0f ? decoGrassTex : decoBushTex;
+            batch.draw(tex, d[0], d[1], 48, 48);
         }
 
-        // Draw lane lines (subtle)
         // Draw entities
         entityManager.render(batch);
 
@@ -513,8 +578,10 @@ public class GameScene extends Scene implements CollisionDispatcher.GameEventLis
         if (inputManager != null) inputManager.dispose();
 
         disposeTexture(bgTexture);
-        disposeTexture(terrainTopTexture);
-        disposeTexture(terrainFillTexture);
+        disposeTexture(grassBgTexture);
+        disposeTexture(dirtBgTexture);
+        disposeTexture(decoGrassTex);
+        disposeTexture(decoBushTex);
         disposeTexture(heartTexture);
         disposeTexture(heartEmptyTexture);
         disposeTexture(obstacleTexSaw);

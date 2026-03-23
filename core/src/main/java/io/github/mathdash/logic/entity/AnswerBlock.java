@@ -8,7 +8,7 @@ import io.github.mathdash.AbstractEngine.entity.Entity;
 import io.github.mathdash.AbstractEngine.entity.Renderable;
 import io.github.mathdash.AbstractEngine.entity.Transform;
 import io.github.mathdash.logic.Collision.CollisionHandler;
-import io.github.mathdash.logic.component.ScrollMovement;
+import io.github.mathdash.logic.movement.ScrollMovement;
 
 /**
  * AnswerBlock - An answer option that scrolls from right to left.
