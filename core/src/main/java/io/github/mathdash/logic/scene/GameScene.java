@@ -34,6 +34,7 @@ import io.github.mathdash.logic.entity.Player;
 import io.github.mathdash.logic.entity.PlayerFactory;
 import io.github.mathdash.logic.math.MathQuestion;
 import io.github.mathdash.logic.math.MathQuestionGenerator;
+import io.github.mathdash.logic.util.FontGenerator;
 
 /**
  * GameScene - The main gameplay scene for MathDash.
@@ -128,32 +129,33 @@ public class GameScene extends Scene implements CollisionDispatcher.GameEventLis
         generateNewQuestion();
     }
 
+    private Texture loadTex(String path) {
+        Texture tex = new Texture(Gdx.files.internal(path));
+        tex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+        return tex;
+    }
+
     private void loadTextures() {
-        bgTexture = new Texture(Gdx.files.internal(ASSET_BASE + "Sprites/Backgrounds/Default/background_color_trees.png"));
+        bgTexture = loadTex(ASSET_BASE + "Sprites/Backgrounds/Default/background_color_trees.png");
         bgTexture.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.ClampToEdge);
-        terrainTopTexture = new Texture(Gdx.files.internal(ASSET_BASE + "Sprites/Tiles/Default/terrain_grass_block_top.png"));
-        terrainFillTexture = new Texture(Gdx.files.internal(ASSET_BASE + "Sprites/Tiles/Default/terrain_grass_block_center.png"));
-        heartTexture = new Texture(Gdx.files.internal(ASSET_BASE + "Sprites/Tiles/Default/hud_heart.png"));
-        heartEmptyTexture = new Texture(Gdx.files.internal(ASSET_BASE + "Sprites/Tiles/Default/hud_heart_empty.png"));
+        terrainTopTexture = loadTex(ASSET_BASE + "Sprites/Tiles/Default/terrain_grass_block_top.png");
+        terrainFillTexture = loadTex(ASSET_BASE + "Sprites/Tiles/Default/terrain_grass_block_center.png");
+        heartTexture = loadTex(ASSET_BASE + "Sprites/Tiles/Default/hud_heart.png");
+        heartEmptyTexture = loadTex(ASSET_BASE + "Sprites/Tiles/Default/hud_heart_empty.png");
 
-        obstacleTexSaw = new Texture(Gdx.files.internal(ASSET_BASE + "Sprites/Enemies/Default/saw_a.png"));
-        obstacleTexSpike = new Texture(Gdx.files.internal(ASSET_BASE + "Sprites/Tiles/Default/block_spikes.png"));
-        obstacleTexSlime = new Texture(Gdx.files.internal(ASSET_BASE + "Sprites/Enemies/Default/slime_spike_rest.png"));
+        obstacleTexSaw = loadTex(ASSET_BASE + "Sprites/Enemies/Default/saw_a.png");
+        obstacleTexSpike = loadTex(ASSET_BASE + "Sprites/Tiles/Default/block_spikes.png");
+        obstacleTexSlime = loadTex(ASSET_BASE + "Sprites/Enemies/Default/slime_spike_rest.png");
 
-        answerBlockTex = new Texture(Gdx.files.internal(ASSET_BASE + "Sprites/Tiles/Default/block_green.png"));
+        answerBlockTex = loadTex(ASSET_BASE + "Sprites/Tiles/Default/block_green.png");
 
-        playerWalkA = new Texture(Gdx.files.internal(ASSET_BASE + "Sprites/Characters/Default/character_green_walk_a.png"));
-        playerWalkB = new Texture(Gdx.files.internal(ASSET_BASE + "Sprites/Characters/Default/character_green_walk_b.png"));
-        playerIdle = new Texture(Gdx.files.internal(ASSET_BASE + "Sprites/Characters/Default/character_green_idle.png"));
-        playerHit = new Texture(Gdx.files.internal(ASSET_BASE + "Sprites/Characters/Default/character_green_hit.png"));
+        playerWalkA = loadTex(ASSET_BASE + "Sprites/Characters/Default/character_green_walk_a.png");
+        playerWalkB = loadTex(ASSET_BASE + "Sprites/Characters/Default/character_green_walk_b.png");
+        playerIdle = loadTex(ASSET_BASE + "Sprites/Characters/Default/character_green_idle.png");
+        playerHit = loadTex(ASSET_BASE + "Sprites/Characters/Default/character_green_hit.png");
 
-        font = new BitmapFont();
-        font.setColor(Color.WHITE);
-        font.getData().setScale(1.5f);
-
-        questionFont = new BitmapFont();
-        questionFont.setColor(Color.YELLOW);
-        questionFont.getData().setScale(2.0f);
+        font = FontGenerator.create(24, Color.WHITE);
+        questionFont = FontGenerator.create(32, Color.YELLOW, Color.DARK_GRAY, 1f);
 
         glyphLayout = new GlyphLayout();
     }

@@ -22,6 +22,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import io.github.mathdash.AbstractEngine.inputouput.AudioManager;
 import io.github.mathdash.AbstractEngine.scene.Scene;
 import io.github.mathdash.AbstractEngine.scene.SceneManager;
+import io.github.mathdash.logic.util.FontGenerator;
 
 /**
  * DeathScene - Displayed when the player dies.
@@ -72,6 +73,7 @@ public class DeathScene extends Scene {
         overlay.dispose();
 
         characterHitTexture = new Texture(Gdx.files.internal(ASSET_BASE + "Sprites/Characters/Default/character_green_hit.png"));
+        characterHitTexture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
 
         audioManager = new AudioManager();
         audioManager.loadSound("death", ASSET_BASE + "Sounds/sfx_disappear.ogg");
@@ -82,8 +84,7 @@ public class DeathScene extends Scene {
     private void createSkin() {
         skin = new Skin();
 
-        BitmapFont skinFont = new BitmapFont();
-        skinFont.getData().setScale(1.5f);
+        BitmapFont skinFont = FontGenerator.create(24, Color.WHITE);
         skin.add("default-font", skinFont);
 
         // Red-themed buttons for death screen
@@ -129,15 +130,13 @@ public class DeathScene extends Scene {
         skin.add("default", menuStyle);
 
         Label.LabelStyle titleStyle = new Label.LabelStyle();
-        BitmapFont titleFont = new BitmapFont();
-        titleFont.getData().setScale(3.0f);
+        BitmapFont titleFont = FontGenerator.create(48, Color.RED, Color.DARK_GRAY, 2f);
         titleStyle.font = titleFont;
         titleStyle.fontColor = Color.RED;
         skin.add("title", titleStyle);
 
         Label.LabelStyle scoreStyle = new Label.LabelStyle();
-        BitmapFont scoreFont = new BitmapFont();
-        scoreFont.getData().setScale(2.0f);
+        BitmapFont scoreFont = FontGenerator.create(32, Color.WHITE);
         scoreStyle.font = scoreFont;
         scoreStyle.fontColor = Color.WHITE;
         skin.add("score", scoreStyle);

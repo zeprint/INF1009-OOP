@@ -22,6 +22,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 
 import io.github.mathdash.AbstractEngine.scene.Scene;
 import io.github.mathdash.AbstractEngine.scene.SceneManager;
+import io.github.mathdash.logic.util.FontGenerator;
 
 /**
  * PauseScene - Displayed when the game is paused.
@@ -68,8 +69,7 @@ public class PauseScene extends Scene {
     private void createSkin() {
         skin = new Skin();
 
-        BitmapFont skinFont = new BitmapFont();
-        skinFont.getData().setScale(1.5f);
+        BitmapFont skinFont = FontGenerator.create(24, Color.WHITE);
         skin.add("default-font", skinFont);
 
         Pixmap btnUp = new Pixmap(200, 50, Pixmap.Format.RGBA8888);
@@ -93,8 +93,7 @@ public class PauseScene extends Scene {
         skin.add("default", style);
 
         Label.LabelStyle labelStyle = new Label.LabelStyle();
-        BitmapFont titleFont = new BitmapFont();
-        titleFont.getData().setScale(3.0f);
+        BitmapFont titleFont = FontGenerator.create(48, Color.WHITE);
         labelStyle.font = titleFont;
         labelStyle.fontColor = Color.WHITE;
         skin.add("title", labelStyle);

@@ -24,6 +24,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import io.github.mathdash.AbstractEngine.inputouput.AudioManager;
 import io.github.mathdash.AbstractEngine.scene.Scene;
 import io.github.mathdash.AbstractEngine.scene.SceneManager;
+import io.github.mathdash.logic.util.FontGenerator;
 
 /**
  * MainMenuScene - The main menu with level selection and high scores.
@@ -65,17 +66,15 @@ public class MainMenuScene extends Scene {
         camera.update();
 
         bgTexture = new Texture(Gdx.files.internal(ASSET_BASE + "Sprites/Backgrounds/Default/background_color_trees.png"));
+        bgTexture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
         characterTexture = new Texture(Gdx.files.internal(ASSET_BASE + "Sprites/Characters/Default/character_green_front.png"));
+        characterTexture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
 
         audioManager = new AudioManager();
         audioManager.loadSound("select", ASSET_BASE + "Sounds/sfx_select.ogg");
 
-        titleFont = new BitmapFont();
-        titleFont.getData().setScale(3.0f);
-        titleFont.setColor(Color.WHITE);
-
-        buttonFont = new BitmapFont();
-        buttonFont.getData().setScale(1.5f);
+        titleFont = FontGenerator.create(48, Color.WHITE);
+        buttonFont = FontGenerator.create(22, Color.WHITE);
 
         createSkin();
         createUI();
@@ -107,8 +106,7 @@ public class MainMenuScene extends Scene {
         skin.add("button-down", new Texture(buttonDown));
         buttonDown.dispose();
 
-        BitmapFont skinFont = new BitmapFont();
-        skinFont.getData().setScale(1.4f);
+        BitmapFont skinFont = FontGenerator.create(22, Color.WHITE);
         skin.add("default-font", skinFont);
 
         TextButton.TextButtonStyle buttonStyle = new TextButton.TextButtonStyle();
@@ -126,15 +124,13 @@ public class MainMenuScene extends Scene {
         skin.add("default", labelStyle);
 
         Label.LabelStyle titleStyle = new Label.LabelStyle();
-        BitmapFont titleSkinFont = new BitmapFont();
-        titleSkinFont.getData().setScale(2.5f);
+        BitmapFont titleSkinFont = FontGenerator.create(42, Color.YELLOW, Color.DARK_GRAY, 2f);
         titleStyle.font = titleSkinFont;
         titleStyle.fontColor = Color.YELLOW;
         skin.add("title", titleStyle);
 
         Label.LabelStyle subtitleStyle = new Label.LabelStyle();
-        BitmapFont subtitleFont = new BitmapFont();
-        subtitleFont.getData().setScale(1.2f);
+        BitmapFont subtitleFont = FontGenerator.create(18, new Color(0.8f, 0.8f, 0.8f, 1f));
         subtitleStyle.font = subtitleFont;
         subtitleStyle.fontColor = new Color(0.8f, 0.8f, 0.8f, 1f);
         skin.add("subtitle", subtitleStyle);
