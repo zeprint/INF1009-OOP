@@ -117,6 +117,9 @@ public class GameScene extends Scene
     private Array<AnswerBlock> activeAnswers = new Array<>();
     private Array<Obstacle> activeObstacles = new Array<>();
 
+    // Track surge state for updates
+    private boolean previousSurgingState = false;
+
     // Extracted helpers
     private BackgroundRenderer backgroundRenderer;
     private HudRenderer hudRenderer;
@@ -319,6 +322,13 @@ public class GameScene extends Scene
         scrollSpeed = BASE_SCROLL_SPEED * difficulty.getSpeedMultiplier()
             * surgeComponent.getSpeedBonus();
 
+        // Detect surge state changes and update entity speeds
+        boolean currentSurgingState = surgeComponent.isSurging();
+        if (currentSurgingState != previousSurgingState) {
+            previousSurgingState = currentSurgingState;
+            updateScrollSpeeds();
+        }
+
         // Delegate to helpers
         backgroundRenderer.update(deltaTime, scrollSpeed);
         entitySpawner.update(deltaTime, scrollSpeed, currentQuestion);
@@ -355,10 +365,28 @@ public class GameScene extends Scene
     @Override
     public void onHealthChanged(int newHealth) { }
 
+    private void updateScrollSpeeds() {
+        float newSpeed = BASE_SCROLL_SPEED * difficulty.getSpeedMultiplier()
+            * surgeComponent.getSpeedBonus();
+        
+        // Update factories for future spawns
+        obstacleFactory.setScrollSpeed(newSpeed);
+        answerBlockFactory.setScrollSpeed(newSpeed);
+        
+        // Update all existing entities on screen
+        for (Obstacle obs : activeObstacles) {
+            obs.setScrollSpeed(newSpeed);
+        }
+        for (AnswerBlock block : activeAnswers) {
+            block.setScrollSpeed(newSpeed);
+        }
+    }
+
     @Override
     public void onObstacleHit() {
         difficulty.onObstacleHit();
         surgeComponent.resetSurge();
+        updateScrollSpeeds();
     }
 
     @Override
@@ -372,10 +400,7 @@ public class GameScene extends Scene
         difficulty.onCorrect();
         surgeComponent.addSurge();
 
-        float newSpeed = BASE_SCROLL_SPEED * difficulty.getSpeedMultiplier();
-        obstacleFactory.setScrollSpeed(newSpeed);
-        answerBlockFactory.setScrollSpeed(newSpeed);
-
+        updateScrollSpeeds();
         entitySpawner.clearAnswerBlocks();
         generateNewQuestion();
     }
@@ -385,10 +410,7 @@ public class GameScene extends Scene
         difficulty.onWrong();
         surgeComponent.resetSurge();
 
-        float newSpeed = BASE_SCROLL_SPEED * difficulty.getSpeedMultiplier();
-        obstacleFactory.setScrollSpeed(newSpeed);
-        answerBlockFactory.setScrollSpeed(newSpeed);
-
+        updateScrollSpeeds();
         entitySpawner.clearAnswerBlocks();
         generateNewQuestion();
     }
