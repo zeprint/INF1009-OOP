@@ -17,9 +17,6 @@ import io.github.mathdash.logic.scene.PauseScene;
 /**
  * GameMaster - Main application entry point.
  * Wires all scenes together via SceneManager.
- * Key code constants (Input.Keys.*) are kept here — the one place where
- * libGDX input constants are acceptable — and injected into scenes as
- * InputBindings so the logic layer never imports them directly.
  */
 public class GameMaster extends ApplicationAdapter {
 
@@ -44,9 +41,18 @@ public class GameMaster extends ApplicationAdapter {
         try {
             cleanupGameScenes();
 
-            GameScene gameScene = new GameScene(sceneManager, level);
+            // Build game input bindings — Input.Keys stays in GameMaster.
+            InputBindings gameBindings = new InputBindings();
+            gameBindings.bindAction(InputAction.JUMP, Input.Keys.UP);
+            gameBindings.bindAction(InputAction.JUMP, Input.Keys.W);
+            gameBindings.bindAction(InputAction.CONFIRM, Input.Keys.DOWN);
+            gameBindings.bindAction(InputAction.CONFIRM, Input.Keys.S);
+            gameBindings.bindAction(InputAction.TOGGLE_PAUSE, Input.Keys.ESCAPE);
+            gameBindings.bindAction(InputAction.TOGGLE_PAUSE, Input.Keys.P);
 
-            // Build pause bindings here — libGDX key constants stay in GameMaster.
+            GameScene gameScene = new GameScene(sceneManager, level, gameBindings);
+
+            // Build pause input bindings.
             InputBindings pauseBindings = new InputBindings();
             pauseBindings.bindAction(InputAction.TOGGLE_PAUSE, Input.Keys.ESCAPE);
             pauseBindings.bindAction(InputAction.TOGGLE_PAUSE, Input.Keys.P);
@@ -57,7 +63,6 @@ public class GameMaster extends ApplicationAdapter {
                 () -> startGame(level),
                 this::returnToMainMenu
             );
-
             deathScene.setFinalScore(0);
             deathScene.setLevel(level);
 
@@ -77,7 +82,7 @@ public class GameMaster extends ApplicationAdapter {
     }
 
     private void cleanupGameScenes() {
-        if (sceneManager.hasScene("game")) {
+        if (sceneManager.hasScene("game"))  {
             sceneManager.removeScene("game");
         }
         if (sceneManager.hasScene("pause")) {
@@ -94,7 +99,6 @@ public class GameMaster extends ApplicationAdapter {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         float deltaTime = Gdx.graphics.getDeltaTime();
-
         sceneManager.update(deltaTime);
         sceneManager.render(batch);
     }
@@ -106,11 +110,7 @@ public class GameMaster extends ApplicationAdapter {
 
     @Override
     public void dispose() {
-        if (sceneManager != null) {
-            sceneManager.dispose();
-        }
-        if (batch != null) {
-            batch.dispose();
-        }
+        if (sceneManager != null) sceneManager.dispose();
+        if (batch != null) batch.dispose();
     }
 }

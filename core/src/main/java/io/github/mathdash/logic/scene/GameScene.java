@@ -1,21 +1,22 @@
 package io.github.mathdash.logic.scene;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
+import java.util.Random;
+
 import io.github.mathdash.AbstractEngine.collision.CollisionManager;
 import io.github.mathdash.AbstractEngine.entity.Entity;
 import io.github.mathdash.AbstractEngine.entity.EntityManager;
+import io.github.mathdash.AbstractEngine.entity.Renderable;
 import io.github.mathdash.AbstractEngine.entity.Transform;
 import io.github.mathdash.AbstractEngine.inputouput.AudioManager;
 import io.github.mathdash.AbstractEngine.inputouput.InputAction;
@@ -25,7 +26,6 @@ import io.github.mathdash.AbstractEngine.movement.MovementManager;
 import io.github.mathdash.AbstractEngine.scene.Scene;
 import io.github.mathdash.AbstractEngine.scene.SceneManager;
 import io.github.mathdash.logic.Collision.CollisionDispatcher;
-import io.github.mathdash.logic.Collision.CollisionHandler;
 import io.github.mathdash.logic.entity.AnswerBlock;
 import io.github.mathdash.logic.entity.AnswerBlockFactory;
 import io.github.mathdash.logic.entity.Obstacle;
@@ -36,15 +36,13 @@ import io.github.mathdash.logic.math.MathQuestion;
 import io.github.mathdash.logic.math.MathQuestionGenerator;
 import io.github.mathdash.logic.movement.ScrollMovement;
 import io.github.mathdash.logic.util.FontGenerator;
-import io.github.mathdash.AbstractEngine.entity.Renderable;
 
 /**
  * GameScene - The main gameplay scene for MathDash.
- * Uses engine managers: EntityManager, CollisionManager, MovementManager, InputManager, AudioManager.
  */
 public class GameScene extends Scene implements CollisionDispatcher.GameEventListener {
 
-    public static final float WORLD_WIDTH = 800f;
+    public static final float WORLD_WIDTH  = 800f;
     public static final float WORLD_HEIGHT = 600f;
 
     private static final String ASSET_BASE = "kenney_new-platformer-pack-1.1/";
@@ -52,24 +50,27 @@ public class GameScene extends Scene implements CollisionDispatcher.GameEventLis
     private static final float SPEED_INCREMENT = 15f;
     private static final float SPAWN_INTERVAL_BASE = 3.0f;
     private static final float OBSTACLE_SPAWN_INTERVAL = 2.0f;
+    private static final float ANSWER_SAFE_DISTANCE = 100f;
+    private static final float DECO_SPAWN_INTERVAL = 80f;
 
     // Lane background band definitions [yStart, height]
-    // Dirt = lane fill (where player runs), Grass = gaps between lanes
     private static final float[][] DIRT_BANDS = {
-        {50f, 100f},   // Lane 1 (center=100)
-        {200f, 100f},  // Lane 2 (center=250)
-        {350f, 100f},  // Lane 3 (center=400)
+        {50f, 100f},
+        {200f, 100f},
+        {350f, 100f},
     };
     private static final float[][] GRASS_BANDS = {
-        {0f, 50f},     // Below lane 1
-        {150f, 50f},   // Between lane 1 and 2
-        {300f, 50f},   // Between lane 2 and 3
-        {450f, 30f},   // Above lane 3
+        {0f, 50f},
+        {150f, 50f},
+        {300f, 50f},
+        {450f, 30f},
     };
     private static final float SKY_Y = 480f;
 
     private final SceneManager sceneManager;
     private final int level;
+    private final InputBindings inputBindings;
+    private final Random random = new Random();
 
     // Engine managers
     private EntityManager entityManager;
@@ -113,29 +114,25 @@ public class GameScene extends Scene implements CollisionDispatcher.GameEventLis
     private MathQuestionGenerator questionGenerator;
     private MathQuestion currentQuestion;
 
-    private float scrollSpeed;
+    private float scrollSpeed = BASE_SCROLL_SPEED;
     private float bgScrollX = 0f;
     private float floorScrollX = 0f;
     private float obstacleSpawnTimer = 0f;
     private float answerSpawnTimer = 0f;
-    private boolean answersOnScreen = false;
+    private boolean answersOnScreen  = false;
     private int score = 0;
     private boolean gameOver = false;
 
-    // Track active answer blocks
-    private Array<AnswerBlock> activeAnswers = new Array<>();
-
-    // Decorations (grass/bush sprites on grass bands) — each float[] = {x, y, textureIndex (0=grass, 1=bush)}
-    private Array<float[]> decorations = new Array<>();
-    private static final float DECO_SPAWN_INTERVAL = 80f; // pixels between decorations
+    private final Array<AnswerBlock> activeAnswers = new Array<>();
+    private final Array<Obstacle> activeObstacles = new Array<>();
+    private final Array<float[]> decorations = new Array<>();
     private float decoSpawnAccum = 0f;
-    private Array<Obstacle> activeObstacles = new Array<>();
 
-    public GameScene(SceneManager sceneManager, int level) {
+    public GameScene(SceneManager sceneManager, int level, InputBindings inputBindings) {
         super("game");
         this.sceneManager = sceneManager;
         this.level = level;
-        this.scrollSpeed = BASE_SCROLL_SPEED;
+        this.inputBindings = inputBindings;
     }
 
     @Override
@@ -155,10 +152,10 @@ public class GameScene extends Scene implements CollisionDispatcher.GameEventLis
 
         // Pre-populate decorations across the screen
         for (float x = 0; x < WORLD_WIDTH; x += DECO_SPAWN_INTERVAL) {
-            float[] band = GRASS_BANDS[MathUtils.random(GRASS_BANDS.length - 1)];
-            float y = band[0] + MathUtils.random(0f, Math.max(0f, band[1] - 48f));
-            float texIdx = MathUtils.randomBoolean() ? 0f : 1f;
-            decorations.add(new float[]{x + MathUtils.random(-20f, 20f), y, texIdx});
+            float[] band = GRASS_BANDS[random.nextInt(GRASS_BANDS.length)];
+            float y = band[0] + random.nextFloat() * Math.max(0f, band[1] - 48f);
+            float texIdx = random.nextBoolean() ? 0f : 1f;
+            decorations.add(new float[]{x + (random.nextFloat() * 40f - 20f), y, texIdx});
         }
     }
 
@@ -175,27 +172,23 @@ public class GameScene extends Scene implements CollisionDispatcher.GameEventLis
         grassBgTexture.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.ClampToEdge);
         dirtBgTexture = loadTex(ASSET_BASE + "Sprites/Backgrounds/Default/cobble.png");
         dirtBgTexture.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.ClampToEdge);
+
         heartTexture = loadTex(ASSET_BASE + "Sprites/Tiles/Default/hud_heart.png");
         heartEmptyTexture = loadTex(ASSET_BASE + "Sprites/Tiles/Default/hud_heart_empty.png");
-
         obstacleTexSaw = loadTex(ASSET_BASE + "Sprites/Enemies/Default/saw_a.png");
         obstacleTexSpike = loadTex(ASSET_BASE + "Sprites/Tiles/Default/block_spikes.png");
         obstacleTexSlime = loadTex(ASSET_BASE + "Sprites/Enemies/Default/slime_spike_rest.png");
-
         answerBlockTex = loadTex(ASSET_BASE + "Sprites/Tiles/Default/block_green.png");
-
         playerWalkA = loadTex(ASSET_BASE + "Sprites/Characters/Default/character_green_walk_a.png");
         playerWalkB = loadTex(ASSET_BASE + "Sprites/Characters/Default/character_green_walk_b.png");
         playerIdle = loadTex(ASSET_BASE + "Sprites/Characters/Default/character_green_idle.png");
         playerHit = loadTex(ASSET_BASE + "Sprites/Characters/Default/character_green_hit.png");
-
         decoGrassTex = loadTex(ASSET_BASE + "Sprites/Tiles/Default/grass.png");
         decoBushTex = loadTex(ASSET_BASE + "Sprites/Tiles/Default/bush.png");
 
         font = FontGenerator.create(24, Color.WHITE);
         hudFont = FontGenerator.create(24, Color.BLACK);
         questionFont = FontGenerator.create(32, Color.YELLOW, Color.DARK_GRAY, 1f);
-
         glyphLayout = new GlyphLayout();
     }
 
@@ -206,14 +199,7 @@ public class GameScene extends Scene implements CollisionDispatcher.GameEventLis
     }
 
     private void setupInput() {
-        InputBindings bindings = new InputBindings();
-        bindings.bindAction(InputAction.JUMP, Input.Keys.UP);
-        bindings.bindAction(InputAction.JUMP, Input.Keys.W);
-        bindings.bindAction(InputAction.CONFIRM, Input.Keys.DOWN);
-        bindings.bindAction(InputAction.CONFIRM, Input.Keys.S);
-        bindings.bindAction(InputAction.TOGGLE_PAUSE, Input.Keys.ESCAPE);
-        bindings.bindAction(InputAction.TOGGLE_PAUSE, Input.Keys.P);
-        inputManager = new InputManager(bindings);
+        inputManager = new InputManager(inputBindings);
     }
 
     private void setupAudio() {
@@ -233,10 +219,8 @@ public class GameScene extends Scene implements CollisionDispatcher.GameEventLis
 
     private void spawnPlayer() {
         player = playerFactory.create(120f, Player.LANE_Y[0]);
-
         collisionDispatcher = new CollisionDispatcher(audioManager, this);
         player.setCollisionHandler(collisionDispatcher);
-
         entityManager.addEntity(player);
         collisionManager.addObject(player);
     }
@@ -250,19 +234,15 @@ public class GameScene extends Scene implements CollisionDispatcher.GameEventLis
 
     @Override
     public void update(float deltaTime) {
-        if (gameOver) {
-            return;
-        }
+        if (gameOver) return;
 
         inputManager.update();
 
-        // Pause
         if (inputManager.isActionTriggered(InputAction.TOGGLE_PAUSE)) {
             sceneManager.setScene("pause");
             return;
         }
 
-        // Player lane switching
         if (inputManager.isActionTriggered(InputAction.JUMP)) {
             player.switchLane(1);
             audioManager.playSound("jump");
@@ -276,27 +256,23 @@ public class GameScene extends Scene implements CollisionDispatcher.GameEventLis
         entityManager.update(deltaTime);
         collisionManager.checkCollisions();
 
-        // Scroll background
         bgScrollX += scrollSpeed * 0.3f * deltaTime;
         floorScrollX += scrollSpeed * deltaTime;
 
-        // Update decorations — move left with floor speed, remove off-screen, spawn new
+        // Update decorations
         float decoMove = scrollSpeed * deltaTime;
         for (int i = decorations.size - 1; i >= 0; i--) {
             float[] d = decorations.get(i);
             d[0] -= decoMove;
-            if (d[0] < -50f) {
-                decorations.removeIndex(i);
-            }
+            if (d[0] < -50f) decorations.removeIndex(i);
         }
         decoSpawnAccum += decoMove;
         while (decoSpawnAccum >= DECO_SPAWN_INTERVAL) {
             decoSpawnAccum -= DECO_SPAWN_INTERVAL;
-            // Spawn a decoration on a random grass band
-            float[] band = GRASS_BANDS[MathUtils.random(GRASS_BANDS.length - 1)];
-            float y = band[0] + MathUtils.random(0f, Math.max(0f, band[1] - 48f)); // 24px sprite height margin
-            float texIdx = MathUtils.randomBoolean() ? 0f : 1f;
-            decorations.add(new float[]{WORLD_WIDTH + MathUtils.random(0f, 40f), y, texIdx});
+            float[] band = GRASS_BANDS[random.nextInt(GRASS_BANDS.length)];
+            float y = band[0] + random.nextFloat() * Math.max(0f, band[1] - 48f);
+            float texIdx = random.nextBoolean() ? 0f : 1f;
+            decorations.add(new float[]{WORLD_WIDTH + random.nextFloat() * 40f, y, texIdx});
         }
 
         // Spawn obstacles
@@ -317,37 +293,27 @@ public class GameScene extends Scene implements CollisionDispatcher.GameEventLis
             }
         }
 
-        // Clean up off-screen entities
         cleanupEntities();
     }
-
-    private static final float ANSWER_SAFE_DISTANCE = 100f;
 
     private void spawnObstacle() {
         float spawnX = WORLD_WIDTH + 50f;
 
-        // Don't spawn if any active answer block is within safe distance
         for (int i = 0; i < activeAnswers.size; i++) {
             AnswerBlock block = activeAnswers.get(i);
             if (!block.isActive()) continue;
             Transform bt = block.getComponent(Transform.class);
-            if (bt != null && Math.abs(bt.getX() - spawnX) < ANSWER_SAFE_DISTANCE) {
-                return;
-            }
+            if (bt != null && Math.abs(bt.getX() - spawnX) < ANSWER_SAFE_DISTANCE) return;
         }
 
-        // Don't spawn if answer blocks are about to spawn soon
         if (!answersOnScreen) {
             float answerInterval = SPAWN_INTERVAL_BASE * (BASE_SCROLL_SPEED / scrollSpeed);
             float timeUntilAnswers = answerInterval - answerSpawnTimer;
-            // Convert safe distance to time: how long it takes to scroll 100px
             float safeTime = ANSWER_SAFE_DISTANCE / scrollSpeed;
-            if (timeUntilAnswers <= safeTime) {
-                return;
-            }
+            if (timeUntilAnswers <= safeTime) return;
         }
 
-        int lane = MathUtils.random(0, 2);
+        int lane = random.nextInt(3);
         float y = Player.LANE_Y[lane];
 
         Obstacle obs = obstacleFactory.create(spawnX, y);
@@ -363,20 +329,14 @@ public class GameScene extends Scene implements CollisionDispatcher.GameEventLis
         if (currentQuestion == null) return;
 
         float x = WORLD_WIDTH + 50f;
-
-        // Assign answers to random lanes
         int[] laneOrder = {0, 1, 2};
         shuffleLanes(laneOrder);
 
-        int[] answers = {
-            currentQuestion.getCorrectAnswer(),
-            currentQuestion.getWrongAnswer1(),
-            currentQuestion.getWrongAnswer2()
-        };
+        int[] answers = {currentQuestion.getCorrectAnswer(), currentQuestion.getWrongAnswer1(), currentQuestion.getWrongAnswer2()};
         boolean[] isCorrect = {true, false, false};
 
         for (int i = 0; i < 3; i++) {
-            float y = Player.LANE_Y[laneOrder[i]];
+            float      y     = Player.LANE_Y[laneOrder[i]];
             AnswerBlock block = answerBlockFactory.create(x, y, answers[i], isCorrect[i]);
             movementManager.add(block.getComponent(ScrollMovement.class));
             block.setCollisionHandler(collisionDispatcher);
@@ -389,7 +349,7 @@ public class GameScene extends Scene implements CollisionDispatcher.GameEventLis
 
     private void shuffleLanes(int[] arr) {
         for (int i = arr.length - 1; i > 0; i--) {
-            int j = MathUtils.random(0, i);
+            int j = random.nextInt(i + 1);
             int temp = arr[i];
             arr[i] = arr[j];
             arr[j] = temp;
@@ -397,10 +357,9 @@ public class GameScene extends Scene implements CollisionDispatcher.GameEventLis
     }
 
     private void cleanupEntities() {
-        // Clean obstacles
         for (int i = activeObstacles.size - 1; i >= 0; i--) {
-            Obstacle obs = activeObstacles.get(i);
-            Transform t = obs.getComponent(Transform.class);
+            Obstacle  obs = activeObstacles.get(i);
+            Transform t   = obs.getComponent(Transform.class);
             if (t == null || t.getX() < -100f || !obs.isActive()) {
                 collisionManager.removeObject(obs);
                 entityManager.removeEntity(obs);
@@ -409,7 +368,6 @@ public class GameScene extends Scene implements CollisionDispatcher.GameEventLis
             }
         }
 
-        // Clean answer blocks
         boolean allAnswersGone = true;
         for (int i = activeAnswers.size - 1; i >= 0; i--) {
             AnswerBlock block = activeAnswers.get(i);
@@ -424,7 +382,6 @@ public class GameScene extends Scene implements CollisionDispatcher.GameEventLis
             }
         }
 
-        // If all answers are gone, generate new question
         if (answersOnScreen && allAnswersGone) {
             generateNewQuestion();
         }
@@ -436,28 +393,26 @@ public class GameScene extends Scene implements CollisionDispatcher.GameEventLis
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
 
-        // Draw sky background (upper portion only, with parallax)
-        float bgWidth = WORLD_WIDTH;
+        float bgWidth  = WORLD_WIDTH;
         float bgOffset = bgScrollX % bgWidth;
         batch.draw(bgTexture, -bgOffset, SKY_Y, bgWidth, WORLD_HEIGHT - SKY_Y);
         batch.draw(bgTexture, bgWidth - bgOffset, SKY_Y, bgWidth, WORLD_HEIGHT - SKY_Y);
 
-        // Draw scrolling lane bands — grass background then dirt lane fills
         float laneOffset = floorScrollX % bgWidth;
         for (float[] band : GRASS_BANDS) {
             batch.draw(grassBgTexture, -laneOffset, band[0], bgWidth, band[1]);
             batch.draw(grassBgTexture, bgWidth - laneOffset, band[0], bgWidth, band[1]);
         }
-        float dirtTileW = 100f; // tile width to preserve aspect ratio
-        int dirtTilesNeeded = (int)(WORLD_WIDTH / dirtTileW) + 2;
+
+        float dirtTileW = 100f;
+        int   dirtTilesNeeded = (int)(WORLD_WIDTH / dirtTileW) + 2;
         float dirtOffset = floorScrollX % dirtTileW;
         for (float[] band : DIRT_BANDS) {
             for (int i = 0; i < dirtTilesNeeded; i++) {
-                float dx = i * dirtTileW - dirtOffset;
-                batch.draw(dirtBgTexture, dx, band[0], dirtTileW, band[1]);
+                batch.draw(dirtBgTexture, i * dirtTileW - dirtOffset, band[0], dirtTileW, band[1]);
             }
         }
-        // Draw decorations (grass/bush) on grass bands
+
         for (int i = 0; i < decorations.size; i++) {
             float[] d = decorations.get(i);
             Texture tex = d[2] == 0f ? decoGrassTex : decoBushTex;
@@ -470,7 +425,7 @@ public class GameScene extends Scene implements CollisionDispatcher.GameEventLis
             Entity entity = entities.get(i);
             if (!entity.isActive()) continue;
             Renderable renderable = entity.getComponent(Renderable.class);
-            Transform transform = entity.getComponent(Transform.class);
+            Transform  transform  = entity.getComponent(Transform.class);
             if (renderable != null && transform != null) {
                 renderable.render(batch, transform);
             }
@@ -479,19 +434,12 @@ public class GameScene extends Scene implements CollisionDispatcher.GameEventLis
         // Draw answer values on blocks
         for (int i = 0; i < activeAnswers.size; i++) {
             AnswerBlock block = activeAnswers.get(i);
-            if (!block.isActive()) {
-                continue;
-            }
+            if (!block.isActive()) continue;
             Transform t = block.getComponent(Transform.class);
-            if (t == null) {
-                continue;
-            }
-
+            if (t == null) continue;
             String text = String.valueOf(block.getAnswerValue());
             glyphLayout.setText(font, text);
-            font.draw(batch, text,
-                t.getX() - glyphLayout.width / 2f,
-                t.getY() + glyphLayout.height / 2f);
+            font.draw(batch, text, t.getX() - glyphLayout.width / 2f, t.getY() + glyphLayout.height / 2f);
         }
 
         // Draw HUD - Hearts
@@ -516,9 +464,7 @@ public class GameScene extends Scene implements CollisionDispatcher.GameEventLis
         if (currentQuestion != null) {
             String qText = currentQuestion.getQuestionText();
             glyphLayout.setText(questionFont, qText);
-            questionFont.draw(batch, qText,
-                WORLD_WIDTH / 2f - glyphLayout.width / 2f,
-                WORLD_HEIGHT - 70);
+            questionFont.draw(batch, qText, WORLD_WIDTH / 2f - glyphLayout.width / 2f, WORLD_HEIGHT - 70);
         }
 
         batch.end();
@@ -529,24 +475,18 @@ public class GameScene extends Scene implements CollisionDispatcher.GameEventLis
         viewport.update(width, height, true);
     }
 
-    // CollisionDispatcher.GameEventListener callbacks
     @Override
-    public void onHealthChanged(int newHealth) {
-        // HUD will update automatically via render
-    }
+    public void onHealthChanged(int newHealth) {}
 
     @Override
     public void onPlayerDeath() {
         gameOver = true;
-        // Save high score
         saveHighScore();
-        // Pass score to death scene before switching
         Scene deathSceneRef = sceneManager.getScene("death");
         if (deathSceneRef instanceof DeathScene) {
             ((DeathScene) deathSceneRef).setFinalScore(score);
             ((DeathScene) deathSceneRef).setLevel(level);
         }
-        // Switch to death scene
         sceneManager.setScene("death");
     }
 
@@ -556,15 +496,12 @@ public class GameScene extends Scene implements CollisionDispatcher.GameEventLis
         scrollSpeed += SPEED_INCREMENT;
         obstacleFactory.setScrollSpeed(scrollSpeed);
         answerBlockFactory.setScrollSpeed(scrollSpeed);
-
-        // Clear remaining answer blocks
         clearAnswerBlocks();
         generateNewQuestion();
     }
 
     @Override
     public void onWrongAnswer() {
-        // Clear remaining answer blocks
         clearAnswerBlocks();
         generateNewQuestion();
     }
@@ -583,16 +520,20 @@ public class GameScene extends Scene implements CollisionDispatcher.GameEventLis
 
     private void saveHighScore() {
         com.badlogic.gdx.Preferences prefs = Gdx.app.getPreferences("MathDash");
-        String key = "highscore_level_" + level;
-        int current = prefs.getInteger(key, 0);
+        String key     = "highscore_level_" + level;
+        int    current = prefs.getInteger(key, 0);
         if (score > current) {
             prefs.putInteger(key, score);
             prefs.flush();
         }
     }
 
-    public int getScore() { return score; }
-    public int getLevel() { return level; }
+    public int getScore() { 
+        return score; 
+    }
+    public int getLevel() { 
+        return level; 
+    }
 
     @Override
     protected void onUnload() {
