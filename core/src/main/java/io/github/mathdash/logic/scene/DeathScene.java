@@ -9,7 +9,6 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -19,16 +18,19 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
-import io.github.mathdash.AbstractEngine.ServiceLocator;
-import io.github.mathdash.AbstractEngine.inputouput.IAudioSystem;
-import io.github.mathdash.AbstractEngine.scene.Scene;
-import io.github.mathdash.AbstractEngine.scene.SceneManager;
+import io.github.mathdash.engine.ServiceLocator;
+import io.github.mathdash.engine.inputoutput.IAudioSystem;
+import io.github.mathdash.engine.scene.BaseStage;
+import io.github.mathdash.engine.scene.Scene;
+import io.github.mathdash.engine.scene.SceneManager;
+import io.github.mathdash.engine.scene.StageManager;
 import io.github.mathdash.logic.util.FontGenerator;
 
 /**
  * DeathScene - Displayed when the player dies.
  * Shows final score and offers Try Again and Main Menu buttons.
  * Uses ServiceLocator for audio (Dependency Inversion Principle).
+ * Uses BaseStage and StageManager for stage lifecycle management.
  */
 public class DeathScene extends Scene {
 
@@ -41,7 +43,7 @@ public class DeathScene extends Scene {
 
     private OrthographicCamera camera;
     private Viewport viewport;
-    private Stage stage;
+    private StageManager stageManager;
     private Skin skin;
     private Texture overlayTexture;
 
@@ -65,6 +67,8 @@ public class DeathScene extends Scene {
         camera.position.set(WORLD_WIDTH / 2f, WORLD_HEIGHT / 2f, 0);
         camera.update();
 
+        stageManager = new StageManager();
+
         Pixmap overlay = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
         overlay.setColor(0.15f, 0, 0, 0.85f);
         overlay.fill();
@@ -80,7 +84,6 @@ public class DeathScene extends Scene {
         BitmapFont skinFont = FontGenerator.create(24, Color.WHITE);
         skin.add("default-font", skinFont);
 
-        // Red-themed buttons for death screen
         Pixmap btnUp = new Pixmap(200, 50, Pixmap.Format.RGBA8888);
         btnUp.setColor(new Color(0.7f, 0.2f, 0.2f, 1f));
         btnUp.fill();
@@ -93,7 +96,6 @@ public class DeathScene extends Scene {
         skin.add("btn-over", new Texture(btnOver));
         btnOver.dispose();
 
-        // Green try again button
         Pixmap tryBtnUp = new Pixmap(200, 50, Pixmap.Format.RGBA8888);
         tryBtnUp.setColor(new Color(0.2f, 0.6f, 0.3f, 1f));
         tryBtnUp.fill();
@@ -141,55 +143,60 @@ public class DeathScene extends Scene {
     }
 
     private void createUI() {
-        if (stage != null) {
-            stage.dispose();
+        stageManager.dispose();
+        stageManager = new StageManager();
+
+        DeathStage deathStage = new DeathStage(viewport);
+        stageManager.addStage(deathStage);
+    }
+
+    /** Concrete BaseStage subclass that builds the death screen UI. */
+    private class DeathStage extends BaseStage {
+        public DeathStage(Viewport viewport) {
+            super(viewport);
         }
-        stage = new Stage(viewport);
-        Gdx.input.setInputProcessor(stage);
 
-        Table root = new Table();
-        root.setFillParent(true);
+        @Override
+        protected void initialize() {
+            Table root = new Table();
+            root.setFillParent(true);
 
-        Label title = new Label("GAME OVER", skin, "title");
-        root.add(title).padBottom(30).row();
+            Label title = new Label("GAME OVER", skin, "title");
+            root.add(title).padBottom(30).row();
 
-        Label scoreLabel = new Label("Score: " + finalScore, skin, "score");
-        root.add(scoreLabel).padBottom(10).row();
+            Label scoreLabel = new Label("Score: " + finalScore, skin, "score");
+            root.add(scoreLabel).padBottom(10).row();
 
-        // Show high score
-        com.badlogic.gdx.Preferences prefs = Gdx.app.getPreferences("MathDash");
-        int highScore = prefs.getInteger("highscore_level_" + level, 0);
-        Label highScoreLabel = new Label("Best: " + highScore, skin, "info");
-        root.add(highScoreLabel).padBottom(40).row();
+            com.badlogic.gdx.Preferences prefs = Gdx.app.getPreferences("MathDash");
+            int highScore = prefs.getInteger("highscore_level_" + level, 0);
+            Label highScoreLabel = new Label("Best: " + highScore, skin, "info");
+            root.add(highScoreLabel).padBottom(40).row();
 
-        TextButton tryAgainBtn = new TextButton("Try Again", skin, "try-again");
-        tryAgainBtn.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                if (onTryAgain != null) {
-                    onTryAgain.run();
+            TextButton tryAgainBtn = new TextButton("Try Again", skin, "try-again");
+            tryAgainBtn.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    if (onTryAgain != null) onTryAgain.run();
                 }
-            }
-        });
-        root.add(tryAgainBtn).width(250).height(55).padBottom(20).row();
+            });
+            root.add(tryAgainBtn).width(250).height(55).padBottom(20).row();
 
-        TextButton menuBtn = new TextButton("Main Menu", skin);
-        menuBtn.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                if (onMainMenu != null) {
-                    onMainMenu.run();
+            TextButton menuBtn = new TextButton("Main Menu", skin);
+            menuBtn.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    if (onMainMenu != null) onMainMenu.run();
                 }
-            }
-        });
-        root.add(menuBtn).width(250).height(55).row();
+            });
+            root.add(menuBtn).width(250).height(55).row();
 
-        stage.addActor(root);
+            getStage().addActor(root);
+        }
     }
 
     @Override
     public void update(float deltaTime) {
-        stage.act(deltaTime);
+        stageManager.update(deltaTime);
     }
 
     @Override
@@ -199,12 +206,13 @@ public class DeathScene extends Scene {
         batch.begin();
         batch.draw(overlayTexture, 0, 0, WORLD_WIDTH, WORLD_HEIGHT);
         batch.end();
-        stage.draw();
+        stageManager.render();
     }
 
     @Override
     protected void onResize(int width, int height) {
         viewport.update(width, height, true);
+        stageManager.resize(width, height);
     }
 
     @Override
@@ -212,6 +220,9 @@ public class DeathScene extends Scene {
         IAudioSystem audio = ServiceLocator.getAudio();
         if (audio != null) audio.playSound("death");
         createUI();
+        if (stageManager.getStageCount() > 0) {
+            Gdx.input.setInputProcessor(stageManager.getStages().get(0).getStage());
+        }
     }
 
     @Override
@@ -221,7 +232,7 @@ public class DeathScene extends Scene {
 
     @Override
     protected void onUnload() {
-        if (stage != null) stage.dispose();
+        stageManager.dispose();
         if (skin != null) skin.dispose();
         if (overlayTexture != null) overlayTexture.dispose();
     }

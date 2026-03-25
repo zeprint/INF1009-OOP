@@ -11,7 +11,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -24,16 +23,24 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
-import io.github.mathdash.AbstractEngine.ServiceLocator;
-import io.github.mathdash.AbstractEngine.inputouput.IAudioSystem;
-import io.github.mathdash.AbstractEngine.scene.Scene;
-import io.github.mathdash.AbstractEngine.scene.SceneManager;
+import io.github.mathdash.engine.ServiceLocator;
+import io.github.mathdash.engine.inputoutput.IAudioSystem;
+import io.github.mathdash.engine.inputoutput.InputAction;
+import io.github.mathdash.engine.inputoutput.InputBindings;
+import io.github.mathdash.engine.inputoutput.InputManager;
+import io.github.mathdash.engine.scene.BaseStage;
+import io.github.mathdash.engine.scene.Scene;
+import io.github.mathdash.engine.scene.SceneManager;
+import io.github.mathdash.engine.scene.StageManager;
 import io.github.mathdash.logic.util.FontGenerator;
 
 /**
  * PauseScene - Displayed when the game is paused.
  * Offers Resume / Main Menu buttons plus volume slider and mute toggle.
  * Volume/mute state is always synced via ServiceLocator (single source of truth).
+ *
+ * Uses BaseStage and StageManager for stage lifecycle management.
+ * Routes all input through InputManager (Dependency Inversion Principle).
  */
 public class PauseScene extends Scene {
 
@@ -45,12 +52,13 @@ public class PauseScene extends Scene {
 
     private OrthographicCamera camera;
     private Viewport viewport;
-    private Stage stage;
+    private StageManager stageManager;
     private Skin skin;
     private Texture overlayTexture;
     private Texture muteIconTex;
     private Texture unmuteIconTex;
 
+    private InputManager inputManager;
     private ImageButton muteBtn;
     private Label volumeLabel;
     private Slider volumeSlider;
@@ -68,6 +76,8 @@ public class PauseScene extends Scene {
         camera.position.set(WORLD_WIDTH / 2f, WORLD_HEIGHT / 2f, 0);
         camera.update();
 
+        stageManager = new StageManager();
+
         Pixmap overlay = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
         overlay.setColor(0, 0, 0, 0.7f);
         overlay.fill();
@@ -78,6 +88,13 @@ public class PauseScene extends Scene {
         muteIconTex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
         unmuteIconTex = new Texture(Gdx.files.internal("unmute.png"));
         unmuteIconTex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+
+        // Set up InputManager for pause controls
+        InputBindings bindings = new InputBindings();
+        bindings.bindAction(InputAction.TOGGLE_PAUSE, Input.Keys.ESCAPE);
+        bindings.bindAction(InputAction.TOGGLE_PAUSE, Input.Keys.P);
+        bindings.bindAction(InputAction.TOGGLE_MUTE, Input.Keys.M);
+        inputManager = new InputManager(bindings);
 
         createSkin();
     }
@@ -139,77 +156,86 @@ public class PauseScene extends Scene {
 
     /** Rebuilds the UI to reflect current audio state from ServiceLocator. */
     private void createUI() {
-        if (stage != null) stage.dispose();
-        stage = new Stage(viewport);
+        stageManager.dispose();
+        stageManager = new StageManager();
 
-        Table root = new Table();
-        root.setFillParent(true);
-        root.center();
+        PauseStage pauseStage = new PauseStage(viewport);
+        stageManager.addStage(pauseStage);
+    }
 
-        Label title = new Label("PAUSED", skin, "title");
-        root.add(title).padBottom(40).row();
+    /** Concrete BaseStage subclass that builds the pause menu UI. */
+    private class PauseStage extends BaseStage {
+        public PauseStage(Viewport viewport) {
+            super(viewport);
+        }
 
-        // Resume button
-        TextButton resumeBtn = new TextButton("Resume", skin);
-        resumeBtn.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                sceneManager.setScene("game");
-            }
-        });
-        root.add(resumeBtn).width(250).height(50).padBottom(15).row();
+        @Override
+        protected void initialize() {
+            Table root = new Table();
+            root.setFillParent(true);
+            root.center();
 
-        // Main Menu button
-        TextButton menuBtn = new TextButton("Main Menu", skin);
-        menuBtn.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                if (onMainMenu != null) onMainMenu.run();
-            }
-        });
-        root.add(menuBtn).width(250).height(50).padBottom(30).row();
+            Label title = new Label("PAUSED", skin, "title");
+            root.add(title).padBottom(40).row();
 
-        // ---- Audio controls ----
-        Table audioRow = new Table();
+            TextButton resumeBtn = new TextButton("Resume", skin);
+            resumeBtn.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    sceneManager.setScene("game");
+                }
+            });
+            root.add(resumeBtn).width(250).height(50).padBottom(15).row();
 
-        // Read current state from ServiceLocator (single source of truth)
-        IAudioSystem audio = ServiceLocator.getAudio();
-        int vol = audio != null ? Math.max(1, Math.round(audio.getVolume() * 10f)) : 7;
-        boolean muted = audio != null && audio.isMuted();
+            TextButton menuBtn = new TextButton("Main Menu", skin);
+            menuBtn.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    if (onMainMenu != null) onMainMenu.run();
+                }
+            });
+            root.add(menuBtn).width(250).height(50).padBottom(30).row();
 
-        volumeLabel = new Label("Vol: " + vol, skin);
-        audioRow.add(volumeLabel).padRight(8);
+            // Audio controls
+            Table audioRow = new Table();
 
-        volumeSlider = new Slider(1, 10, 1, false, skin);
-        volumeSlider.setValue(vol);
-        volumeSlider.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                int newVol = (int) ((Slider) actor).getValue();
-                volumeLabel.setText("Vol: " + newVol);
-                IAudioSystem a = ServiceLocator.getAudio();
-                if (a != null) a.setVolume(newVol / 10f);
-            }
-        });
-        audioRow.add(volumeSlider).width(120).height(30).padRight(15);
+            IAudioSystem audio = ServiceLocator.getAudio();
+            int vol = audio != null ? Math.max(1, Math.round(audio.getVolume() * 10f)) : 7;
+            boolean muted = audio != null && audio.isMuted();
 
-        // Mute button with PNG icon
-        TextureRegionDrawable icon = new TextureRegionDrawable(
-            new TextureRegion(muted ? muteIconTex : unmuteIconTex)
-        );
-        ImageButton.ImageButtonStyle muteBtnStyle = new ImageButton.ImageButtonStyle();
-        muteBtnStyle.imageUp = icon;
-        muteBtn = new ImageButton(muteBtnStyle);
-        muteBtn.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                toggleMute();
-            }
-        });
-        audioRow.add(muteBtn).size(36, 36);
+            volumeLabel = new Label("Vol: " + vol, skin);
+            audioRow.add(volumeLabel).padRight(8);
 
-        root.add(audioRow).padBottom(20).row();
-        stage.addActor(root);
+            volumeSlider = new Slider(1, 10, 1, false, skin);
+            volumeSlider.setValue(vol);
+            volumeSlider.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    int newVol = (int) ((Slider) actor).getValue();
+                    volumeLabel.setText("Vol: " + newVol);
+                    IAudioSystem a = ServiceLocator.getAudio();
+                    if (a != null) a.setVolume(newVol / 10f);
+                }
+            });
+            audioRow.add(volumeSlider).width(120).height(30).padRight(15);
+
+            TextureRegionDrawable icon = new TextureRegionDrawable(
+                new TextureRegion(muted ? muteIconTex : unmuteIconTex)
+            );
+            ImageButton.ImageButtonStyle muteBtnStyle = new ImageButton.ImageButtonStyle();
+            muteBtnStyle.imageUp = icon;
+            muteBtn = new ImageButton(muteBtnStyle);
+            muteBtn.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    toggleMute();
+                }
+            });
+            audioRow.add(muteBtn).size(36, 36);
+
+            root.add(audioRow).padBottom(20).row();
+            getStage().addActor(root);
+        }
     }
 
     private void toggleMute() {
@@ -232,16 +258,19 @@ public class PauseScene extends Scene {
 
     @Override
     public void update(float deltaTime) {
-        // ESC/P to resume
-        if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE) || Gdx.input.isKeyJustPressed(Input.Keys.P)) {
+        inputManager.update();
+
+        // Resume via InputManager
+        if (inputManager.isActionTriggered(InputAction.TOGGLE_PAUSE)) {
             sceneManager.setScene("game");
             return;
         }
-        // M key to toggle mute even while paused
-        if (Gdx.input.isKeyJustPressed(Input.Keys.M)) {
+        // Mute toggle via InputManager
+        if (inputManager.isActionTriggered(InputAction.TOGGLE_MUTE)) {
             toggleMute();
         }
-        stage.act(deltaTime);
+
+        stageManager.update(deltaTime);
     }
 
     @Override
@@ -251,19 +280,21 @@ public class PauseScene extends Scene {
         batch.begin();
         batch.draw(overlayTexture, 0, 0, WORLD_WIDTH, WORLD_HEIGHT);
         batch.end();
-        stage.draw();
+        stageManager.render();
     }
 
     @Override
     protected void onResize(int width, int height) {
         viewport.update(width, height, true);
+        stageManager.resize(width, height);
     }
 
     @Override
     protected void onShow() {
-        // Rebuild UI every time we show, so volume/mute are always synced
         createUI();
-        Gdx.input.setInputProcessor(stage);
+        if (stageManager.getStageCount() > 0) {
+            Gdx.input.setInputProcessor(stageManager.getStages().get(0).getStage());
+        }
     }
 
     @Override
@@ -273,10 +304,11 @@ public class PauseScene extends Scene {
 
     @Override
     protected void onUnload() {
-        if (stage != null) stage.dispose();
+        stageManager.dispose();
         if (skin != null) skin.dispose();
         if (overlayTexture != null) overlayTexture.dispose();
         if (muteIconTex != null) muteIconTex.dispose();
         if (unmuteIconTex != null) unmuteIconTex.dispose();
+        if (inputManager != null) inputManager.dispose();
     }
 }

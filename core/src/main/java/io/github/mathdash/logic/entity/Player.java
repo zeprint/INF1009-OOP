@@ -1,12 +1,12 @@
 package io.github.mathdash.logic.entity;
 
 import com.badlogic.gdx.math.Rectangle;
-import io.github.mathdash.AbstractEngine.collision.Collidable;
-import io.github.mathdash.AbstractEngine.collision.CollisionResult;
-import io.github.mathdash.AbstractEngine.entity.Entity;
-import io.github.mathdash.AbstractEngine.entity.Renderable;
-import io.github.mathdash.AbstractEngine.entity.Transform;
-import io.github.mathdash.logic.Collision.CollisionHandler;
+import io.github.mathdash.engine.collision.Collidable;
+import io.github.mathdash.engine.collision.CollisionResult;
+import io.github.mathdash.engine.entity.Entity;
+import io.github.mathdash.engine.entity.Renderable;
+import io.github.mathdash.engine.entity.Transform;
+import io.github.mathdash.logic.collision.CollisionHandler;
 import io.github.mathdash.logic.component.HealthComponent;
 
 /**

@@ -1,6 +1,6 @@
 package io.github.mathdash.logic.state;
 
-import io.github.mathdash.AbstractEngine.state.GameState;
+import io.github.mathdash.engine.state.GameState;
 
 /**
  * GameOverState - State entered when the player has lost all lives.

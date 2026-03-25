@@ -1,7 +1,7 @@
 package io.github.mathdash.logic.component;
 
-import io.github.mathdash.AbstractEngine.entity.Component;
-import io.github.mathdash.AbstractEngine.entity.Entity;
+import io.github.mathdash.engine.entity.Component;
+import io.github.mathdash.engine.entity.Entity;
 
 /**
  * SurgeComponent - Tracks the player's "Surge Meter" for the

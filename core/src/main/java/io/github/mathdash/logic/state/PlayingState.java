@@ -1,6 +1,6 @@
 package io.github.mathdash.logic.state;
 
-import io.github.mathdash.AbstractEngine.state.GameState;
+import io.github.mathdash.engine.state.GameState;
 
 /**
  * PlayingState - Active gameplay state.

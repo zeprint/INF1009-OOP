@@ -5,9 +5,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
-import io.github.mathdash.AbstractEngine.ServiceLocator;
-import io.github.mathdash.AbstractEngine.inputouput.AudioManager;
-import io.github.mathdash.AbstractEngine.scene.SceneManager;
+import io.github.mathdash.engine.ServiceLocator;
+import io.github.mathdash.engine.inputoutput.AudioManager;
+import io.github.mathdash.engine.scene.SceneManager;
 import io.github.mathdash.logic.scene.DeathScene;
 import io.github.mathdash.logic.scene.GameScene;
 import io.github.mathdash.logic.scene.MainMenuScene;

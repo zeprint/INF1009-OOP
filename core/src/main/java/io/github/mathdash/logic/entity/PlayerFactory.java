@@ -1,7 +1,7 @@
 package io.github.mathdash.logic.entity;
 
-import io.github.mathdash.AbstractEngine.entity.GenericFactory;
-import io.github.mathdash.AbstractEngine.entity.Renderable;
+import io.github.mathdash.engine.entity.GenericFactory;
+import io.github.mathdash.engine.entity.Renderable;
 
 /**
  * PlayerFactory - Creates Player entities with pre-built Renderable components.

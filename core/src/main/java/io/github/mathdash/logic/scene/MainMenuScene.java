@@ -25,10 +25,10 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
-import io.github.mathdash.AbstractEngine.ServiceLocator;
-import io.github.mathdash.AbstractEngine.inputouput.IAudioSystem;
-import io.github.mathdash.AbstractEngine.scene.Scene;
-import io.github.mathdash.AbstractEngine.scene.SceneManager;
+import io.github.mathdash.engine.ServiceLocator;
+import io.github.mathdash.engine.inputoutput.IAudioSystem;
+import io.github.mathdash.engine.scene.Scene;
+import io.github.mathdash.engine.scene.SceneManager;
 import io.github.mathdash.logic.util.FontGenerator;
 
 /**

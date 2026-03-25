@@ -1,8 +1,8 @@
 package io.github.mathdash.logic.movement;
 
-import io.github.mathdash.AbstractEngine.entity.PhysicsBody;
-import io.github.mathdash.AbstractEngine.entity.Transform;
-import io.github.mathdash.AbstractEngine.movement.MovementComponent;
+import io.github.mathdash.engine.entity.PhysicsBody;
+import io.github.mathdash.engine.entity.Transform;
+import io.github.mathdash.engine.movement.MovementComponent;
 
 /**
  * ScrollMovement - Moves entities from right to left at a configurable speed.

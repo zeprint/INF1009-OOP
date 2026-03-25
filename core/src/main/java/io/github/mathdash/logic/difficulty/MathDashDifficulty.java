@@ -1,6 +1,6 @@
 package io.github.mathdash.logic.difficulty;
 
-import io.github.mathdash.AbstractEngine.difficulty.DifficultyAdapter;
+import io.github.mathdash.engine.difficulty.DifficultyAdapter;
 
 /**
  * MathDashDifficulty - Concrete adaptive difficulty for MathDash.
