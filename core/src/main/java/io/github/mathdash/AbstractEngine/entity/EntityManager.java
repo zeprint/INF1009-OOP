@@ -70,21 +70,6 @@ public class EntityManager {
         }
     }
 
-    // Renders all active entities that have both a Transform and Renderable component.
-    public void render(SpriteBatch batch) {
-        for (int i = 0; i < entityList.size; i++) {
-            Entity entity = entityList.get(i);
-            if (!entity.isActive()) continue;
-
-            Renderable renderable = entity.getComponent(Renderable.class);
-            Transform transform = entity.getComponent(Transform.class);
-
-            if (renderable != null && transform != null) {
-                renderable.render(batch, transform);
-            }
-        }
-    }
-
     // Disposes all entities and clears the manager.
     public void dispose() {
         // Also dispose anything in the pending queue

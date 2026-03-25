@@ -2,9 +2,12 @@ package io.github.mathdash;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
+import io.github.mathdash.AbstractEngine.inputouput.InputAction;
+import io.github.mathdash.AbstractEngine.inputouput.InputBindings;
 import io.github.mathdash.AbstractEngine.scene.SceneManager;
 import io.github.mathdash.logic.scene.DeathScene;
 import io.github.mathdash.logic.scene.GameScene;
@@ -14,6 +17,9 @@ import io.github.mathdash.logic.scene.PauseScene;
 /**
  * GameMaster - Main application entry point.
  * Wires all scenes together via SceneManager.
+ * Key code constants (Input.Keys.*) are kept here — the one place where
+ * libGDX input constants are acceptable — and injected into scenes as
+ * InputBindings so the logic layer never imports them directly.
  */
 public class GameMaster extends ApplicationAdapter {
 
@@ -26,11 +32,8 @@ public class GameMaster extends ApplicationAdapter {
         sceneManager = new SceneManager();
 
         try {
-            // Create and register the main menu scene
             MainMenuScene mainMenu = new MainMenuScene(sceneManager, this::startGame);
             sceneManager.addScene(mainMenu);
-
-            // Start at main menu
             sceneManager.setScene("mainmenu");
         } catch (Exception e) {
             Gdx.app.error("GameMaster", "Failed to initialize scenes", e);
@@ -39,31 +42,29 @@ public class GameMaster extends ApplicationAdapter {
 
     private void startGame(int level) {
         try {
-            // Remove previous game/pause/death scenes if they exist
             cleanupGameScenes();
 
-            // Create game scene
             GameScene gameScene = new GameScene(sceneManager, level);
 
-            // Create pause scene with main menu callback
-            PauseScene pauseScene = new PauseScene(sceneManager, this::returnToMainMenu);
+            // Build pause bindings here — libGDX key constants stay in GameMaster.
+            InputBindings pauseBindings = new InputBindings();
+            pauseBindings.bindAction(InputAction.TOGGLE_PAUSE, Input.Keys.ESCAPE);
+            pauseBindings.bindAction(InputAction.TOGGLE_PAUSE, Input.Keys.P);
 
-            // Create death scene with try again and main menu callbacks
+            PauseScene pauseScene = new PauseScene(sceneManager, this::returnToMainMenu, pauseBindings);
+
             DeathScene deathScene = new DeathScene(sceneManager,
-                () -> startGame(level),   // Try Again -> restart same level
-                this::returnToMainMenu    // Main Menu -> go back to menu
+                () -> startGame(level),
+                this::returnToMainMenu
             );
 
-            // Wire the death scene to receive score/level from game scene
             deathScene.setFinalScore(0);
             deathScene.setLevel(level);
 
-            // Register scenes
             sceneManager.addScene(gameScene);
             sceneManager.addScene(pauseScene);
             sceneManager.addScene(deathScene);
 
-            // Start the game
             sceneManager.setScene("game");
         } catch (Exception e) {
             Gdx.app.error("GameMaster", "Failed to start game level " + level, e);
@@ -105,7 +106,11 @@ public class GameMaster extends ApplicationAdapter {
 
     @Override
     public void dispose() {
-        if (sceneManager != null) sceneManager.dispose();
-        if (batch != null) batch.dispose();
+        if (sceneManager != null) {
+            sceneManager.dispose();
+        }
+        if (batch != null) {
+            batch.dispose();
+        }
     }
 }

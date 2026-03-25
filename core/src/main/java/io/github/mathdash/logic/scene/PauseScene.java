@@ -1,7 +1,6 @@
 package io.github.mathdash.logic.scene;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap;
@@ -20,6 +19,9 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
+import io.github.mathdash.AbstractEngine.inputouput.InputAction;
+import io.github.mathdash.AbstractEngine.inputouput.InputBindings;
+import io.github.mathdash.AbstractEngine.inputouput.InputManager;
 import io.github.mathdash.AbstractEngine.scene.Scene;
 import io.github.mathdash.AbstractEngine.scene.SceneManager;
 import io.github.mathdash.logic.util.FontGenerator;
@@ -27,25 +29,29 @@ import io.github.mathdash.logic.util.FontGenerator;
 /**
  * PauseScene - Displayed when the game is paused.
  * Offers Resume and Main Menu options.
+ * Input is handled via InputManager — no direct libGDX input imports.
  */
 public class PauseScene extends Scene {
 
-    private static final float WORLD_WIDTH = 800f;
+    private static final float WORLD_WIDTH  = 800f;
     private static final float WORLD_HEIGHT = 600f;
 
     private final SceneManager sceneManager;
     private final Runnable onMainMenu;
+    private final InputBindings inputBindings;
 
     private OrthographicCamera camera;
     private Viewport viewport;
     private Stage stage;
     private Skin skin;
     private Texture overlayTexture;
+    private InputManager inputManager;
 
-    public PauseScene(SceneManager sceneManager, Runnable onMainMenu) {
+    public PauseScene(SceneManager sceneManager, Runnable onMainMenu, InputBindings inputBindings) {
         super("pause");
         this.sceneManager = sceneManager;
         this.onMainMenu = onMainMenu;
+        this.inputBindings = inputBindings;
     }
 
     @Override
@@ -55,12 +61,13 @@ public class PauseScene extends Scene {
         camera.position.set(WORLD_WIDTH / 2f, WORLD_HEIGHT / 2f, 0);
         camera.update();
 
-        // Create semi-transparent overlay
         Pixmap overlay = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
         overlay.setColor(0, 0, 0, 0.7f);
         overlay.fill();
         overlayTexture = new Texture(overlay);
         overlay.dispose();
+
+        inputManager = new InputManager(inputBindings);
 
         createSkin();
         createUI();
@@ -85,16 +92,16 @@ public class PauseScene extends Scene {
         btnOver.dispose();
 
         TextButton.TextButtonStyle style = new TextButton.TextButtonStyle();
-        style.up = new TextureRegionDrawable(new TextureRegion(skin.get("btn-up", Texture.class)));
+        style.up   = new TextureRegionDrawable(new TextureRegion(skin.get("btn-up",   Texture.class)));
         style.over = new TextureRegionDrawable(new TextureRegion(skin.get("btn-over", Texture.class)));
-        style.font = skinFont;
-        style.fontColor = Color.WHITE;
+        style.font          = skinFont;
+        style.fontColor     = Color.WHITE;
         style.overFontColor = Color.YELLOW;
         skin.add("default", style);
 
         Label.LabelStyle labelStyle = new Label.LabelStyle();
         BitmapFont titleFont = FontGenerator.create(48, Color.WHITE);
-        labelStyle.font = titleFont;
+        labelStyle.font      = titleFont;
         labelStyle.fontColor = Color.WHITE;
         skin.add("title", labelStyle);
     }
@@ -131,7 +138,8 @@ public class PauseScene extends Scene {
 
     @Override
     public void update(float deltaTime) {
-        if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE) || Gdx.input.isKeyJustPressed(Input.Keys.P)) {
+        inputManager.update();
+        if (inputManager.isActionTriggered(InputAction.TOGGLE_PAUSE)) {
             sceneManager.setScene("game");
             return;
         }
@@ -166,8 +174,17 @@ public class PauseScene extends Scene {
 
     @Override
     protected void onUnload() {
-        if (stage != null) stage.dispose();
-        if (skin != null) skin.dispose();
-        if (overlayTexture != null) overlayTexture.dispose();
+        if (stage != null) {
+            stage.dispose();
+        }
+        if (skin != null) {
+            skin.dispose();
+        }
+        if (overlayTexture != null) {
+            overlayTexture.dispose();
+        }
+        if (inputManager != null) {
+            inputManager.dispose();
+        }
     }
 }

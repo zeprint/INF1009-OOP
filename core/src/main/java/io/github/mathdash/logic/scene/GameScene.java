@@ -36,6 +36,7 @@ import io.github.mathdash.logic.math.MathQuestion;
 import io.github.mathdash.logic.math.MathQuestionGenerator;
 import io.github.mathdash.logic.movement.ScrollMovement;
 import io.github.mathdash.logic.util.FontGenerator;
+import io.github.mathdash.AbstractEngine.entity.Renderable;
 
 /**
  * GameScene - The main gameplay scene for MathDash.
@@ -464,7 +465,16 @@ public class GameScene extends Scene implements CollisionDispatcher.GameEventLis
         }
 
         // Draw entities
-        entityManager.render(batch);
+        Array<Entity> entities = entityManager.getAllEntities();
+        for (int i = 0; i < entities.size; i++) {
+            Entity entity = entities.get(i);
+            if (!entity.isActive()) continue;
+            Renderable renderable = entity.getComponent(Renderable.class);
+            Transform transform = entity.getComponent(Transform.class);
+            if (renderable != null && transform != null) {
+                renderable.render(batch, transform);
+            }
+        }
 
         // Draw answer values on blocks
         for (int i = 0; i < activeAnswers.size; i++) {
