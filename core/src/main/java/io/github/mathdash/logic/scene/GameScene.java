@@ -34,6 +34,7 @@ import io.github.mathdash.logic.entity.Player;
 import io.github.mathdash.logic.entity.PlayerFactory;
 import io.github.mathdash.logic.math.MathQuestion;
 import io.github.mathdash.logic.math.MathQuestionGenerator;
+import io.github.mathdash.logic.movement.ScrollMovement;
 import io.github.mathdash.logic.util.FontGenerator;
 
 /**
@@ -96,6 +97,7 @@ public class GameScene extends Scene implements CollisionDispatcher.GameEventLis
 
     // Fonts
     private BitmapFont font;
+    private BitmapFont hudFont;
     private BitmapFont questionFont;
     private GlyphLayout glyphLayout;
 
@@ -190,6 +192,7 @@ public class GameScene extends Scene implements CollisionDispatcher.GameEventLis
         decoBushTex = loadTex(ASSET_BASE + "Sprites/Tiles/Default/bush.png");
 
         font = FontGenerator.create(24, Color.WHITE);
+        hudFont = FontGenerator.create(24, Color.BLACK);
         questionFont = FontGenerator.create(32, Color.YELLOW, Color.DARK_GRAY, 1f);
 
         glyphLayout = new GlyphLayout();
@@ -198,7 +201,7 @@ public class GameScene extends Scene implements CollisionDispatcher.GameEventLis
     private void setupManagers() {
         entityManager = new EntityManager();
         collisionManager = new CollisionManager();
-        movementManager = new MovementManager(entityManager);
+        movementManager = new MovementManager();
     }
 
     private void setupInput() {
@@ -246,7 +249,9 @@ public class GameScene extends Scene implements CollisionDispatcher.GameEventLis
 
     @Override
     public void update(float deltaTime) {
-        if (gameOver) return;
+        if (gameOver) {
+            return;
+        }
 
         inputManager.update();
 
@@ -345,6 +350,7 @@ public class GameScene extends Scene implements CollisionDispatcher.GameEventLis
         float y = Player.LANE_Y[lane];
 
         Obstacle obs = obstacleFactory.create(spawnX, y);
+        movementManager.add(obs.getComponent(ScrollMovement.class));
         obs.setCollisionHandler(collisionDispatcher);
         obs.setScrollSpeed(scrollSpeed);
         entityManager.addEntity(obs);
@@ -371,6 +377,7 @@ public class GameScene extends Scene implements CollisionDispatcher.GameEventLis
         for (int i = 0; i < 3; i++) {
             float y = Player.LANE_Y[laneOrder[i]];
             AnswerBlock block = answerBlockFactory.create(x, y, answers[i], isCorrect[i]);
+            movementManager.add(block.getComponent(ScrollMovement.class));
             block.setCollisionHandler(collisionDispatcher);
             block.setScrollSpeed(scrollSpeed);
             entityManager.addEntity(block);
@@ -396,6 +403,7 @@ public class GameScene extends Scene implements CollisionDispatcher.GameEventLis
             if (t == null || t.getX() < -100f || !obs.isActive()) {
                 collisionManager.removeObject(obs);
                 entityManager.removeEntity(obs);
+                movementManager.remove(obs.getComponent(ScrollMovement.class));
                 activeObstacles.removeIndex(i);
             }
         }
@@ -408,6 +416,7 @@ public class GameScene extends Scene implements CollisionDispatcher.GameEventLis
             if (t == null || t.getX() < -100f || !block.isActive()) {
                 collisionManager.removeObject(block);
                 entityManager.removeEntity(block);
+                movementManager.remove(block.getComponent(ScrollMovement.class));
                 activeAnswers.removeIndex(i);
             } else {
                 allAnswersGone = false;
@@ -460,9 +469,13 @@ public class GameScene extends Scene implements CollisionDispatcher.GameEventLis
         // Draw answer values on blocks
         for (int i = 0; i < activeAnswers.size; i++) {
             AnswerBlock block = activeAnswers.get(i);
-            if (!block.isActive()) continue;
+            if (!block.isActive()) {
+                continue;
+            }
             Transform t = block.getComponent(Transform.class);
-            if (t == null) continue;
+            if (t == null) {
+                continue;
+            }
 
             String text = String.valueOf(block.getAnswerValue());
             glyphLayout.setText(font, text);
@@ -481,13 +494,13 @@ public class GameScene extends Scene implements CollisionDispatcher.GameEventLis
 
         // Draw score
         String scoreText = "Score: " + score;
-        glyphLayout.setText(font, scoreText);
-        font.draw(batch, scoreText, WORLD_WIDTH - glyphLayout.width - 20, hudY + 25);
+        glyphLayout.setText(hudFont, scoreText);
+        hudFont.draw(batch, scoreText, WORLD_WIDTH - glyphLayout.width - 20, hudY + 25);
 
         // Draw level
         String levelText = "Level " + level;
-        glyphLayout.setText(font, levelText);
-        font.draw(batch, levelText, WORLD_WIDTH / 2f - glyphLayout.width / 2f, hudY + 25);
+        glyphLayout.setText(hudFont, levelText);
+        hudFont.draw(batch, levelText, WORLD_WIDTH / 2f - glyphLayout.width / 2f, hudY + 25);
 
         // Draw question
         if (currentQuestion != null) {
@@ -552,6 +565,7 @@ public class GameScene extends Scene implements CollisionDispatcher.GameEventLis
             block.setActive(false);
             collisionManager.removeObject(block);
             entityManager.removeEntity(block);
+            movementManager.remove(block.getComponent(ScrollMovement.class));
         }
         activeAnswers.clear();
         answersOnScreen = false;
@@ -572,10 +586,18 @@ public class GameScene extends Scene implements CollisionDispatcher.GameEventLis
 
     @Override
     protected void onUnload() {
-        if (entityManager != null) entityManager.dispose();
-        if (collisionManager != null) collisionManager.clear();
-        if (audioManager != null) audioManager.dispose();
-        if (inputManager != null) inputManager.dispose();
+        if (entityManager != null) {
+            entityManager.dispose();
+        }
+        if (collisionManager != null) {
+            collisionManager.clear();
+        }
+        if (audioManager != null) {
+            audioManager.dispose();
+        }
+        if (inputManager != null) {
+            inputManager.dispose();
+        }
 
         disposeTexture(bgTexture);
         disposeTexture(grassBgTexture);
@@ -593,20 +615,36 @@ public class GameScene extends Scene implements CollisionDispatcher.GameEventLis
         disposeTexture(playerIdle);
         disposeTexture(playerHit);
 
-        if (font != null) font.dispose();
-        if (questionFont != null) questionFont.dispose();
+        if (font != null) {
+            font.dispose();
+        }
+        if (hudFont != null) {
+            hudFont.dispose();
+        }
+        if (questionFont != null) {
+            questionFont.dispose();
+        }
     }
 
     private void disposeTexture(Texture tex) {
-        if (tex != null) tex.dispose();
+        if (tex != null) {
+            tex.dispose();
+        }
     }
 
     @Override
     protected void onShow() {
         gameOver = false;
         viewport.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
+        if (movementManager != null) {
+            movementManager.unfreezeAll();
+        }
     }
 
     @Override
-    protected void onHide() {}
+    protected void onHide() {
+        if (movementManager != null) {
+            movementManager.freezeAll();
+        }
+    }
 }

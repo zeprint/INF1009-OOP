@@ -130,9 +130,9 @@ public class MainMenuScene extends Scene {
         skin.add("title", titleStyle);
 
         Label.LabelStyle subtitleStyle = new Label.LabelStyle();
-        BitmapFont subtitleFont = FontGenerator.create(18, new Color(0.8f, 0.8f, 0.8f, 1f));
+        BitmapFont subtitleFont = FontGenerator.create(18, Color.BLACK);
         subtitleStyle.font = subtitleFont;
-        subtitleStyle.fontColor = new Color(0.8f, 0.8f, 0.8f, 1f);
+        subtitleStyle.fontColor = Color.BLACK;
         skin.add("subtitle", subtitleStyle);
     }
 
@@ -240,12 +240,26 @@ public class MainMenuScene extends Scene {
 
     @Override
     protected void onUnload() {
-        if (stage != null) stage.dispose();
-        if (skin != null) skin.dispose();
-        if (bgTexture != null) bgTexture.dispose();
-        if (characterTexture != null) characterTexture.dispose();
-        if (titleFont != null) titleFont.dispose();
-        if (buttonFont != null) buttonFont.dispose();
-        if (audioManager != null) audioManager.dispose();
+        if (stage != null) {
+            stage.dispose();
+        }
+        if (skin != null) {
+            skin.dispose();
+        }
+        if (bgTexture != null) {
+            bgTexture.dispose();
+        }
+        if (characterTexture != null) {
+            characterTexture.dispose();
+        }
+        if (titleFont != null) {
+            titleFont.dispose();
+        }
+        if (buttonFont != null) {
+            buttonFont.dispose();
+        }
+        if (audioManager != null) {
+            audioManager.dispose();
+        }
     }
 }

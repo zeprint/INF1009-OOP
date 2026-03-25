@@ -1,62 +1,58 @@
 package io.github.mathdash.AbstractEngine.movement;
 
 import com.badlogic.gdx.utils.Array;
-import io.github.mathdash.AbstractEngine.entity.Entity;
-import io.github.mathdash.AbstractEngine.entity.EntityManager;
 
 /**
- * MovementManager - Provides query and bulk control over entities with MovementComponents.
- * Movement updates happen through the Entity/Component update pipeline,
- * so this manager focuses on management operations rather than driving updates.
+ * MovementManager - Manages a list of MovementComponents.
  */
 public class MovementManager {
 
-    private final EntityManager entityManager;
+    private final Array<MovementComponent> components;
 
-    // Creates a MovementManager linked to the given EntityManager.
-    public MovementManager(EntityManager entityManager) {
-        if (entityManager == null) {
-            throw new IllegalArgumentException("EntityManager cannot be null.");
-        }
-        this.entityManager = entityManager;
+    public MovementManager() {
+        this.components = new Array<>();
     }
 
-    // Returns all entities that have a MovementComponent attached.
-    public Array<Entity> getMovingEntities() {
-        return entityManager.getEntitiesWithComponent(MovementComponent.class);
-    }
-
-    // Enables or disables movement on a specific entity.
-    public void setMovementEnabled(Entity entity, boolean enabled) {
-        if (entity == null) return;
-        MovementComponent mc = entity.getComponent(MovementComponent.class);
-        if (mc != null) {
-            if (enabled) {
-                mc.enable();
-            } else {
-                mc.disable();
-            }
+    // Called when an entity with a MovementComponent is spawned.
+    public void add(MovementComponent component) {
+        if (component != null && !components.contains(component, true)) {
+            components.add(component);
         }
     }
 
-    // Disables movement on all entities.
+    // Called when an entity with a MovementComponent is removed.
+    public void remove(MovementComponent component) {
+        components.removeValue(component, true);
+    }
+
+    // Asks all components to disable themselves.
     public void freezeAll() {
-        Array<Entity> moving = getMovingEntities();
-        for (int i = 0; i < moving.size; i++) {
-            setMovementEnabled(moving.get(i), false);
+        for (int i = 0; i < components.size; i++) {
+            components.get(i).disable();
         }
     }
 
-    // Enables movement on all entities.
+    // Asks all components to enable themselves.
     public void unfreezeAll() {
-        Array<Entity> moving = getMovingEntities();
-        for (int i = 0; i < moving.size; i++) {
-            setMovementEnabled(moving.get(i), true);
+        for (int i = 0; i < components.size; i++) {
+            components.get(i).enable();
         }
     }
 
-    // Returns the number of entities with movement components.
-    public int getMovingEntityCount() {
-        return getMovingEntities().size;
+    public void setMovementEnabled(MovementComponent component, boolean enabled) {
+        if (component == null) {
+            return;
+        }
+        
+        if (enabled) {
+            component.enable();
+        }
+        else {
+            component.disable();
+        }
+    }
+
+    public int getCount() {
+        return components.size;
     }
 }

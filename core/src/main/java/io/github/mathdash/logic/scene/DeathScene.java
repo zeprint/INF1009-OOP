@@ -43,7 +43,6 @@ public class DeathScene extends Scene {
     private Stage stage;
     private Skin skin;
     private Texture overlayTexture;
-    private Texture characterHitTexture;
     private AudioManager audioManager;
 
     private int finalScore = 0;
@@ -71,9 +70,6 @@ public class DeathScene extends Scene {
         overlay.fill();
         overlayTexture = new Texture(overlay);
         overlay.dispose();
-
-        characterHitTexture = new Texture(Gdx.files.internal(ASSET_BASE + "Sprites/Characters/Default/character_green_hit.png"));
-        characterHitTexture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
 
         audioManager = new AudioManager();
         audioManager.loadSound("death", ASSET_BASE + "Sounds/sfx_disappear.ogg");
@@ -148,7 +144,9 @@ public class DeathScene extends Scene {
     }
 
     private void createUI() {
-        if (stage != null) stage.dispose();
+        if (stage != null) {
+            stage.dispose();
+        }
         stage = new Stage(viewport);
         Gdx.input.setInputProcessor(stage);
 
@@ -172,7 +170,9 @@ public class DeathScene extends Scene {
         tryAgainBtn.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                if (onTryAgain != null) onTryAgain.run();
+                if (onTryAgain != null) {
+                    onTryAgain.run();
+                }
             }
         });
         root.add(tryAgainBtn).width(250).height(55).padBottom(20).row();
@@ -181,7 +181,9 @@ public class DeathScene extends Scene {
         menuBtn.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                if (onMainMenu != null) onMainMenu.run();
+                if (onMainMenu != null) {
+                    onMainMenu.run();
+                }
             }
         });
         root.add(menuBtn).width(250).height(55).row();
@@ -201,10 +203,6 @@ public class DeathScene extends Scene {
         batch.begin();
 
         batch.draw(overlayTexture, 0, 0, WORLD_WIDTH, WORLD_HEIGHT);
-
-        // Draw hit character
-        batch.draw(characterHitTexture,
-            WORLD_WIDTH / 2f - 48f, 80, 96, 96);
 
         batch.end();
 
@@ -229,10 +227,17 @@ public class DeathScene extends Scene {
 
     @Override
     protected void onUnload() {
-        if (stage != null) stage.dispose();
-        if (skin != null) skin.dispose();
-        if (overlayTexture != null) overlayTexture.dispose();
-        if (characterHitTexture != null) characterHitTexture.dispose();
-        if (audioManager != null) audioManager.dispose();
+        if (stage != null) {
+            stage.dispose();
+        }
+        if (skin != null) {
+            skin.dispose();
+        }
+        if (overlayTexture != null) {
+            overlayTexture.dispose();
+        }
+        if (audioManager != null) {
+            audioManager.dispose();
+        }
     }
 }

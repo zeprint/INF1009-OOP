@@ -33,7 +33,9 @@ public abstract class MovementComponent implements Component {
         Transform transform = owner.getComponent(Transform.class);
         PhysicsBody physics = owner.getComponent(PhysicsBody.class);
 
-        if (transform == null) return;
+        if (transform == null) {
+            return;
+        }
 
         applyMovement(deltaTime, transform, physics);
     }
