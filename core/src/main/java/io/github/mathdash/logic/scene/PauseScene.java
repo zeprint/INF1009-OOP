@@ -1,6 +1,7 @@
 package io.github.mathdash.logic.scene;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap;
@@ -8,50 +9,56 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
-import io.github.mathdash.AbstractEngine.inputouput.InputAction;
-import io.github.mathdash.AbstractEngine.inputouput.InputBindings;
-import io.github.mathdash.AbstractEngine.inputouput.InputManager;
+import io.github.mathdash.AbstractEngine.ServiceLocator;
+import io.github.mathdash.AbstractEngine.inputouput.IAudioSystem;
 import io.github.mathdash.AbstractEngine.scene.Scene;
 import io.github.mathdash.AbstractEngine.scene.SceneManager;
 import io.github.mathdash.logic.util.FontGenerator;
 
 /**
  * PauseScene - Displayed when the game is paused.
- * Offers Resume and Main Menu options.
- * Input is handled via InputManager — no direct libGDX input imports.
+ * Offers Resume / Main Menu buttons plus volume slider and mute toggle.
+ * Volume/mute state is always synced via ServiceLocator (single source of truth).
  */
 public class PauseScene extends Scene {
 
-    private static final float WORLD_WIDTH  = 800f;
+    private static final float WORLD_WIDTH = 800f;
     private static final float WORLD_HEIGHT = 600f;
 
     private final SceneManager sceneManager;
     private final Runnable onMainMenu;
-    private final InputBindings inputBindings;
 
     private OrthographicCamera camera;
     private Viewport viewport;
     private Stage stage;
     private Skin skin;
     private Texture overlayTexture;
-    private InputManager inputManager;
+    private Texture muteIconTex;
+    private Texture unmuteIconTex;
 
-    public PauseScene(SceneManager sceneManager, Runnable onMainMenu, InputBindings inputBindings) {
+    private ImageButton muteBtn;
+    private Label volumeLabel;
+    private Slider volumeSlider;
+
+    public PauseScene(SceneManager sceneManager, Runnable onMainMenu) {
         super("pause");
         this.sceneManager = sceneManager;
         this.onMainMenu = onMainMenu;
-        this.inputBindings = inputBindings;
     }
 
     @Override
@@ -67,10 +74,12 @@ public class PauseScene extends Scene {
         overlayTexture = new Texture(overlay);
         overlay.dispose();
 
-        inputManager = new InputManager(inputBindings);
+        muteIconTex = new Texture(Gdx.files.internal("mute.png"));
+        muteIconTex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+        unmuteIconTex = new Texture(Gdx.files.internal("unmute.png"));
+        unmuteIconTex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
 
         createSkin();
-        createUI();
     }
 
     private void createSkin() {
@@ -79,42 +88,68 @@ public class PauseScene extends Scene {
         BitmapFont skinFont = FontGenerator.create(24, Color.WHITE);
         skin.add("default-font", skinFont);
 
-        Pixmap btnUp = new Pixmap(200, 50, Pixmap.Format.RGBA8888);
-        btnUp.setColor(new Color(0.3f, 0.5f, 0.8f, 1f));
-        btnUp.fill();
-        skin.add("btn-up", new Texture(btnUp));
-        btnUp.dispose();
+        addPixmap(skin, "btn-up", new Color(0.3f, 0.5f, 0.8f, 1f));
+        addPixmap(skin, "btn-over", new Color(0.4f, 0.6f, 0.9f, 1f));
+        addPixmap(skin, "slider-bg", new Color(0.3f, 0.3f, 0.3f, 0.8f));
+        addPixmap(skin, "slider-fill", new Color(0.3f, 0.7f, 0.3f, 0.9f));
 
-        Pixmap btnOver = new Pixmap(200, 50, Pixmap.Format.RGBA8888);
-        btnOver.setColor(new Color(0.4f, 0.6f, 0.9f, 1f));
-        btnOver.fill();
-        skin.add("btn-over", new Texture(btnOver));
-        btnOver.dispose();
+        Pixmap knob = new Pixmap(14, 20, Pixmap.Format.RGBA8888);
+        knob.setColor(new Color(0.4f, 0.8f, 0.4f, 1f));
+        knob.fill();
+        skin.add("slider-knob", new Texture(knob));
+        knob.dispose();
 
         TextButton.TextButtonStyle style = new TextButton.TextButtonStyle();
-        style.up   = new TextureRegionDrawable(new TextureRegion(skin.get("btn-up",   Texture.class)));
-        style.over = new TextureRegionDrawable(new TextureRegion(skin.get("btn-over", Texture.class)));
-        style.font          = skinFont;
-        style.fontColor     = Color.WHITE;
+        style.up = drawable("btn-up");
+        style.over = drawable("btn-over");
+        style.font = skinFont;
+        style.fontColor = Color.WHITE;
         style.overFontColor = Color.YELLOW;
         skin.add("default", style);
 
-        Label.LabelStyle labelStyle = new Label.LabelStyle();
+        Slider.SliderStyle sliderStyle = new Slider.SliderStyle();
+        sliderStyle.background = drawable("slider-bg");
+        sliderStyle.knob = new TextureRegionDrawable(new TextureRegion(skin.get("slider-knob", Texture.class)));
+        sliderStyle.knobBefore = drawable("slider-fill");
+        skin.add("default-horizontal", sliderStyle);
+
+        Label.LabelStyle titleLabelStyle = new Label.LabelStyle();
         BitmapFont titleFont = FontGenerator.create(48, Color.WHITE);
-        labelStyle.font      = titleFont;
-        labelStyle.fontColor = Color.WHITE;
-        skin.add("title", labelStyle);
+        titleLabelStyle.font = titleFont;
+        titleLabelStyle.fontColor = Color.WHITE;
+        skin.add("title", titleLabelStyle);
+
+        Label.LabelStyle defaultLabel = new Label.LabelStyle();
+        defaultLabel.font = skinFont;
+        defaultLabel.fontColor = Color.WHITE;
+        skin.add("default", defaultLabel);
     }
 
+    private void addPixmap(Skin s, String name, Color c) {
+        Pixmap p = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
+        p.setColor(c);
+        p.fill();
+        s.add(name, new Texture(p));
+        p.dispose();
+    }
+
+    private TextureRegionDrawable drawable(String name) {
+        return new TextureRegionDrawable(new TextureRegion(skin.get(name, Texture.class)));
+    }
+
+    /** Rebuilds the UI to reflect current audio state from ServiceLocator. */
     private void createUI() {
+        if (stage != null) stage.dispose();
         stage = new Stage(viewport);
 
         Table root = new Table();
         root.setFillParent(true);
+        root.center();
 
         Label title = new Label("PAUSED", skin, "title");
-        root.add(title).padBottom(60).row();
+        root.add(title).padBottom(40).row();
 
+        // Resume button
         TextButton resumeBtn = new TextButton("Resume", skin);
         resumeBtn.addListener(new ClickListener() {
             @Override
@@ -122,8 +157,9 @@ public class PauseScene extends Scene {
                 sceneManager.setScene("game");
             }
         });
-        root.add(resumeBtn).width(250).height(55).padBottom(20).row();
+        root.add(resumeBtn).width(250).height(50).padBottom(15).row();
 
+        // Main Menu button
         TextButton menuBtn = new TextButton("Main Menu", skin);
         menuBtn.addListener(new ClickListener() {
             @Override
@@ -131,17 +167,79 @@ public class PauseScene extends Scene {
                 if (onMainMenu != null) onMainMenu.run();
             }
         });
-        root.add(menuBtn).width(250).height(55).row();
+        root.add(menuBtn).width(250).height(50).padBottom(30).row();
 
+        // ---- Audio controls ----
+        Table audioRow = new Table();
+
+        // Read current state from ServiceLocator (single source of truth)
+        IAudioSystem audio = ServiceLocator.getAudio();
+        int vol = audio != null ? Math.max(1, Math.round(audio.getVolume() * 10f)) : 7;
+        boolean muted = audio != null && audio.isMuted();
+
+        volumeLabel = new Label("Vol: " + vol, skin);
+        audioRow.add(volumeLabel).padRight(8);
+
+        volumeSlider = new Slider(1, 10, 1, false, skin);
+        volumeSlider.setValue(vol);
+        volumeSlider.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                int newVol = (int) ((Slider) actor).getValue();
+                volumeLabel.setText("Vol: " + newVol);
+                IAudioSystem a = ServiceLocator.getAudio();
+                if (a != null) a.setVolume(newVol / 10f);
+            }
+        });
+        audioRow.add(volumeSlider).width(120).height(30).padRight(15);
+
+        // Mute button with PNG icon
+        TextureRegionDrawable icon = new TextureRegionDrawable(
+            new TextureRegion(muted ? muteIconTex : unmuteIconTex)
+        );
+        ImageButton.ImageButtonStyle muteBtnStyle = new ImageButton.ImageButtonStyle();
+        muteBtnStyle.imageUp = icon;
+        muteBtn = new ImageButton(muteBtnStyle);
+        muteBtn.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                toggleMute();
+            }
+        });
+        audioRow.add(muteBtn).size(36, 36);
+
+        root.add(audioRow).padBottom(20).row();
         stage.addActor(root);
+    }
+
+    private void toggleMute() {
+        IAudioSystem audio = ServiceLocator.getAudio();
+        if (audio == null) return;
+        audio.setMuted(!audio.isMuted());
+        updateMuteIcon();
+    }
+
+    private void updateMuteIcon() {
+        IAudioSystem audio = ServiceLocator.getAudio();
+        if (audio == null || muteBtn == null) return;
+        TextureRegionDrawable icon = new TextureRegionDrawable(
+            new TextureRegion(audio.isMuted() ? muteIconTex : unmuteIconTex)
+        );
+        ImageButton.ImageButtonStyle style = new ImageButton.ImageButtonStyle();
+        style.imageUp = icon;
+        muteBtn.setStyle(style);
     }
 
     @Override
     public void update(float deltaTime) {
-        inputManager.update();
-        if (inputManager.isActionTriggered(InputAction.TOGGLE_PAUSE)) {
+        // ESC/P to resume
+        if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE) || Gdx.input.isKeyJustPressed(Input.Keys.P)) {
             sceneManager.setScene("game");
             return;
+        }
+        // M key to toggle mute even while paused
+        if (Gdx.input.isKeyJustPressed(Input.Keys.M)) {
+            toggleMute();
         }
         stage.act(deltaTime);
     }
@@ -153,7 +251,6 @@ public class PauseScene extends Scene {
         batch.begin();
         batch.draw(overlayTexture, 0, 0, WORLD_WIDTH, WORLD_HEIGHT);
         batch.end();
-
         stage.draw();
     }
 
@@ -164,7 +261,9 @@ public class PauseScene extends Scene {
 
     @Override
     protected void onShow() {
-        if (stage != null) Gdx.input.setInputProcessor(stage);
+        // Rebuild UI every time we show, so volume/mute are always synced
+        createUI();
+        Gdx.input.setInputProcessor(stage);
     }
 
     @Override
@@ -174,17 +273,10 @@ public class PauseScene extends Scene {
 
     @Override
     protected void onUnload() {
-        if (stage != null) {
-            stage.dispose();
-        }
-        if (skin != null) {
-            skin.dispose();
-        }
-        if (overlayTexture != null) {
-            overlayTexture.dispose();
-        }
-        if (inputManager != null) {
-            inputManager.dispose();
-        }
+        if (stage != null) stage.dispose();
+        if (skin != null) skin.dispose();
+        if (overlayTexture != null) overlayTexture.dispose();
+        if (muteIconTex != null) muteIconTex.dispose();
+        if (unmuteIconTex != null) unmuteIconTex.dispose();
     }
 }

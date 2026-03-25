@@ -1,6 +1,5 @@
 package io.github.mathdash.logic.entity;
 
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Rectangle;
 import io.github.mathdash.AbstractEngine.collision.Collidable;
 import io.github.mathdash.AbstractEngine.collision.CollisionResult;
@@ -12,6 +11,8 @@ import io.github.mathdash.logic.component.HealthComponent;
 
 /**
  * Player - The player character entity.
+ * Accepts pre-built Renderable components for animation frames,
+ * keeping the logic layer decoupled from raw LibGDX texture loading.
  * Implements Collidable for collision detection.
  */
 public class Player extends Entity implements Collidable {
@@ -31,10 +32,10 @@ public class Player extends Entity implements Collidable {
     private static final float LANE_SWITCH_SPEED = 600f;
     public static final float[] LANE_Y = {100f, 250f, 400f};
 
-    private Texture walkA, walkB, idle, hit;
+    private Renderable walkA, walkB, idle, hit;
     private float animTimer = 0f;
 
-    public Player(Texture walkA, Texture walkB, Texture idle, Texture hit) {
+    public Player(Renderable walkA, Renderable walkB, Renderable idle, Renderable hit) {
         super("player");
         this.walkA = walkA;
         this.walkB = walkB;
@@ -42,7 +43,7 @@ public class Player extends Entity implements Collidable {
         this.hit = hit;
 
         addComponent(new Transform(120f, LANE_Y[0]));
-        addComponent(new Renderable(walkA, WIDTH, HEIGHT));
+        addComponent(new Renderable(walkA.getTextureRegion(), WIDTH, HEIGHT));
         addComponent(new HealthComponent(MAX_LIVES));
 
         this.targetY = LANE_Y[0];
@@ -82,11 +83,11 @@ public class Player extends Entity implements Collidable {
         Renderable renderable = getComponent(Renderable.class);
         if (renderable != null) {
             if (hitFlashTimer > 0f && hit != null) {
-                renderable.setTextureRegion(new com.badlogic.gdx.graphics.g2d.TextureRegion(hit));
+                renderable.setTextureRegion(hit.getTextureRegion());
             } else {
                 boolean frame = ((int)(animTimer * 6f)) % 2 == 0;
-                Texture tex = frame ? walkA : walkB;
-                renderable.setTextureRegion(new com.badlogic.gdx.graphics.g2d.TextureRegion(tex));
+                Renderable tex = frame ? walkA : walkB;
+                renderable.setTextureRegion(tex.getTextureRegion());
             }
 
             // Flashing visibility during invincibility

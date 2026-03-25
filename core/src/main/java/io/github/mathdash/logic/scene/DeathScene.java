@@ -19,7 +19,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
-import io.github.mathdash.AbstractEngine.inputouput.AudioManager;
+import io.github.mathdash.AbstractEngine.ServiceLocator;
+import io.github.mathdash.AbstractEngine.inputouput.IAudioSystem;
 import io.github.mathdash.AbstractEngine.scene.Scene;
 import io.github.mathdash.AbstractEngine.scene.SceneManager;
 import io.github.mathdash.logic.util.FontGenerator;
@@ -27,12 +28,12 @@ import io.github.mathdash.logic.util.FontGenerator;
 /**
  * DeathScene - Displayed when the player dies.
  * Shows final score and offers Try Again and Main Menu buttons.
+ * Uses ServiceLocator for audio (Dependency Inversion Principle).
  */
 public class DeathScene extends Scene {
 
     private static final float WORLD_WIDTH = 800f;
     private static final float WORLD_HEIGHT = 600f;
-    private static final String ASSET_BASE = "kenney_new-platformer-pack-1.1/";
 
     private final SceneManager sceneManager;
     private final Runnable onTryAgain;
@@ -43,7 +44,6 @@ public class DeathScene extends Scene {
     private Stage stage;
     private Skin skin;
     private Texture overlayTexture;
-    private AudioManager audioManager;
 
     private int finalScore = 0;
     private int level = 1;
@@ -70,9 +70,6 @@ public class DeathScene extends Scene {
         overlay.fill();
         overlayTexture = new Texture(overlay);
         overlay.dispose();
-
-        audioManager = new AudioManager();
-        audioManager.loadSound("death", ASSET_BASE + "Sounds/sfx_disappear.ogg");
 
         createSkin();
     }
@@ -156,7 +153,6 @@ public class DeathScene extends Scene {
         Label title = new Label("GAME OVER", skin, "title");
         root.add(title).padBottom(30).row();
 
-        // Show character hit sprite as text context
         Label scoreLabel = new Label("Score: " + finalScore, skin, "score");
         root.add(scoreLabel).padBottom(10).row();
 
@@ -201,11 +197,8 @@ public class DeathScene extends Scene {
         camera.update();
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
-
         batch.draw(overlayTexture, 0, 0, WORLD_WIDTH, WORLD_HEIGHT);
-
         batch.end();
-
         stage.draw();
     }
 
@@ -216,7 +209,8 @@ public class DeathScene extends Scene {
 
     @Override
     protected void onShow() {
-        audioManager.playSound("death");
+        IAudioSystem audio = ServiceLocator.getAudio();
+        if (audio != null) audio.playSound("death");
         createUI();
     }
 
@@ -227,17 +221,8 @@ public class DeathScene extends Scene {
 
     @Override
     protected void onUnload() {
-        if (stage != null) {
-            stage.dispose();
-        }
-        if (skin != null) {
-            skin.dispose();
-        }
-        if (overlayTexture != null) {
-            overlayTexture.dispose();
-        }
-        if (audioManager != null) {
-            audioManager.dispose();
-        }
+        if (stage != null) stage.dispose();
+        if (skin != null) skin.dispose();
+        if (overlayTexture != null) overlayTexture.dispose();
     }
 }

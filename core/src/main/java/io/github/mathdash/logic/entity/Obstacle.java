@@ -1,6 +1,5 @@
 package io.github.mathdash.logic.entity;
 
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Rectangle;
 import io.github.mathdash.AbstractEngine.collision.Collidable;
 import io.github.mathdash.AbstractEngine.collision.CollisionResult;
@@ -12,6 +11,7 @@ import io.github.mathdash.logic.movement.ScrollMovement;
 
 /**
  * Obstacle - An obstacle entity that scrolls from right to left.
+ * Accepts a pre-built Renderable component for decoupled rendering.
  */
 public class Obstacle extends Entity implements Collidable {
 
@@ -21,10 +21,10 @@ public class Obstacle extends Entity implements Collidable {
     private CollisionHandler collisionHandler;
     private final Rectangle bounds;
 
-    public Obstacle(Texture texture, float x, float y, float scrollSpeed) {
+    public Obstacle(Renderable template, float x, float y, float scrollSpeed) {
         super();
         addComponent(new Transform(x, y));
-        addComponent(new Renderable(texture, WIDTH, HEIGHT));
+        addComponent(new Renderable(template.getTextureRegion(), WIDTH, HEIGHT));
         addComponent(new ScrollMovement(scrollSpeed));
         this.bounds = new Rectangle(x - WIDTH / 2f, y - HEIGHT / 2f, WIDTH, HEIGHT);
     }

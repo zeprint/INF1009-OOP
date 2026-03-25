@@ -1333,3 +1333,5 @@ kenney_new-platformer-pack-1.1/Vector/Tiles/weight.svg
 kenney_new-platformer-pack-1.1/Vector/Tiles/window.svg
 kenney_new-platformer-pack-1.1/Visit Kenney.url
 kenney_new-platformer-pack-1.1/Visit Patreon.url
+mute.png
+unmute.png

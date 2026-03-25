@@ -2,12 +2,11 @@ package io.github.mathdash;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
-import io.github.mathdash.AbstractEngine.inputouput.InputAction;
-import io.github.mathdash.AbstractEngine.inputouput.InputBindings;
+import io.github.mathdash.AbstractEngine.ServiceLocator;
+import io.github.mathdash.AbstractEngine.inputouput.AudioManager;
 import io.github.mathdash.AbstractEngine.scene.SceneManager;
 import io.github.mathdash.logic.scene.DeathScene;
 import io.github.mathdash.logic.scene.GameScene;
@@ -17,16 +16,30 @@ import io.github.mathdash.logic.util.FontGenerator;
 
 /**
  * GameMaster - Main application entry point.
- * Wires all scenes together via SceneManager.
+ *
+ * Bootstraps the ServiceLocator with shared engine services (AudioManager),
+ * then wires all scenes together via SceneManager.
  */
 public class GameMaster extends ApplicationAdapter {
 
     private SpriteBatch batch;
     private SceneManager sceneManager;
+    private AudioManager audioManager;
 
     @Override
     public void create() {
         batch = new SpriteBatch();
+
+        // Bootstrap shared services via ServiceLocator (Singleton / Service Locator pattern)
+        audioManager = new AudioManager();
+        audioManager.loadSound("select", "kenney_new-platformer-pack-1.1/Sounds/sfx_select.ogg");
+        audioManager.loadSound("jump", "kenney_new-platformer-pack-1.1/Sounds/sfx_jump.ogg");
+        audioManager.loadSound("hurt", "kenney_new-platformer-pack-1.1/Sounds/sfx_hurt.ogg");
+        audioManager.loadSound("correct", "kenney_new-platformer-pack-1.1/Sounds/sfx_coin.ogg");
+        audioManager.loadSound("wrong", "kenney_new-platformer-pack-1.1/Sounds/sfx_bump.ogg");
+        audioManager.loadSound("death", "kenney_new-platformer-pack-1.1/Sounds/sfx_disappear.ogg");
+        ServiceLocator.provide(audioManager);
+
         sceneManager = new SceneManager();
 
         try {
@@ -42,23 +55,9 @@ public class GameMaster extends ApplicationAdapter {
         try {
             cleanupGameScenes();
 
-            // Build game input bindings — Input.Keys stays in GameMaster.
-            InputBindings gameBindings = new InputBindings();
-            gameBindings.bindAction(InputAction.JUMP, Input.Keys.UP);
-            gameBindings.bindAction(InputAction.JUMP, Input.Keys.W);
-            gameBindings.bindAction(InputAction.CONFIRM, Input.Keys.DOWN);
-            gameBindings.bindAction(InputAction.CONFIRM, Input.Keys.S);
-            gameBindings.bindAction(InputAction.TOGGLE_PAUSE, Input.Keys.ESCAPE);
-            gameBindings.bindAction(InputAction.TOGGLE_PAUSE, Input.Keys.P);
+            GameScene gameScene = new GameScene(sceneManager, level);
 
-            GameScene gameScene = new GameScene(sceneManager, level, gameBindings);
-
-            // Build pause input bindings.
-            InputBindings pauseBindings = new InputBindings();
-            pauseBindings.bindAction(InputAction.TOGGLE_PAUSE, Input.Keys.ESCAPE);
-            pauseBindings.bindAction(InputAction.TOGGLE_PAUSE, Input.Keys.P);
-
-            PauseScene pauseScene = new PauseScene(sceneManager, this::returnToMainMenu, pauseBindings);
+            PauseScene pauseScene = new PauseScene(sceneManager, this::returnToMainMenu);
 
             DeathScene deathScene = new DeathScene(sceneManager,
                 () -> startGame(level),
@@ -83,7 +82,7 @@ public class GameMaster extends ApplicationAdapter {
     }
 
     private void cleanupGameScenes() {
-        if (sceneManager.hasScene("game"))  {
+        if (sceneManager.hasScene("game")) {
             sceneManager.removeScene("game");
         }
         if (sceneManager.hasScene("pause")) {
@@ -111,12 +110,10 @@ public class GameMaster extends ApplicationAdapter {
 
     @Override
     public void dispose() {
-        if (sceneManager != null) {
-            sceneManager.dispose();
-        }
-        if (batch != null) {
-            batch.dispose();
-        }
+        if (sceneManager != null) sceneManager.dispose();
+        if (batch != null) batch.dispose();
+        if (audioManager != null) audioManager.dispose();
         FontGenerator.dispose();
+        ServiceLocator.reset();
     }
 }

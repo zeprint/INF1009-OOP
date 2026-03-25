@@ -13,9 +13,10 @@ import io.github.mathdash.logic.entity.Player;
  * Design Pattern: Observer (concrete observer).
  *
  * Centralises all game-specific collision rules:
- *   - Player hits Obstacle -> lose a life
+ *   - Player hits Obstacle -> lose a life (unless surging)
  *   - Player hits wrong AnswerBlock -> lose a life
  *   - Player hits correct AnswerBlock -> gain a life, increase speed
+ *   - During Surge Mode: obstacles are destroyed on contact (power fantasy)
  */
 public class CollisionDispatcher implements CollisionHandler {
 
@@ -24,17 +25,24 @@ public class CollisionDispatcher implements CollisionHandler {
 
     private final IAudioSystem audioSystem;
     private final GameEventListener listener;
+    private boolean surging = false;
 
     public interface GameEventListener {
         void onHealthChanged(int newHealth);
         void onPlayerDeath();
         void onCorrectAnswer();
         void onWrongAnswer();
+        void onObstacleHit();
     }
 
     public CollisionDispatcher(IAudioSystem audioSystem, GameEventListener listener) {
         this.audioSystem = audioSystem;
         this.listener = listener;
+    }
+
+    /** Sets whether the player is in surge mode (invincible, destroys obstacles). */
+    public void setSurging(boolean surging) {
+        this.surging = surging;
     }
 
     public void update(float deltaTime) {
@@ -69,6 +77,12 @@ public class CollisionDispatcher implements CollisionHandler {
     }
 
     private void handleObstacleHit(Player player) {
+        // During surge mode, obstacles are destroyed without hurting the player
+        if (surging) {
+            if (audioSystem != null) audioSystem.playSound("correct");
+            return;
+        }
+
         if (invincibilityTimer > 0f) return;
 
         player.loseLife();
@@ -79,6 +93,7 @@ public class CollisionDispatcher implements CollisionHandler {
 
         if (listener != null) {
             listener.onHealthChanged(player.getLives());
+            listener.onObstacleHit();
             if (player.getLives() <= 0) {
                 listener.onPlayerDeath();
             }

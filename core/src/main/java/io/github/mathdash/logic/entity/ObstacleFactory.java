@@ -1,27 +1,30 @@
 package io.github.mathdash.logic.entity;
 
-import com.badlogic.gdx.graphics.Texture;
+import io.github.mathdash.AbstractEngine.entity.GenericFactory;
+import io.github.mathdash.AbstractEngine.entity.Renderable;
 
 /**
- * ObstacleFactory - Creates Obstacle entities.
+ * ObstacleFactory - Creates Obstacle entities with pre-built Renderable components.
  * Design Pattern: Factory Method.
+ *
+ * Cycles through an array of Renderables (saw, spike, slime) using round-robin.
  */
 public class ObstacleFactory implements GenericFactory<Obstacle> {
 
-    private final Texture[] textures;
-    private int textureIndex = 0;
+    private final Renderable[] renderables;
+    private int renderableIndex = 0;
     private float scrollSpeed;
 
-    public ObstacleFactory(float scrollSpeed, Texture... textures) {
-        this.textures = textures;
+    public ObstacleFactory(float scrollSpeed, Renderable... renderables) {
+        this.renderables = renderables;
         this.scrollSpeed = scrollSpeed;
     }
 
     @Override
     public Obstacle create(float x, float y) {
-        Texture tex = textures[textureIndex % textures.length];
-        textureIndex++;
-        return new Obstacle(tex, x, y, scrollSpeed);
+        Renderable renderable = renderables[renderableIndex % renderables.length];
+        renderableIndex++;
+        return new Obstacle(renderable, x, y, scrollSpeed);
     }
 
     public void setScrollSpeed(float speed) {

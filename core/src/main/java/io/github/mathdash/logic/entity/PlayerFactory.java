@@ -1,19 +1,23 @@
 package io.github.mathdash.logic.entity;
 
-import com.badlogic.gdx.graphics.Texture;
+import io.github.mathdash.AbstractEngine.entity.GenericFactory;
+import io.github.mathdash.AbstractEngine.entity.Renderable;
 
 /**
- * PlayerFactory - Creates Player entities with all required textures.
+ * PlayerFactory - Creates Player entities with pre-built Renderable components.
  * Design Pattern: Factory Method.
+ *
+ * Accepts Renderable objects (created in the scene layer from Textures)
+ * so the logic layer stays decoupled from raw LibGDX texture loading.
  */
 public class PlayerFactory implements GenericFactory<Player> {
 
-    private final Texture walkA;
-    private final Texture walkB;
-    private final Texture idle;
-    private final Texture hit;
+    private final Renderable walkA;
+    private final Renderable walkB;
+    private final Renderable idle;
+    private final Renderable hit;
 
-    public PlayerFactory(Texture walkA, Texture walkB, Texture idle, Texture hit) {
+    public PlayerFactory(Renderable walkA, Renderable walkB, Renderable idle, Renderable hit) {
         this.walkA = walkA;
         this.walkB = walkB;
         this.idle = idle;
