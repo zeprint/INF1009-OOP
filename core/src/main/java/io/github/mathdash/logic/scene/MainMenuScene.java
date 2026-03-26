@@ -395,13 +395,14 @@ public class MainMenuScene extends Scene {
         // Section title
         Label sectionTitle = new Label(RULEBOOK_PAGES[currentPage][0], skin, "rule-header");
         sectionTitle.setAlignment(Align.center);
-        content.add(sectionTitle).padTop(5).padBottom(15).expandX().center().row();
+        sectionTitle.setWrap(true);
+        content.add(sectionTitle).width(390).padTop(5).padBottom(15).expandX().center().row();
 
         // Section body
         Label sectionBody = new Label(RULEBOOK_PAGES[currentPage][1], skin, "rule-body");
-        sectionBody.setWrap(false);
+        sectionBody.setWrap(true);
         sectionBody.setAlignment(Align.topLeft);
-        content.add(sectionBody).expand().fill().row();
+        content.add(sectionBody).width(390).expandY().fillY().row();
 
         // Navigation: < Prev | Next >
         Table navRow = new Table();
