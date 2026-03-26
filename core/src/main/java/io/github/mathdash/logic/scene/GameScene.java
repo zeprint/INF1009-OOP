@@ -314,7 +314,6 @@ public class GameScene extends Scene
 
         // Update game systems
         collisionDispatcher.update(deltaTime);
-        surgeComponent.update(deltaTime);
         entityManager.update(deltaTime);
         collisionManager.checkCollisions();
 
