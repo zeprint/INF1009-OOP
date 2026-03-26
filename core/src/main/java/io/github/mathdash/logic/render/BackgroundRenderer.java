@@ -5,8 +5,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 
-import io.github.mathdash.logic.scene.GameScene;
-
 /**
  * BackgroundRenderer - Renders the scrolling parallax background,
  * lane bands (grass + dirt), and decorative elements.
@@ -15,6 +13,8 @@ import io.github.mathdash.logic.scene.GameScene;
  */
 public class BackgroundRenderer {
 
+    private final float worldWidth;
+    private final float worldHeight;
     private static final float[][] DIRT_BANDS = {
         {50f, 100f},
         {200f, 100f},
@@ -40,16 +40,17 @@ public class BackgroundRenderer {
     private final Array<float[]> decorations = new Array<>();
     private float decoSpawnAccum = 0f;
 
-    public BackgroundRenderer(Texture bgTexture, Texture grassBgTexture, Texture dirtBgTexture,
+    public BackgroundRenderer(float worldWidth, float worldHeight, Texture bgTexture, Texture grassBgTexture, Texture dirtBgTexture,
                               Texture decoGrassTex, Texture decoBushTex) {
+        this.worldWidth = worldWidth;
+        this.worldHeight = worldHeight;
         this.bgTexture = bgTexture;
         this.grassBgTexture = grassBgTexture;
         this.dirtBgTexture = dirtBgTexture;
         this.decoGrassTex = decoGrassTex;
         this.decoBushTex = decoBushTex;
 
-        // Pre-populate decorations across the screen
-        for (float x = 0; x < GameScene.WORLD_WIDTH; x += DECO_SPAWN_INTERVAL) {
+        for (float x = 0; x < this.worldWidth; x += DECO_SPAWN_INTERVAL) {
             float[] band = GRASS_BANDS[MathUtils.random(GRASS_BANDS.length - 1)];
             float y = band[0] + MathUtils.random(0f, Math.max(0f, band[1] - 48f));
             float texIdx = MathUtils.randomBoolean() ? 0f : 1f;
@@ -75,17 +76,17 @@ public class BackgroundRenderer {
             float[] band = GRASS_BANDS[MathUtils.random(GRASS_BANDS.length - 1)];
             float y = band[0] + MathUtils.random(0f, Math.max(0f, band[1] - 48f));
             float texIdx = MathUtils.randomBoolean() ? 0f : 1f;
-            decorations.add(new float[]{GameScene.WORLD_WIDTH + MathUtils.random(0f, 40f), y, texIdx});
+            decorations.add(new float[]{this.worldWidth + MathUtils.random(0f, 40f), y, texIdx});
         }
     }
 
     public void render(SpriteBatch batch) {
-        float bgWidth = GameScene.WORLD_WIDTH;
+        float bgWidth = this.worldWidth;
 
         // Sky background with parallax
         float bgOffset = bgScrollX % bgWidth;
-        batch.draw(bgTexture, -bgOffset, SKY_Y, bgWidth, GameScene.WORLD_HEIGHT - SKY_Y);
-        batch.draw(bgTexture, bgWidth - bgOffset, SKY_Y, bgWidth, GameScene.WORLD_HEIGHT - SKY_Y);
+        batch.draw(bgTexture, -bgOffset, SKY_Y, bgWidth, this.worldHeight - SKY_Y);
+        batch.draw(bgTexture, bgWidth - bgOffset, SKY_Y, bgWidth, this.worldHeight - SKY_Y);
 
         // Scrolling lane bands
         float laneOffset = floorScrollX % bgWidth;
@@ -94,7 +95,7 @@ public class BackgroundRenderer {
             batch.draw(grassBgTexture, bgWidth - laneOffset, band[0], bgWidth, band[1]);
         }
         float dirtTileW = 100f;
-        int dirtTilesNeeded = (int) (GameScene.WORLD_WIDTH / dirtTileW) + 2;
+        int dirtTilesNeeded = (int) (this.worldWidth / dirtTileW) + 2;
         float dirtOffset = floorScrollX % dirtTileW;
         for (float[] band : DIRT_BANDS) {
             for (int i = 0; i < dirtTilesNeeded; i++) {

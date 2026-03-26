@@ -236,7 +236,7 @@ public class GameScene extends Scene
     }
 
     private void setupHelpers() {
-        backgroundRenderer = new BackgroundRenderer(bgTexture, grassBgTexture, dirtBgTexture,
+        backgroundRenderer = new BackgroundRenderer(WORLD_WIDTH, WORLD_HEIGHT, bgTexture, grassBgTexture, dirtBgTexture,
             decoGrassTex, decoBushTex);
         hudRenderer = new HudRenderer(heartTexture, heartEmptyTexture,
             surgeBarBgTex, surgeBarFillTex, surgeTintTex,
@@ -264,7 +264,7 @@ public class GameScene extends Scene
         collisionManager.addObject(player);
 
         // Create spawner and cleaner after player (needs collisionDispatcher)
-        entitySpawner = new EntitySpawner(obstacleFactory, answerBlockFactory,
+        entitySpawner = new EntitySpawner(WORLD_WIDTH, obstacleFactory, answerBlockFactory,
             entityManager, collisionManager, movementManager, collisionDispatcher,
             activeAnswers, activeObstacles);
         entityCleaner = new EntityCleaner(collisionManager, entityManager, movementManager);

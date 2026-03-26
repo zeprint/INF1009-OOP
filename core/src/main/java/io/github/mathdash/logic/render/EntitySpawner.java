@@ -15,7 +15,7 @@ import io.github.mathdash.logic.entity.ObstacleFactory;
 import io.github.mathdash.logic.entity.Player;
 import io.github.mathdash.logic.math.MathQuestion;
 import io.github.mathdash.logic.movement.ScrollMovement;
-import io.github.mathdash.logic.scene.GameScene;
+
 
 /**
  * EntitySpawner - Handles spawning of obstacles and answer blocks
@@ -24,6 +24,8 @@ import io.github.mathdash.logic.scene.GameScene;
  * Extracted from GameScene to follow the Single Responsibility Principle.
  */
 public class EntitySpawner {
+
+    private final float worldWidth;
 
     private static final float SPAWN_INTERVAL_BASE = 3.0f;
     private static final float OBSTACLE_SPAWN_INTERVAL = 2.0f;
@@ -43,11 +45,12 @@ public class EntitySpawner {
     private float obstacleSpawnTimer = 0f;
     private float answerSpawnTimer = 0f;
     private boolean answersOnScreen = false;
-
-    public EntitySpawner(ObstacleFactory obstacleFactory, AnswerBlockFactory answerBlockFactory,
+    
+    public EntitySpawner(float worldWidth,ObstacleFactory obstacleFactory, AnswerBlockFactory answerBlockFactory,
                          EntityManager entityManager, CollisionManager collisionManager,
                          MovementManager movementManager, CollisionDispatcher collisionDispatcher,
                          Array<AnswerBlock> activeAnswers, Array<Obstacle> activeObstacles) {
+        this.worldWidth = worldWidth;
         this.obstacleFactory = obstacleFactory;
         this.answerBlockFactory = answerBlockFactory;
         this.entityManager = entityManager;
@@ -79,7 +82,7 @@ public class EntitySpawner {
     }
 
     private void spawnObstacle(float scrollSpeed) {
-        float spawnX = GameScene.WORLD_WIDTH + 50f;
+        float spawnX = this.worldWidth + 50f;
 
         for (int i = 0; i < activeAnswers.size; i++) {
             AnswerBlock block = activeAnswers.get(i);
@@ -114,7 +117,7 @@ public class EntitySpawner {
     private void spawnAnswerBlocks(MathQuestion currentQuestion, float scrollSpeed) {
         if (currentQuestion == null) return;
 
-        float x = GameScene.WORLD_WIDTH + 50f;
+        float x = this.worldWidth + 50f;
 
         int[] laneOrder = {0, 1, 2};
         shuffleLanes(laneOrder);
