@@ -2,13 +2,6 @@ package io.github.mathdash.engine.state;
 
 /**
  * GameState - Abstract interface for the State design pattern.
- *
- * Each concrete state encapsulates behaviour for one distinct phase
- * of a scene (e.g. Playing, Paused, GameOver). The owning scene
- * delegates its update() call to the current GameState, and a
- * GameStateManager handles transitions between states.
- *
- * Design Pattern: State
  */
 public interface GameState {
 

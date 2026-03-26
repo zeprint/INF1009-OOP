@@ -12,13 +12,9 @@ import io.github.mathdash.logic.entity.Player;
  * Design Pattern: Observer (concrete observer).
  *
  * Centralises all game-specific collision rules:
- *   - Player hits Obstacle  -> lose a life (always, regardless of surge state)
+ *   - Player hits Obstacle  -> lose a life
  *   - Player hits wrong AnswerBlock -> lose a life
  *   - Player hits correct AnswerBlock -> gain a life, increase speed
- *
- * Surge mode only affects scroll speed via SurgeComponent; it confers
- * no collision immunity. Life loss and invincibility frames behave
- * identically whether the player is surging or not.
  */
 public class CollisionDispatcher implements CollisionHandler {
 
@@ -79,7 +75,9 @@ public class CollisionDispatcher implements CollisionHandler {
         invincibilityTimer = INVINCIBILITY_DURATION;
         player.triggerHitFlash();
 
-        if (audioSystem != null) audioSystem.playSound("hurt");
+        if (audioSystem != null) {
+            audioSystem.playSound("hurt");
+        }
 
         if (listener != null) {
             listener.onHealthChanged(player.getLives());
@@ -91,21 +89,29 @@ public class CollisionDispatcher implements CollisionHandler {
     }
 
     private void handleAnswerHit(Player player, AnswerBlock answer) {
-        if (!answer.isActive()) return;
+        if (!answer.isActive()) {
+            return;
+        }
 
         if (answer.isCorrect()) {
             player.gainLife();
-            if (audioSystem != null) audioSystem.playSound("correct");
+            if (audioSystem != null) {
+                audioSystem.playSound("correct");
+            }
             if (listener != null) {
                 listener.onHealthChanged(player.getLives());
                 listener.onCorrectAnswer();
             }
         } else {
-            if (invincibilityTimer > 0f) return;
+            if (invincibilityTimer > 0f) {
+                return;
+            }
             player.loseLife();
             invincibilityTimer = INVINCIBILITY_DURATION;
             player.triggerHitFlash();
-            if (audioSystem != null) audioSystem.playSound("wrong");
+            if (audioSystem != null) {
+                audioSystem.playSound("wrong");
+            }
             if (listener != null) {
                 listener.onHealthChanged(player.getLives());
                 listener.onWrongAnswer();

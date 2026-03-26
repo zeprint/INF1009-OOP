@@ -29,7 +29,7 @@ import io.github.mathdash.logic.util.FontGenerator;
 /**
  * DeathScene - Displayed when the player dies.
  * Shows final score and offers Try Again and Main Menu buttons.
- * Uses ServiceLocator for audio (Dependency Inversion Principle).
+ * Uses ServiceLocator for audio
  * Uses BaseStage and StageManager for stage lifecycle management.
  */
 public class DeathScene extends Scene {
@@ -57,8 +57,12 @@ public class DeathScene extends Scene {
         this.onMainMenu = onMainMenu;
     }
 
-    public void setFinalScore(int score) { this.finalScore = score; }
-    public void setLevel(int level) { this.level = level; }
+    public void setFinalScore(int score) { 
+        this.finalScore = score; 
+    }
+    public void setLevel(int level) { 
+        this.level = level; 
+    }
 
     @Override
     protected void onLoad() {
@@ -178,7 +182,9 @@ public class DeathScene extends Scene {
             tryAgainBtn.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
-                    if (onTryAgain != null) onTryAgain.run();
+                    if (onTryAgain != null) {
+                        onTryAgain.run();
+                    }
                 }
             });
             root.add(tryAgainBtn).width(250).height(55).padBottom(20).row();
@@ -187,7 +193,9 @@ public class DeathScene extends Scene {
             menuBtn.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
-                    if (onMainMenu != null) onMainMenu.run();
+                    if (onMainMenu != null) {
+                        onMainMenu.run();
+                    }
                 }
             });
             root.add(menuBtn).width(250).height(55).row();
@@ -220,7 +228,9 @@ public class DeathScene extends Scene {
     @Override
     protected void onShow() {
         IAudioSystem audio = ServiceLocator.getAudio();
-        if (audio != null) audio.playSound("death");
+        if (audio != null) {
+            audio.playSound("death");
+        }
         createUI();
         if (stageManager.getStageCount() > 0) {
             Gdx.input.setInputProcessor(stageManager.getStages().get(0).getStage());
@@ -235,8 +245,14 @@ public class DeathScene extends Scene {
     @Override
     protected void onUnload() {
         stageManager.dispose();
-        if (skin != null) skin.dispose();
-        if (overlayTexture != null) overlayTexture.dispose();
-        if (fontGenerator != null) fontGenerator.dispose();
+        if (skin != null) {
+            skin.dispose();
+        }
+        if (overlayTexture != null) {
+            overlayTexture.dispose();
+        }
+        if (fontGenerator != null) {
+            fontGenerator.dispose();
+        }
     }
 }

@@ -20,8 +20,6 @@ import io.github.mathdash.logic.movement.ScrollMovement;
 /**
  * EntitySpawner - Handles spawning of obstacles and answer blocks
  * at timed intervals with safe-distance logic.
- *
- * Extracted from GameScene to follow the Single Responsibility Principle.
  */
 public class EntitySpawner {
 

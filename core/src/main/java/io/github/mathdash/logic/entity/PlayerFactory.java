@@ -5,7 +5,6 @@ import io.github.mathdash.engine.entity.Renderable;
 
 /**
  * PlayerFactory - Creates Player entities with pre-built Renderable components.
- * Design Pattern: Factory Method.
  *
  * Accepts Renderable objects (created in the scene layer from Textures)
  * so the logic layer stays decoupled from raw LibGDX texture loading.

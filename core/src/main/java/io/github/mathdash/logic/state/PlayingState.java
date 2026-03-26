@@ -4,7 +4,6 @@ import io.github.mathdash.engine.state.GameState;
 
 /**
  * PlayingState - Active gameplay state.
- * Design Pattern: State (concrete state).
  *
  * Delegates per-frame logic to the GameScene's gameplay methods.
  */

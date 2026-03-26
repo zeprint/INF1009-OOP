@@ -5,8 +5,6 @@ import io.github.mathdash.engine.entity.Renderable;
 
 /**
  * AnswerBlockFactory - Creates AnswerBlock entities with pre-built Renderable components.
- * Design Pattern: Factory Method.
- * Implements GenericFactory for polymorphic entity creation.
  */
 public class AnswerBlockFactory implements GenericFactory<AnswerBlock> {
 

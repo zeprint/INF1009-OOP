@@ -41,15 +41,21 @@ public class Level1 implements Questions {
     protected MathQuestion createQuestion(String text, int correctAnswer) {
         int wrong1 = generateWrong(correctAnswer);
         int wrong2;
-        do { wrong2 = generateWrong(correctAnswer); } while (wrong2 == wrong1);
+        do { 
+            wrong2 = generateWrong(correctAnswer); 
+        } while (wrong2 == wrong1);
         return new MathQuestion(text + " = ?", correctAnswer, wrong1, wrong2);
     }
 
     protected int generateWrong(int correct) {
         int offset = random.nextInt(10) + 1;
         int wrong = random.nextBoolean() ? correct + offset : correct - offset;
-        if (wrong < 0) wrong = correct + offset;
-        if (wrong == correct) wrong = correct + 1;
+        if (wrong < 0) {
+            wrong = correct + offset;
+        }
+        if (wrong == correct) {
+            wrong = correct + 1;
+        }
         return wrong;
     }
 }

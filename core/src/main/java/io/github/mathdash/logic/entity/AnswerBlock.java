@@ -45,8 +45,12 @@ public class AnswerBlock extends Entity implements Collidable {
         }
     }
 
-    public int getAnswerValue() { return answerValue; }
-    public boolean isCorrect() { return correct; }
+    public int getAnswerValue() { 
+        return answerValue; 
+    }
+    public boolean isCorrect() { 
+        return correct; 
+    }
 
     public void setCollisionHandler(CollisionHandler handler) {
         this.collisionHandler = handler;
@@ -54,11 +58,15 @@ public class AnswerBlock extends Entity implements Collidable {
 
     public void setScrollSpeed(float speed) {
         ScrollMovement sm = getComponent(ScrollMovement.class);
-        if (sm != null) sm.setSpeed(speed);
+        if (sm != null) {
+            sm.setSpeed(speed);
+        }
     }
 
     @Override
-    public Rectangle getBounds() { return bounds; }
+    public Rectangle getBounds() { 
+        return bounds; 
+    }
 
     @Override
     public void onCollision(CollisionResult result) {
@@ -68,5 +76,7 @@ public class AnswerBlock extends Entity implements Collidable {
     }
 
     @Override
-    public boolean isCollidable() { return isActive(); }
+    public boolean isCollidable() { 
+        return isActive(); 
+    }
 }

@@ -45,13 +45,13 @@ public class GameMaster extends ApplicationAdapter {
 
         // Bootstrap shared InputManager via ServiceLocator so all scenes share one instance
         InputBindings bindings = new InputBindings();
-        bindings.bindAction(InputAction.JUMP,         com.badlogic.gdx.Input.Keys.UP);
-        bindings.bindAction(InputAction.JUMP,         com.badlogic.gdx.Input.Keys.W);
-        bindings.bindAction(InputAction.CONFIRM,      com.badlogic.gdx.Input.Keys.DOWN);
-        bindings.bindAction(InputAction.CONFIRM,      com.badlogic.gdx.Input.Keys.S);
+        bindings.bindAction(InputAction.JUMP, com.badlogic.gdx.Input.Keys.UP);
+        bindings.bindAction(InputAction.JUMP, com.badlogic.gdx.Input.Keys.W);
+        bindings.bindAction(InputAction.CONFIRM, com.badlogic.gdx.Input.Keys.DOWN);
+        bindings.bindAction(InputAction.CONFIRM, com.badlogic.gdx.Input.Keys.S);
         bindings.bindAction(InputAction.TOGGLE_PAUSE, com.badlogic.gdx.Input.Keys.ESCAPE);
         bindings.bindAction(InputAction.TOGGLE_PAUSE, com.badlogic.gdx.Input.Keys.P);
-        bindings.bindAction(InputAction.TOGGLE_MUTE,  com.badlogic.gdx.Input.Keys.M);
+        bindings.bindAction(InputAction.TOGGLE_MUTE, com.badlogic.gdx.Input.Keys.M);
         inputManager = new InputManager(bindings);
         ServiceLocator.provide(inputManager);
 
@@ -125,10 +125,18 @@ public class GameMaster extends ApplicationAdapter {
 
     @Override
     public void dispose() {
-        if (sceneManager != null) sceneManager.dispose();
-        if (batch != null) batch.dispose();
-        if (audioManager != null) audioManager.dispose();
-        if (inputManager != null) inputManager.dispose();
+        if (sceneManager != null) {
+            sceneManager.dispose();
+        }
+        if (batch != null) {
+            batch.dispose();
+        }
+        if (audioManager != null) {
+            audioManager.dispose();
+        }
+        if (inputManager != null) {
+            inputManager.dispose();
+        }
         ServiceLocator.reset();
     }
 }

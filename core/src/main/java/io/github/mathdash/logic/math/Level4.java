@@ -3,7 +3,6 @@ package io.github.mathdash.logic.math;
 /**
  * Level 4: Level 3 operations + Bracket expressions.
  * Uses iterative retry loops instead of recursion to avoid stack overflow
- * with unlucky random seeds.
  */
 public class Level4 extends Level3 {
 

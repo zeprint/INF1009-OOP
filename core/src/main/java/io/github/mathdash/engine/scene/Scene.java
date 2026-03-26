@@ -24,14 +24,18 @@ public abstract class Scene {
 
     // Called once when the scene is first loaded. Use for resource allocation and setup.
     public void load() {
-        if (loaded) return;
+        if (loaded) {
+            return;
+        }
         onLoad();
         loaded = true;
     }
 
     // Called once when the scene is being unloaded. Use for resource cleanup.
     public void unload() {
-        if (!loaded) return;
+        if (!loaded) {
+            return;
+        }
         onUnload();
         loaded = false;
     }

@@ -13,8 +13,6 @@ import io.github.mathdash.logic.movement.ScrollMovement;
 /**
  * EntityCleaner - Removes off-screen or inactive entities from
  * all engine managers.
- *
- * Extracted from GameScene to follow the Single Responsibility Principle.
  */
 public class EntityCleaner {
 
@@ -29,11 +27,6 @@ public class EntityCleaner {
         this.movementManager = movementManager;
     }
 
-    /**
-     * Cleans up off-screen or inactive obstacles and answer blocks.
-     *
-     * @return true if all answer blocks have been removed (triggering new question generation)
-     */
     public boolean cleanup(Array<Obstacle> activeObstacles, Array<AnswerBlock> activeAnswers) {
         for (int i = activeObstacles.size - 1; i >= 0; i--) {
             Obstacle obs = activeObstacles.get(i);

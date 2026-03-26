@@ -20,7 +20,7 @@ import io.github.mathdash.engine.difficulty.DifficultyAdapter;
  */
 public class MathDashDifficulty extends DifficultyAdapter {
 
-    private static final float SPEED_UP_PER_CORRECT = 0.08f;  // +8% per correct
+    private static final float SPEED_UP_PER_CORRECT = 0.08f;   // +8% per correct
     private static final float SLOW_DOWN_ON_WRONG = 0.15f;     // -15% on wrong answer
     private static final float SLOW_DOWN_ON_HIT = 0.10f;       // -10% on obstacle hit
     private static final float MIN_MULTIPLIER = 0.6f;          // never slower than 60%

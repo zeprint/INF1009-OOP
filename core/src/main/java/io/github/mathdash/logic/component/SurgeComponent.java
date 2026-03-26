@@ -6,13 +6,6 @@ import io.github.mathdash.engine.entity.Entity;
 /**
  * SurgeComponent - Tracks the player's "Surge Meter" for the
  * risk/reward combo system.
- *
- * Correct answers fill the meter. When full, the player enters
- * "Surge Mode" - temporary invincibility and a speed burst
- * that makes the game feel exhilarating.
- *
- * This creates stealth learning: players WANT to solve math
- * because it fuels power, not because they're being tested.
  */
 public class SurgeComponent implements Component {
 
@@ -45,7 +38,9 @@ public class SurgeComponent implements Component {
 
     /** Adds surge energy from a correct answer. Triggers surge mode when full. */
     public void addSurge() {
-        if (surging) return; // Already surging, don't stack
+        if (surging) {
+            return; // Already surging, don't stack
+        }
         surgeAmount = Math.min(MAX_SURGE, surgeAmount + SURGE_PER_CORRECT);
         if (surgeAmount >= MAX_SURGE) {
             activateSurge();
@@ -67,13 +62,19 @@ public class SurgeComponent implements Component {
     // --- Queries ---
 
     /** Returns 0.0 to 1.0 representing how full the meter is. */
-    public float getSurgeAmount() { return surgeAmount; }
+    public float getSurgeAmount() { 
+        return surgeAmount; 
+    }
 
     /** Returns true if the player is currently in surge mode. */
-    public boolean isSurging() { return surging; }
+    public boolean isSurging() { 
+        return surging; 
+    }
 
     /** Returns time remaining in surge mode, or 0 if not surging. */
-    public float getSurgeTimeRemaining() { return surgeTimer; }
+    public float getSurgeTimeRemaining() { 
+        return surgeTimer; 
+    }
 
     /** Returns the speed bonus multiplier during surge mode. */
     public float getSpeedBonus() {

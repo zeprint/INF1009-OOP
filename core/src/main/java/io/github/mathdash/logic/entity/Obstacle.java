@@ -44,7 +44,9 @@ public class Obstacle extends Entity implements Collidable {
 
     public void setScrollSpeed(float speed) {
         ScrollMovement sm = getComponent(ScrollMovement.class);
-        if (sm != null) sm.setSpeed(speed);
+        if (sm != null) {
+            sm.setSpeed(speed);
+        }
     }
 
     @Override
@@ -58,5 +60,7 @@ public class Obstacle extends Entity implements Collidable {
     }
 
     @Override
-    public boolean isCollidable() { return isActive(); }
+    public boolean isCollidable() { 
+        return isActive(); 
+    }
 }

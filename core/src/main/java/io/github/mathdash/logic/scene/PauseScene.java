@@ -38,7 +38,7 @@ import io.github.mathdash.logic.util.FontGenerator;
  * Volume/mute state is always synced via ServiceLocator (single source of truth).
  *
  * Uses BaseStage and StageManager for stage lifecycle management.
- * Routes all input through InputManager (Dependency Inversion Principle).
+ * Routes all input through InputManager
  */
 public class PauseScene extends Scene {
 
@@ -236,14 +236,18 @@ public class PauseScene extends Scene {
 
     private void toggleMute() {
         IAudioSystem audio = ServiceLocator.getAudio();
-        if (audio == null) return;
+        if (audio == null) {
+            return;
+        }
         audio.setMuted(!audio.isMuted());
         updateMuteIcon();
     }
 
     private void updateMuteIcon() {
         IAudioSystem audio = ServiceLocator.getAudio();
-        if (audio == null || muteBtn == null) return;
+        if (audio == null || muteBtn == null) {
+            return;
+        }
         TextureRegionDrawable icon = new TextureRegionDrawable(
             new TextureRegion(audio.isMuted() ? muteIconTex : unmuteIconTex)
         );
@@ -301,10 +305,20 @@ public class PauseScene extends Scene {
     @Override
     protected void onUnload() {
         stageManager.dispose();
-        if (skin != null) skin.dispose();
-        if (overlayTexture != null) overlayTexture.dispose();
-        if (muteIconTex != null) muteIconTex.dispose();
-        if (unmuteIconTex != null) unmuteIconTex.dispose();
-        if (fontGenerator != null) fontGenerator.dispose();
+        if (skin != null) {
+            skin.dispose();
+        }
+        if (overlayTexture != null) {
+            overlayTexture.dispose();
+        }
+        if (muteIconTex != null) {
+            muteIconTex.dispose();
+        }
+        if (unmuteIconTex != null) {
+            unmuteIconTex.dispose();
+        }
+        if (fontGenerator != null) {
+            fontGenerator.dispose();
+        }
     }
 }

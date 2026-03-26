@@ -27,7 +27,9 @@ public abstract class MovementComponent implements Component {
     // Fetches Transform and PhysicsBody from the owner entity, then delegates to applyMovement.
     @Override
     public final void update(float deltaTime) {
-        if (!enabled || owner == null) return;
+        if (!enabled || owner == null) {
+            return;
+        }
         validateDeltaTime(deltaTime);
 
         Transform transform = owner.getComponent(Transform.class);

@@ -18,23 +18,37 @@ public class HealthComponent implements Component {
     }
 
     @Override
-    public void init(Entity owner) {}
+    public void init(Entity owner) {
+
+    }
 
     @Override
-    public void update(float deltaTime) {}
+    public void update(float deltaTime) {
+
+    }
 
     @Override
-    public void dispose() {}
+    public void dispose() {
 
-    public int getLives() { return lives; }
-    public int getMaxLives() { return maxLives; }
+    }
+
+    public int getLives() { 
+        return lives; 
+    }
+    public int getMaxLives() { 
+        return maxLives; 
+    }
 
     public void loseLife() {
-        if (lives > 0) lives--;
+        if (lives > 0) {
+            lives--;
+        }
     }
 
     public void gainLife() {
-        if (lives < maxLives) lives++;
+        if (lives < maxLives) {
+            lives++;
+        }
     }
 
     public boolean isDead() {

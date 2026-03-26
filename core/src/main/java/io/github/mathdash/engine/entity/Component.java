@@ -7,12 +7,12 @@ package io.github.mathdash.engine.entity;
 
 public interface Component {
 
-    //Called once when this component is first attached to an entity.
+    // Called once when this component is first attached to an entity.
     void init(Entity owner);
 
-    //Called every frame to update this component's state.
+    // Called every frame to update this component's state.
     void update(float deltaTime);
 
-    //Called when this component is removed from its entity or the entity is disposed.
+    // Called when this component is removed from its entity or the entity is disposed.
     void dispose();
 }

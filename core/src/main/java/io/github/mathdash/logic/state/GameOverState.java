@@ -4,7 +4,6 @@ import io.github.mathdash.engine.state.GameState;
 
 /**
  * GameOverState - State entered when the player has lost all lives.
- * Design Pattern: State (concrete state).
  *
  * Halts all gameplay updates and triggers the scene transition to
  * the death screen via a callback.

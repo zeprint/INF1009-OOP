@@ -9,7 +9,7 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 /**
  * FontGenerator - Generates crisp BitmapFonts at any size using FreeType.
  * Instance-based: each owner creates its own FontGenerator and disposes it
- * in its own cleanup method, following SRP and OOP ownership principles.
+ * in its own cleanup method
  */
 public class FontGenerator {
 

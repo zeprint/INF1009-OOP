@@ -3,11 +3,6 @@ package io.github.mathdash.engine.collision;
 /**
  * CollisionResult - Immutable data object describing a detected collision
  * from one Collidable's perspective.
- *
- * Contains the other Collidable involved, the overlap depths on each axis,
- * and the direction of impact relative to the receiver.
- *
- * This is a pure engine data structure with no game-specific knowledge.
  */
 public class CollisionResult {
 
@@ -18,9 +13,9 @@ public class CollisionResult {
 
     public CollisionResult(Collidable other, float overlapX, float overlapY,
                            CollisionDirection direction) {
-        this.other     = other;
-        this.overlapX  = overlapX;
-        this.overlapY  = overlapY;
+        this.other = other;
+        this.overlapX = overlapX;
+        this.overlapY = overlapY;
         this.direction = direction;
     }
 

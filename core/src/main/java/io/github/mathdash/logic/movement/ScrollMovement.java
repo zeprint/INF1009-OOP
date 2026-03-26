@@ -6,7 +6,6 @@ import io.github.mathdash.engine.movement.MovementComponent;
 
 /**
  * ScrollMovement - Moves entities from right to left at a configurable speed.
- * Design Pattern: Strategy (concrete movement strategy).
  */
 public class ScrollMovement extends MovementComponent {
 

@@ -54,13 +54,13 @@ public class Renderable implements Component {
 
         batch.draw(
             textureRegion,
-            transform.getX() - width / 2f,  // center the sprite on position
+            transform.getX() - width / 2f,      // center the sprite on position
             transform.getY() - height / 2f,
-            width / 2f,   // origin x (for rotation)
-            height / 2f,  // origin y (for rotation)
+            width / 2f,                         // origin x (for rotation)
+            height / 2f,                        // origin y (for rotation)
             width,
             height,
-            1f, 1f,       // scale x, scale y
+            1f, 1f,              // scale x, scale y
             transform.getRotation()
         );
     }

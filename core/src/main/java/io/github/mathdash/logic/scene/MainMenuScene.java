@@ -528,12 +528,26 @@ public class MainMenuScene extends Scene {
 
     @Override
     protected void onUnload() {
-        if (stage != null) stage.dispose();
-        if (skin != null) skin.dispose();
-        if (bgTexture != null) bgTexture.dispose();
-        if (characterTexture != null) characterTexture.dispose();
-        if (muteIconTex != null) muteIconTex.dispose();
-        if (unmuteIconTex != null) unmuteIconTex.dispose();
-        if (fontGenerator != null) fontGenerator.dispose();
+        if (stage != null) {
+            stage.dispose();
+        }
+        if (skin != null) {
+            skin.dispose();
+        }
+        if (bgTexture != null) {
+            bgTexture.dispose();
+        }
+        if (characterTexture != null) {
+            characterTexture.dispose();
+        }
+        if (muteIconTex != null) {
+            muteIconTex.dispose();
+        }
+        if (unmuteIconTex != null) {
+            unmuteIconTex.dispose();
+        }
+        if (fontGenerator != null) {
+            fontGenerator.dispose();
+        }
     }
 }

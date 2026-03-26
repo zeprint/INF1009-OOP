@@ -87,22 +87,25 @@ public class InputBindings {
     }
 
     public Array<AxisPair> getAxisPairs(InputAxis axis) {
-        if (axis == null)
+        if (axis == null) {
             return new Array<>();
+        }
         Array<AxisPair> pairs = axisPairs.get(axis);
         return (pairs != null) ? pairs : new Array<>();
     }
 
     public Array<Integer> getActionKeys(InputAction action) {
-        if (action == null)
+        if (action == null) {
             return new Array<>();
+        }
         Array<Integer> keys = actionKeys.get(action);
         return (keys != null) ? keys : new Array<>();
     }
 
     private void warn(String msg) {
-        if (!warningsEnabled)
+        if (!warningsEnabled) {
             return;
+        }
 
         // Safe logging: won't crash even if Gdx.app isn't ready
         try {

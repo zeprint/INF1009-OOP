@@ -12,7 +12,7 @@ public class Level3 extends Level2 {
     }
 
     private MathQuestion generateDivision() {
-        int b      = random.nextInt(9) + 2;
+        int b = random.nextInt(9) + 2;
         int answer = random.nextInt(10) + 1;
         return createQuestion((b * answer) + " / " + b, answer);
     }

@@ -5,11 +5,6 @@ import java.util.Map;
 
 /**
  * GameStateManager - Manages registration and transitions between GameStates.
- *
- * Only one state is active at a time. Transitions call exit() on the old state
- * and enter() on the new state. The active state receives update() each frame.
- *
- * Design Pattern: State (context / manager)
  */
 public class GameStateManager {
 
@@ -22,11 +17,6 @@ public class GameStateManager {
         this.currentState = null;
     }
 
-    /**
-     * Registers a state. The state's name (from getName()) is used as the key.
-     *
-     * @throws IllegalArgumentException if state is null or name is already registered
-     */
     public void addState(GameState state) {
         if (state == null) {
             throw new IllegalArgumentException("Cannot add a null GameState.");
@@ -39,12 +29,6 @@ public class GameStateManager {
         states.put(state.getName(), state);
     }
 
-    /**
-     * Transitions to the state with the given name.
-     * Calls exit() on the current state (if any) and enter() on the target.
-     *
-     * @throws IllegalArgumentException if no state is registered with the given name
-     */
     public void setState(String name) {
         GameState next = states.get(name);
         if (next == null) {

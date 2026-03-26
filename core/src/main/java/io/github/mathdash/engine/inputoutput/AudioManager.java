@@ -22,21 +22,29 @@ public class AudioManager implements IAudioSystem {
     @Override
     public void loadSound(String name, String assetPath) {
         Sound old = sounds.get(name);
-        if (old != null) old.dispose();
+        if (old != null) {
+            old.dispose();
+        }
         sounds.put(name, Gdx.audio.newSound(Gdx.files.internal(assetPath)));
     }
 
     @Override
     public void playSound(String name) {
-        if (muted) return;
+        if (muted) {
+            return;
+        }
         Sound s = sounds.get(name);
-        if (s != null) s.play(volume);
+        if (s != null) {
+            s.play(volume);
+        }
     }
 
     @Override
     public void stopSound(String name) {
         Sound s = sounds.get(name);
-        if (s != null) s.stop();
+        if (s != null) {
+            s.stop();
+        }
     }
 
     // --- Background Music ---
@@ -44,13 +52,17 @@ public class AudioManager implements IAudioSystem {
     @Override
     public void loadMusic(String name, String assetPath) {
         Music old = musics.get(name);
-        if (old != null) old.dispose();
+        if (old != null) {
+            old.dispose();
+        }
         musics.put(name, Gdx.audio.newMusic(Gdx.files.internal(assetPath)));
     }
 
     @Override
     public void playMusic(String name, boolean loop) {
-        if (muted) return;
+        if (muted) {
+            return;
+        }
         Music m = musics.get(name);
         if (m != null) {
             m.setLooping(loop);
@@ -62,21 +74,27 @@ public class AudioManager implements IAudioSystem {
     @Override
     public void stopMusic(String name) {
         Music m = musics.get(name);
-        if (m != null) m.stop();
+        if (m != null) {
+            m.stop();
+        }
     }
 
     @Override
     public void pauseMusic(String name) {
         Music m = musics.get(name);
-        if (m != null) m.pause();
+        if (m != null) {
+            m.pause();
+        }
     }
 
     @Override
     public void resumeMusic(String name) {
-        if (muted) return;
+        if (muted) {
+            return;
+        }
         Music m = musics.get(name);
-        if (m != null){m.setVolume(volume);m.play();
-
+        if (m != null){
+            m.setVolume(volume);m.play();
         }
     }
 
@@ -88,7 +106,9 @@ public class AudioManager implements IAudioSystem {
         // Pause all music when muted
         if (muted) {
             for (Music m : musics.values()) {
-                if (m.isPlaying()) m.pause();
+                if (m.isPlaying()) {
+                    m.pause();
+                }
             }
         }
     }
@@ -116,9 +136,13 @@ public class AudioManager implements IAudioSystem {
 
     @Override
     public void dispose() {
-        for (Sound s : sounds.values()) s.dispose();
+        for (Sound s : sounds.values()) {
+            s.dispose();
+        }
         sounds.clear();
-        for (Music m : musics.values()) m.dispose();
+        for (Music m : musics.values()) {
+            m.dispose();
+        }
         musics.clear();
     }
 }

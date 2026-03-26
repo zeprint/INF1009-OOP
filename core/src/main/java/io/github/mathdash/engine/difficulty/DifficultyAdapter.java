@@ -3,12 +3,6 @@ package io.github.mathdash.engine.difficulty;
 /**
  * DifficultyAdapter - Abstract base for adaptive difficulty systems.
  * Design Pattern: Template Method.
- *
- * The engine defines the abstract hooks (onCorrect, onWrong) and the
- * concrete query methods (getSpeedMultiplier, getDifficultyLevel).
- * Game-specific subclasses fill in the adaptation logic.
- *
- * This class uses no LibGDX imports - pure Java only.
  */
 public abstract class DifficultyAdapter {
 

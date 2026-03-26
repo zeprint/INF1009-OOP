@@ -17,8 +17,16 @@ public class MathQuestion {
         this.wrongAnswer2 = wrongAnswer2;
     }
 
-    public String getQuestionText() { return questionText; }
-    public int getCorrectAnswer() { return correctAnswer; }
-    public int getWrongAnswer1() { return wrongAnswer1; }
-    public int getWrongAnswer2() { return wrongAnswer2; }
+    public String getQuestionText() { 
+        return questionText; 
+    }
+    public int getCorrectAnswer() { 
+        return correctAnswer; 
+    }
+    public int getWrongAnswer1() { 
+        return wrongAnswer1; 
+    }
+    public int getWrongAnswer2() { 
+        return wrongAnswer2; 
+    }
 }

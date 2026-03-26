@@ -11,15 +11,11 @@ import com.badlogic.gdx.utils.Array;
  *   - Detect overlaps each frame using axis-aligned bounding boxes
  *   - Resolve overlap geometry and notify both parties via onCollision()
  *   - Self-clean invalid or null entries with fault tolerance
- *
- * This class is fully context-free. It knows nothing about game-specific
- * entity types, game rules, or how collisions should affect gameplay.
- * All game responses belong in the Logic Engine's onCollision() implementations.
  */
 public class CollisionManager {
 
     private final Array<Collidable> collidables = new Array<>();
-    private final Array<Collidable> toRemove    = new Array<>();
+    private final Array<Collidable> toRemove = new Array<>();
 
     // ---- Registry ----
 
@@ -28,7 +24,9 @@ public class CollisionManager {
      * Null objects, duplicates, and objects with invalid bounds are silently rejected.
      */
     public void addObject(Collidable obj) {
-        if (obj == null || collidables.contains(obj, true)) return;
+        if (obj == null || collidables.contains(obj, true)) {
+            return;
+        }
 
         if (!isValid(obj)) {
             System.err.println("[CollisionManager] Invalid object rejected on add");
@@ -81,12 +79,22 @@ public class CollisionManager {
                 Collidable a = collidables.get(i);
                 Collidable b = collidables.get(j);
 
-                if (a == null || b == null) continue;
+                if (a == null || b == null) {
+                    continue;
+                }
 
-                if (!isValid(a)) { toRemove.add(a); continue; }
-                if (!isValid(b)) { toRemove.add(b); continue; }
+                if (!isValid(a)) { 
+                    toRemove.add(a); 
+                    continue; 
+                }
+                if (!isValid(b)) { 
+                    toRemove.add(b); 
+                    continue; 
+                }
 
-                if (!a.isCollidable() || !b.isCollidable()) continue;
+                if (!a.isCollidable() || !b.isCollidable()) {
+                    continue;
+                }
 
                 try {
                     if (detectCollision(a, b)) {
@@ -118,10 +126,18 @@ public class CollisionManager {
         if (obj == null) return false;
         try {
             Rectangle b = obj.getBounds();
-            if (b == null)                          return false;
-            if (Float.isNaN(b.x)  || Float.isInfinite(b.x))  return false;
-            if (Float.isNaN(b.y)  || Float.isInfinite(b.y))  return false;
-            if (b.width < 0 || b.height < 0)        return false;
+            if (b == null) {
+                return false;
+            }
+            if (Float.isNaN(b.x) || Float.isInfinite(b.x))  {
+                return false;
+            }
+            if (Float.isNaN(b.y) || Float.isInfinite(b.y))  {
+                return false;
+            }
+            if (b.width < 0 || b.height < 0) {
+                return false;
+            }
             return true;
         } catch (Exception e) {
             return false;
@@ -134,16 +150,12 @@ public class CollisionManager {
     private boolean detectCollision(Collidable a, Collidable b) {
         Rectangle ra = a.getBounds();
         Rectangle rb = b.getBounds();
-        if (ra == null || rb == null) return false;
+        if (ra == null || rb == null) {
+            return false;
+        }
         return ra.overlaps(rb);
     }
 
-    /**
-     * Computes a CollisionResult describing the overlap from a's perspective.
-     *
-     * @param a  the entity receiving the result
-     * @param b  the other entity (stored as CollisionResult.other)
-     */
     private CollisionResult resolveCollision(Collidable a, Collidable b) {
         Rectangle ra = a.getBounds();
         Rectangle rb = b.getBounds();

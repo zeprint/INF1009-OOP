@@ -6,15 +6,6 @@ import io.github.mathdash.engine.inputoutput.IInputSystem;
 /**
  * ServiceLocator - Provides global access to shared engine services
  * without tight coupling to concrete implementations.
- *
- * Design Pattern: Singleton / Service Locator
- *
- * Usage:
- *   ServiceLocator.provide(audioManager);   // register during bootstrap
- *   ServiceLocator.getAudio().playSound(...); // lookup anywhere
- *
- * This replaces scattered "new AudioManager()" calls in individual scenes,
- * improving testability and adherence to the Dependency Inversion Principle (SOLID-D).
  */
 public final class ServiceLocator {
 

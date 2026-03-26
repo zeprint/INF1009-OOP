@@ -20,8 +20,6 @@ import io.github.mathdash.logic.scene.GameScene;
 /**
  * HudRenderer - Renders the heads-up display: hearts, score, level,
  * question text, surge bar, and streak counter.
- *
- * Extracted from GameScene to follow the Single Responsibility Principle.
  */
 public class HudRenderer {
 

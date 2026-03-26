@@ -56,24 +56,27 @@ public class InputManager implements IInputSystem {
 
     @Override
     public float getAxis(InputAxis axis) {
-        if (axis == null)
+        if (axis == null) {
             return 0f; // defensive
+        }
         Float v = axisValues.get(axis);
         return (v != null) ? v : 0f;
     }
 
     @Override
     public boolean isActionTriggered(InputAction action) {
-        if (action == null)
+        if (action == null) {
             return false; // defensive
+        }
         Boolean b = actionTriggered.get(action);
         return b != null && b;
     }
 
     @Override
     public boolean isActionHeld(InputAction action) {
-        if (action == null)
+        if (action == null) {
             return false; // defensive
+        }
         Array<Integer> keys = bindings.getActionKeys(action);
         for (int i = 0; i < keys.size; i++) {
             if (Gdx.input.isKeyPressed(keys.get(i))) {
@@ -99,8 +102,9 @@ public class InputManager implements IInputSystem {
 
     /* Convenience: raw key check. */
     public boolean isKeyDown(int keycode) {
-        if (keycode < 0)
+        if (keycode < 0) {
             return false; // invalid keycode guard
+        }
         return Gdx.input.isKeyPressed(keycode);
     }
 
@@ -112,8 +116,9 @@ public class InputManager implements IInputSystem {
     // Internal
 
     private float computeAxis(InputAxis axis) {
-        if (axis == null)
+        if (axis == null) {
             return 0f;
+        }
 
         Array<InputBindings.AxisPair> pairs = bindings.getAxisPairs(axis);
         if (pairs == null || pairs.size == 0) {
@@ -125,8 +130,9 @@ public class InputManager implements IInputSystem {
 
         for (int i = 0; i < pairs.size; i++) {
             InputBindings.AxisPair pair = pairs.get(i);
-            if (pair == null)
+            if (pair == null) {
                 continue;
+            }
 
             // Keycode sanity (LibGDX uses non-negative keycodes)
             if (pair.negativeKey >= 0 && Gdx.input.isKeyPressed(pair.negativeKey)) {
@@ -140,16 +146,19 @@ public class InputManager implements IInputSystem {
         }
 
         // Clamp to [-1, 1]
-        if (v > 1f)
+        if (v > 1f) {
             v = 1f;
-        if (v < -1f)
+        }
+        if (v < -1f) {
             v = -1f;
+        }
         return v;
     }
 
     private boolean computeActionJustPressed(InputAction action) {
-        if (action == null)
+        if (action == null) {
             return false;
+        }
 
         Array<Integer> keys = bindings.getActionKeys(action);
         if (keys == null || keys.size == 0) {

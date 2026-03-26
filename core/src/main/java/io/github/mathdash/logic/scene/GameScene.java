@@ -46,14 +46,6 @@ import io.github.mathdash.logic.util.FontGenerator;
 /**
  * GameScene - The main gameplay scene for MathDash.
  *
- * Design Patterns used here:
- *   - State (GameStateManager with PlayingState / GameOverState)
- *   - Factory Method (PlayerFactory, ObstacleFactory, AnswerBlockFactory)
- *   - Observer (CollisionDispatcher / CollisionHandler)
- *   - Strategy (MathQuestionGenerator delegates to Level1-4 strategies)
- *   - Service Locator (ServiceLocator for audio)
- *   - Template Method (DifficultyAdapter -> MathDashDifficulty)
- *
  * Delegates rendering and entity management to:
  *   - BackgroundRenderer: parallax sky, lane bands, decorations
  *   - HudRenderer: hearts, score, question, surge bar
@@ -211,9 +203,9 @@ public class GameScene extends Scene
     private void setupFactories() {
         Renderable renderWalkA = new Renderable(new TextureRegion(playerWalkA), 48, 48);
         Renderable renderWalkB = new Renderable(new TextureRegion(playerWalkB), 48, 48);
-        Renderable renderIdle  = new Renderable(new TextureRegion(playerIdle),  48, 48);
-        Renderable renderHit   = new Renderable(new TextureRegion(playerHit),   48, 48);
-        Renderable renderSaw   = new Renderable(new TextureRegion(obstacleTexSaw),   48, 48);
+        Renderable renderIdle = new Renderable(new TextureRegion(playerIdle),  48, 48);
+        Renderable renderHit = new Renderable(new TextureRegion(playerHit),   48, 48);
+        Renderable renderSaw = new Renderable(new TextureRegion(obstacleTexSaw),   48, 48);
         Renderable renderSpike = new Renderable(new TextureRegion(obstacleTexSpike), 48, 48);
         Renderable renderSlime = new Renderable(new TextureRegion(obstacleTexSlime), 48, 48);
         Renderable renderAnswerBlock = new Renderable(new TextureRegion(answerBlockTex), 48, 48);
@@ -292,11 +284,15 @@ public class GameScene extends Scene
         // Player lane switching
         if (inputManager.isActionTriggered(InputAction.JUMP)) {
             player.switchLane(1);
-            if (audio != null) audio.playSound("jump");
+            if (audio != null) {
+                audio.playSound("jump");
+            }
         }
         if (inputManager.isActionTriggered(InputAction.CONFIRM)) {
             player.switchLane(-1);
-            if (audio != null) audio.playSound("jump");
+            if (audio != null) {
+                audio.playSound("jump");
+            }
         }
 
         // Update game systems
@@ -421,15 +417,23 @@ public class GameScene extends Scene
         }
     }
 
-    public int getScore() { return score; }
-    public int getLevel() { return level; }
+    public int getScore() { 
+        return score; 
+    }
+    public int getLevel() { 
+        return level; 
+    }
 
     // ---- Lifecycle ----
 
     @Override
     protected void onUnload() {
-        if (entityManager != null) entityManager.dispose();
-        if (collisionManager != null) collisionManager.clear();
+        if (entityManager != null) {
+            entityManager.dispose();
+        }
+        if (collisionManager != null) {
+            collisionManager.clear();
+        }
 
         disposeTexture(bgTexture);
         disposeTexture(grassBgTexture);
@@ -446,24 +450,38 @@ public class GameScene extends Scene
         disposeTexture(playerWalkB);
         disposeTexture(playerIdle);
         disposeTexture(playerHit);
-        if (font != null) font.dispose();
-        if (hudFont != null) hudFont.dispose();
-        if (questionFont != null) questionFont.dispose();
-        if (streakFont != null) streakFont.dispose();
-        if (fontGenerator != null) fontGenerator.dispose();
+        if (font != null) {
+            font.dispose();
+        }
+        if (hudFont != null) {
+            hudFont.dispose();
+        }
+        if (questionFont != null) {
+            questionFont.dispose();
+        }
+        if (streakFont != null) {
+            streakFont.dispose();
+        }
+        if (fontGenerator != null) {
+            fontGenerator.dispose();
+        }
         disposeTexture(surgeBarBgTex);
         disposeTexture(surgeBarFillTex);
         disposeTexture(surgeTintTex);
     }
 
     private void disposeTexture(Texture tex) {
-        if (tex != null) tex.dispose();
+        if (tex != null) {
+            tex.dispose();
+        }
     }
 
     @Override
     protected void onShow() {
         viewport.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
-        if (movementManager != null) movementManager.unfreezeAll();
+        if (movementManager != null) {
+            movementManager.unfreezeAll();
+        }
         if (gameStateManager != null && !"playing".equals(gameStateManager.getCurrentStateName())) {
             if (!"gameover".equals(gameStateManager.getCurrentStateName())) {
                 gameStateManager.setState("playing");
@@ -473,6 +491,8 @@ public class GameScene extends Scene
 
     @Override
     protected void onHide() {
-        if (movementManager != null) movementManager.freezeAll();
+        if (movementManager != null) {
+            movementManager.freezeAll();
+        }
     }
 }

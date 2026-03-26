@@ -8,8 +8,6 @@ import com.badlogic.gdx.utils.Array;
 /**
  * BackgroundRenderer - Renders the scrolling parallax background,
  * lane bands (grass + dirt), and decorative elements.
- *
- * Extracted from GameScene to follow the Single Responsibility Principle.
  */
 public class BackgroundRenderer {
 

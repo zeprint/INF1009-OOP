@@ -108,7 +108,9 @@ public class Player extends Entity implements Collidable {
         }
     }
 
-    public int getCurrentLane() { return currentLane; }
+    public int getCurrentLane() { 
+        return currentLane; 
+    }
 
     public void triggerHitFlash() {
         hitFlashTimer = HIT_FLASH_DURATION;
@@ -134,7 +136,9 @@ public class Player extends Entity implements Collidable {
     }
 
     @Override
-    public Rectangle getBounds() { return bounds; }
+    public Rectangle getBounds() { 
+        return bounds; 
+    }
 
     @Override
     public void onCollision(CollisionResult result) {
@@ -144,8 +148,14 @@ public class Player extends Entity implements Collidable {
     }
 
     @Override
-    public boolean isCollidable() { return isActive(); }
+    public boolean isCollidable() { 
+        return isActive(); 
+    }
 
-    public float getWidth() { return WIDTH; }
-    public float getHeight() { return HEIGHT; }
+    public float getWidth() { 
+        return WIDTH; 
+    }
+    public float getHeight() { 
+        return HEIGHT; 
+    }
 }
