@@ -66,7 +66,7 @@ public class MainMenuScene extends Scene {
     private int currentPage = 0;
     private static final String[][] RULEBOOK_PAGES = {
         { // Page 1: Welcome
-            "Welcome to MathDash!",
+            "Welcome to MathDash by P9-T5!",
             "You are a runner! Your job is\n" +
             "to solve maths while running.\n\n" +
             "The faster you solve, the more\n" +
