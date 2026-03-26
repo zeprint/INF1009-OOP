@@ -400,9 +400,9 @@ public class MainMenuScene extends Scene {
 
         // Section body
         Label sectionBody = new Label(RULEBOOK_PAGES[currentPage][1], skin, "rule-body");
-        sectionBody.setWrap(true);
+        sectionBody.setWrap(false);
         sectionBody.setAlignment(Align.topLeft);
-        content.add(sectionBody).width(390).expandY().fillY().row();
+        content.add(sectionBody).expandY().fillY().row();
 
         // Navigation: < Prev | Next >
         Table navRow = new Table();
