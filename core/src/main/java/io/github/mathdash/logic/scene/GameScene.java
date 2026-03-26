@@ -111,6 +111,7 @@ public class GameScene extends Scene
     private MathQuestion currentQuestion;
     private DifficultyAdapter difficulty;
     private SurgeComponent surgeComponent;
+    private FontGenerator fontGenerator;
     private float scrollSpeed;
     private int score = 0;
 
@@ -158,6 +159,7 @@ public class GameScene extends Scene
     }
 
     private void loadTextures() {
+        fontGenerator = new FontGenerator();
         bgTexture = loadTex(ASSET_BASE + "Sprites/Backgrounds/Default/background_color_trees.png");
         bgTexture.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.ClampToEdge);
         grassBgTexture = loadTex(ASSET_BASE + "Sprites/Backgrounds/Default/background_solid_grass.png");
@@ -181,10 +183,10 @@ public class GameScene extends Scene
         decoGrassTex = loadTex(ASSET_BASE + "Sprites/Tiles/Default/grass.png");
         decoBushTex = loadTex(ASSET_BASE + "Sprites/Tiles/Default/bush.png");
 
-        font = FontGenerator.create(24, Color.WHITE);
-        hudFont = FontGenerator.create(24, Color.BLACK);
-        questionFont = FontGenerator.create(32, Color.YELLOW, Color.DARK_GRAY, 1f);
-        streakFont = FontGenerator.create(20, Color.ORANGE, Color.DARK_GRAY, 1f);
+        font = fontGenerator.create(24, Color.WHITE);
+        hudFont = fontGenerator.create(24, Color.BLACK);
+        questionFont = fontGenerator.create(32, Color.YELLOW, Color.DARK_GRAY, 1f);
+        streakFont = fontGenerator.create(20, Color.ORANGE, Color.DARK_GRAY, 1f);
         glyphLayout = new GlyphLayout();
 
         surgeBarBgTex = createPixmapTexture(0.2f, 0.2f, 0.2f, 0.7f);
@@ -464,6 +466,7 @@ public class GameScene extends Scene
         if (hudFont != null) hudFont.dispose();
         if (questionFont != null) questionFont.dispose();
         if (streakFont != null) streakFont.dispose();
+        if (fontGenerator != null) fontGenerator.dispose();
         disposeTexture(surgeBarBgTex);
         disposeTexture(surgeBarFillTex);
         disposeTexture(surgeTintTex);

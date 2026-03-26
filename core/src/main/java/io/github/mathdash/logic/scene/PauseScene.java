@@ -57,7 +57,7 @@ public class PauseScene extends Scene {
     private Texture overlayTexture;
     private Texture muteIconTex;
     private Texture unmuteIconTex;
-
+    private FontGenerator fontGenerator;
     private InputManager inputManager;
     private ImageButton muteBtn;
     private Label volumeLabel;
@@ -71,6 +71,7 @@ public class PauseScene extends Scene {
 
     @Override
     protected void onLoad() {
+        fontGenerator = new FontGenerator();
         camera = new OrthographicCamera();
         viewport = new FitViewport(WORLD_WIDTH, WORLD_HEIGHT, camera);
         camera.position.set(WORLD_WIDTH / 2f, WORLD_HEIGHT / 2f, 0);
@@ -102,7 +103,7 @@ public class PauseScene extends Scene {
     private void createSkin() {
         skin = new Skin();
 
-        BitmapFont skinFont = FontGenerator.create(24, Color.WHITE);
+        BitmapFont skinFont = fontGenerator.create(24, Color.WHITE);
         skin.add("default-font", skinFont);
 
         addPixmap(skin, "btn-up", new Color(0.3f, 0.5f, 0.8f, 1f));
@@ -131,7 +132,7 @@ public class PauseScene extends Scene {
         skin.add("default-horizontal", sliderStyle);
 
         Label.LabelStyle titleLabelStyle = new Label.LabelStyle();
-        BitmapFont titleFont = FontGenerator.create(48, Color.WHITE);
+        BitmapFont titleFont = fontGenerator.create(48, Color.WHITE);
         titleLabelStyle.font = titleFont;
         titleLabelStyle.fontColor = Color.WHITE;
         skin.add("title", titleLabelStyle);
@@ -310,5 +311,6 @@ public class PauseScene extends Scene {
         if (muteIconTex != null) muteIconTex.dispose();
         if (unmuteIconTex != null) unmuteIconTex.dispose();
         if (inputManager != null) inputManager.dispose();
+        if (fontGenerator != null) fontGenerator.dispose();
     }
 }

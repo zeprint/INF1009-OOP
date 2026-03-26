@@ -53,7 +53,7 @@ public class MainMenuScene extends Scene {
     private Texture characterTexture;
     private Texture muteIconTex;
     private Texture unmuteIconTex;
-
+    private FontGenerator fontGenerator;
     private float bgScrollX = 0f;
     private static final float BG_SCROLL_SPEED = 40f;
 
@@ -128,6 +128,7 @@ public class MainMenuScene extends Scene {
 
     @Override
     protected void onLoad() {
+        fontGenerator = new FontGenerator();
         camera = new OrthographicCamera();
         viewport = new FitViewport(WORLD_WIDTH, WORLD_HEIGHT, camera);
         camera.position.set(WORLD_WIDTH / 2f, WORLD_HEIGHT / 2f, 0);
@@ -157,19 +158,19 @@ public class MainMenuScene extends Scene {
         skin = new Skin();
 
         // -- Fonts --
-        BitmapFont skinFont = FontGenerator.create(22, Color.WHITE);
+        BitmapFont skinFont = fontGenerator.create(22, Color.WHITE);
         skin.add("default-font", skinFont);
 
-        BitmapFont titleSkinFont = FontGenerator.create(42, Color.YELLOW, Color.DARK_GRAY, 2f);
+        BitmapFont titleSkinFont = fontGenerator.create(42, Color.YELLOW, Color.DARK_GRAY, 2f);
         skin.add("title-font", titleSkinFont);
 
-        BitmapFont subtitleFont = FontGenerator.create(18, Color.BLACK);
+        BitmapFont subtitleFont = fontGenerator.create(18, Color.BLACK);
         skin.add("subtitle-font", subtitleFont);
 
-        BitmapFont ruleHeaderFont = FontGenerator.create(28, Color.YELLOW, Color.DARK_GRAY, 1f);
+        BitmapFont ruleHeaderFont = fontGenerator.create(28, Color.YELLOW, Color.DARK_GRAY, 1f);
         skin.add("rule-header-font", ruleHeaderFont);
 
-        BitmapFont ruleBodyFont = FontGenerator.create(18, Color.WHITE);
+        BitmapFont ruleBodyFont = fontGenerator.create(18, Color.WHITE);
         skin.add("rule-body-font", ruleBodyFont);
 
         // -- Button pixmaps --
@@ -532,5 +533,6 @@ public class MainMenuScene extends Scene {
         if (characterTexture != null) characterTexture.dispose();
         if (muteIconTex != null) muteIconTex.dispose();
         if (unmuteIconTex != null) unmuteIconTex.dispose();
+        if (fontGenerator != null) fontGenerator.dispose();
     }
 }

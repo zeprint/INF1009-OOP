@@ -46,7 +46,7 @@ public class DeathScene extends Scene {
     private StageManager stageManager;
     private Skin skin;
     private Texture overlayTexture;
-
+    private FontGenerator fontGenerator;
     private int finalScore = 0;
     private int level = 1;
 
@@ -62,6 +62,7 @@ public class DeathScene extends Scene {
 
     @Override
     protected void onLoad() {
+        fontGenerator = new FontGenerator();
         camera = new OrthographicCamera();
         viewport = new FitViewport(WORLD_WIDTH, WORLD_HEIGHT, camera);
         camera.position.set(WORLD_WIDTH / 2f, WORLD_HEIGHT / 2f, 0);
@@ -81,7 +82,7 @@ public class DeathScene extends Scene {
     private void createSkin() {
         skin = new Skin();
 
-        BitmapFont skinFont = FontGenerator.create(24, Color.WHITE);
+        BitmapFont skinFont = fontGenerator.create(24, Color.WHITE);
         skin.add("default-font", skinFont);
 
         Pixmap btnUp = new Pixmap(200, 50, Pixmap.Format.RGBA8888);
@@ -125,13 +126,13 @@ public class DeathScene extends Scene {
         skin.add("default", menuStyle);
 
         Label.LabelStyle titleStyle = new Label.LabelStyle();
-        BitmapFont titleFont = FontGenerator.create(48, Color.RED, Color.DARK_GRAY, 2f);
+        BitmapFont titleFont = fontGenerator.create(48, Color.RED, Color.DARK_GRAY, 2f);
         titleStyle.font = titleFont;
         titleStyle.fontColor = Color.RED;
         skin.add("title", titleStyle);
 
         Label.LabelStyle scoreStyle = new Label.LabelStyle();
-        BitmapFont scoreFont = FontGenerator.create(32, Color.WHITE);
+        BitmapFont scoreFont = fontGenerator.create(32, Color.WHITE);
         scoreStyle.font = scoreFont;
         scoreStyle.fontColor = Color.WHITE;
         skin.add("score", scoreStyle);
@@ -235,5 +236,6 @@ public class DeathScene extends Scene {
         stageManager.dispose();
         if (skin != null) skin.dispose();
         if (overlayTexture != null) overlayTexture.dispose();
+        if (fontGenerator != null) fontGenerator.dispose();
     }
 }

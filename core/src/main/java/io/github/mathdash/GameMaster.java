@@ -12,7 +12,6 @@ import io.github.mathdash.logic.scene.DeathScene;
 import io.github.mathdash.logic.scene.GameScene;
 import io.github.mathdash.logic.scene.MainMenuScene;
 import io.github.mathdash.logic.scene.PauseScene;
-import io.github.mathdash.logic.util.FontGenerator;
 
 /**
  * GameMaster - Main application entry point.
@@ -113,7 +112,6 @@ public class GameMaster extends ApplicationAdapter {
         if (sceneManager != null) sceneManager.dispose();
         if (batch != null) batch.dispose();
         if (audioManager != null) audioManager.dispose();
-        FontGenerator.dispose();
         ServiceLocator.reset();
     }
 }

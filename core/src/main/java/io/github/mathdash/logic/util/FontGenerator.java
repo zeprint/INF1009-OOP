@@ -8,29 +8,27 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 
 /**
  * FontGenerator - Generates crisp BitmapFonts at any size using FreeType.
+ * Instance-based: each owner creates its own FontGenerator and disposes it
+ * in its own cleanup method, following SRP and OOP ownership principles.
  */
 public class FontGenerator {
 
-    private static FreeTypeFontGenerator generator;
+    private FreeTypeFontGenerator generator;
 
-    private static FreeTypeFontGenerator getGenerator() {
-        if (generator == null) {
-            generator = new FreeTypeFontGenerator(Gdx.files.internal("arial.ttf"));
-        }
-        return generator;
+    public FontGenerator() {
+        this.generator = new FreeTypeFontGenerator(Gdx.files.internal("arial.ttf"));
     }
 
-    public static BitmapFont create(int size, Color color) {
+    public BitmapFont create(int size, Color color) {
         FreeTypeFontGenerator.FreeTypeFontParameter param = new FreeTypeFontGenerator.FreeTypeFontParameter();
         param.size = size;
         param.color = color;
         param.minFilter = Texture.TextureFilter.Linear;
         param.magFilter = Texture.TextureFilter.Linear;
-        BitmapFont font = getGenerator().generateFont(param);
-        return font;
+        return generator.generateFont(param);
     }
 
-    public static BitmapFont create(int size, Color color, Color borderColor, float borderWidth) {
+    public BitmapFont create(int size, Color color, Color borderColor, float borderWidth) {
         FreeTypeFontGenerator.FreeTypeFontParameter param = new FreeTypeFontGenerator.FreeTypeFontParameter();
         param.size = size;
         param.color = color;
@@ -38,11 +36,10 @@ public class FontGenerator {
         param.borderWidth = borderWidth;
         param.minFilter = Texture.TextureFilter.Linear;
         param.magFilter = Texture.TextureFilter.Linear;
-        BitmapFont font = getGenerator().generateFont(param);
-        return font;
+        return generator.generateFont(param);
     }
 
-    public static void dispose() {
+    public void dispose() {
         if (generator != null) {
             generator.dispose();
             generator = null;
