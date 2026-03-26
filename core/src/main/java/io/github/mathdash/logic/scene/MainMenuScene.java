@@ -109,9 +109,9 @@ public class MainMenuScene extends Scene {
             "Get answers RIGHT in a row to\n" +
             "fill your Surge meter!\n\n" +
             "When the meter is FULL, you\n" +
-            "become INVINCIBLE!\n\n" +
-            "You run super fast and smash\n" +
-            "through everything!\n\n" +
+            "start SURGING!\n\n" +
+            "You run super fast but still\n" +
+            "take damage!\n\n" +
             "Maths = POWER!"
         }
     };
