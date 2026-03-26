@@ -19,6 +19,7 @@ import io.github.mathdash.engine.collision.CollisionManager;
 import io.github.mathdash.engine.entity.EntityManager;
 import io.github.mathdash.engine.entity.Renderable;
 import io.github.mathdash.engine.inputoutput.IAudioSystem;
+import io.github.mathdash.engine.inputoutput.IInputSystem;
 import io.github.mathdash.engine.inputoutput.InputAction;
 import io.github.mathdash.engine.inputoutput.InputBindings;
 import io.github.mathdash.engine.inputoutput.InputManager;
@@ -78,7 +79,7 @@ public class GameScene extends Scene
     private EntityManager entityManager;
     private CollisionManager collisionManager;
     private MovementManager movementManager;
-    private InputManager inputManager;
+    private IInputSystem inputManager;
     private GameStateManager gameStateManager;
 
     // Camera

@@ -75,7 +75,9 @@ public class AudioManager implements IAudioSystem {
     public void resumeMusic(String name) {
         if (muted) return;
         Music m = musics.get(name);
-        if (m != null) m.play();
+        if (m != null){m.setVolume(volume);m.play();
+
+        }
     }
 
     // --- Volume & Mute ---
