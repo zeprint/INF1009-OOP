@@ -16,6 +16,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 
 import io.github.mathdash.engine.ServiceLocator;
 import io.github.mathdash.engine.collision.CollisionManager;
+import io.github.mathdash.engine.difficulty.DifficultyAdapter;
 import io.github.mathdash.engine.entity.EntityManager;
 import io.github.mathdash.engine.entity.Renderable;
 import io.github.mathdash.engine.inputoutput.IAudioSystem;
@@ -45,7 +46,6 @@ import io.github.mathdash.logic.render.HudRenderer;
 import io.github.mathdash.logic.state.GameOverState;
 import io.github.mathdash.logic.state.PlayingState;
 import io.github.mathdash.logic.util.FontGenerator;
-
 /**
  * GameScene - The main gameplay scene for MathDash.
  *
@@ -109,7 +109,7 @@ public class GameScene extends Scene
     private CollisionDispatcher collisionDispatcher;
     private MathQuestionGenerator questionGenerator;
     private MathQuestion currentQuestion;
-    private MathDashDifficulty difficulty;
+    private DifficultyAdapter difficulty;
     private SurgeComponent surgeComponent;
     private float scrollSpeed;
     private int score = 0;

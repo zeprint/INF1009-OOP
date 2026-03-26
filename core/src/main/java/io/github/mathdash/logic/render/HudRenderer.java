@@ -8,13 +8,14 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 
+import io.github.mathdash.engine.difficulty.DifficultyAdapter;
 import io.github.mathdash.engine.entity.Transform;
 import io.github.mathdash.logic.component.SurgeComponent;
-import io.github.mathdash.logic.difficulty.MathDashDifficulty;
 import io.github.mathdash.logic.entity.AnswerBlock;
 import io.github.mathdash.logic.entity.Player;
 import io.github.mathdash.logic.math.MathQuestion;
 import io.github.mathdash.logic.scene.GameScene;
+
 
 /**
  * HudRenderer - Renders the heads-up display: hearts, score, level,
@@ -52,7 +53,7 @@ public class HudRenderer {
     }
 
     public void render(SpriteBatch batch, Player player, SurgeComponent surge,
-                       MathDashDifficulty difficulty, MathQuestion currentQuestion,
+                       DifficultyAdapter difficulty, MathQuestion currentQuestion,
                        int score, int level, Array<AnswerBlock> activeAnswers) {
 
         // Answer values on blocks

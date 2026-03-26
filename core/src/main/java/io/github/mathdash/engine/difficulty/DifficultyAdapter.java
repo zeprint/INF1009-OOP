@@ -34,6 +34,18 @@ public abstract class DifficultyAdapter {
     public abstract void onObstacleHit();
 
     /**
+     * Returns the current correct-answer streak count (0 if no streak).
+     * Subclasses define how streak is tracked.
+     */
+    public abstract int getCorrectStreak();
+
+    /**
+     * Returns whether the player is currently on a positive streak.
+     * Subclasses define the threshold.
+     */
+    public abstract boolean isOnStreak();
+
+    /**
      * Returns the current speed multiplier relative to the base speed.
      * A value of 1.0 means no change; > 1.0 means faster; < 1.0 means slower.
      */

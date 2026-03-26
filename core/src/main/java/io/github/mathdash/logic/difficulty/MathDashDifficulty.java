@@ -58,11 +58,13 @@ public class MathDashDifficulty extends DifficultyAdapter {
     }
 
     /** Returns whether the player is on a positive streak. */
+    @Override
     public boolean isOnStreak() {
         return streak >= STREAK_BONUS_THRESHOLD;
     }
 
     /** Returns the current streak count (only positive streaks). */
+    @Override
     public int getCorrectStreak() {
         return Math.max(0, streak);
     }
