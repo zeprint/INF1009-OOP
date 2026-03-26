@@ -7,7 +7,7 @@ import io.github.mathdash.engine.collision.CollisionManager;
 import io.github.mathdash.engine.entity.EntityManager;
 import io.github.mathdash.engine.entity.Transform;
 import io.github.mathdash.engine.movement.MovementManager;
-import io.github.mathdash.logic.Collision.CollisionDispatcher;
+import io.github.mathdash.logic.collision.CollisionDispatcher;
 import io.github.mathdash.logic.entity.AnswerBlock;
 import io.github.mathdash.logic.entity.AnswerBlockFactory;
 import io.github.mathdash.logic.entity.Obstacle;

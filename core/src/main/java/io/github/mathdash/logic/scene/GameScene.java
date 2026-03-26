@@ -25,7 +25,7 @@ import io.github.mathdash.engine.movement.MovementManager;
 import io.github.mathdash.engine.scene.Scene;
 import io.github.mathdash.engine.scene.SceneManager;
 import io.github.mathdash.engine.state.GameStateManager;
-import io.github.mathdash.logic.Collision.CollisionDispatcher;
+import io.github.mathdash.logic.collision.CollisionDispatcher;
 import io.github.mathdash.logic.component.SurgeComponent;
 import io.github.mathdash.logic.difficulty.MathDashDifficulty;
 import io.github.mathdash.logic.entity.AnswerBlock;
