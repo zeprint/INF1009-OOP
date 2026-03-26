@@ -1,7 +1,6 @@
 package io.github.mathdash.logic.scene;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap;
@@ -22,13 +21,11 @@ import io.github.mathdash.engine.entity.Renderable;
 import io.github.mathdash.engine.inputoutput.IAudioSystem;
 import io.github.mathdash.engine.inputoutput.IInputSystem;
 import io.github.mathdash.engine.inputoutput.InputAction;
-import io.github.mathdash.engine.inputoutput.InputBindings;
-import io.github.mathdash.engine.inputoutput.InputManager;
 import io.github.mathdash.engine.movement.MovementManager;
 import io.github.mathdash.engine.scene.Scene;
 import io.github.mathdash.engine.scene.SceneManager;
 import io.github.mathdash.engine.state.GameStateManager;
-import io.github.mathdash.logic.collision.CollisionDispatcher;
+import io.github.mathdash.logic.Collision.CollisionDispatcher;
 import io.github.mathdash.logic.component.SurgeComponent;
 import io.github.mathdash.logic.difficulty.MathDashDifficulty;
 import io.github.mathdash.logic.entity.AnswerBlock;
@@ -144,7 +141,7 @@ public class GameScene extends Scene
 
         loadTextures();
         setupManagers();
-        setupInput();
+        inputManager = ServiceLocator.getInput();
         setupFactories();
         setupHelpers();
         setupStates();
@@ -209,18 +206,6 @@ public class GameScene extends Scene
         movementManager = new MovementManager();
         difficulty = new MathDashDifficulty();
         surgeComponent = new SurgeComponent();
-    }
-
-    private void setupInput() {
-        InputBindings bindings = new InputBindings();
-        bindings.bindAction(InputAction.JUMP, Input.Keys.UP);
-        bindings.bindAction(InputAction.JUMP, Input.Keys.W);
-        bindings.bindAction(InputAction.CONFIRM, Input.Keys.DOWN);
-        bindings.bindAction(InputAction.CONFIRM, Input.Keys.S);
-        bindings.bindAction(InputAction.TOGGLE_PAUSE, Input.Keys.ESCAPE);
-        bindings.bindAction(InputAction.TOGGLE_PAUSE, Input.Keys.P);
-        bindings.bindAction(InputAction.TOGGLE_MUTE, Input.Keys.M);
-        inputManager = new InputManager(bindings);
     }
 
     private void setupFactories() {
@@ -445,7 +430,6 @@ public class GameScene extends Scene
     protected void onUnload() {
         if (entityManager != null) entityManager.dispose();
         if (collisionManager != null) collisionManager.clear();
-        if (inputManager != null) inputManager.dispose();
 
         disposeTexture(bgTexture);
         disposeTexture(grassBgTexture);

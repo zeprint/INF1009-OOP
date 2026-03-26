@@ -1,7 +1,6 @@
 package io.github.mathdash.logic.scene;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap;
@@ -26,7 +25,6 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import io.github.mathdash.engine.ServiceLocator;
 import io.github.mathdash.engine.inputoutput.IAudioSystem;
 import io.github.mathdash.engine.inputoutput.InputAction;
-import io.github.mathdash.engine.inputoutput.InputBindings;
 import io.github.mathdash.engine.inputoutput.InputManager;
 import io.github.mathdash.engine.scene.BaseStage;
 import io.github.mathdash.engine.scene.Scene;
@@ -90,12 +88,8 @@ public class PauseScene extends Scene {
         unmuteIconTex = new Texture(Gdx.files.internal("unmute.png"));
         unmuteIconTex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
 
-        // Set up InputManager for pause controls
-        InputBindings bindings = new InputBindings();
-        bindings.bindAction(InputAction.TOGGLE_PAUSE, Input.Keys.ESCAPE);
-        bindings.bindAction(InputAction.TOGGLE_PAUSE, Input.Keys.P);
-        bindings.bindAction(InputAction.TOGGLE_MUTE, Input.Keys.M);
-        inputManager = new InputManager(bindings);
+        // Fetch shared InputManager from ServiceLocator (bootstrapped by GameMaster)
+        inputManager = (InputManager) ServiceLocator.getInput();
 
         createSkin();
     }
@@ -311,7 +305,6 @@ public class PauseScene extends Scene {
         if (overlayTexture != null) overlayTexture.dispose();
         if (muteIconTex != null) muteIconTex.dispose();
         if (unmuteIconTex != null) unmuteIconTex.dispose();
-        if (inputManager != null) inputManager.dispose();
         if (fontGenerator != null) fontGenerator.dispose();
     }
 }

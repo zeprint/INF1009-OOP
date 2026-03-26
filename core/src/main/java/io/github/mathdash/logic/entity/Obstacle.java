@@ -6,7 +6,7 @@ import io.github.mathdash.engine.collision.CollisionResult;
 import io.github.mathdash.engine.entity.Entity;
 import io.github.mathdash.engine.entity.Renderable;
 import io.github.mathdash.engine.entity.Transform;
-import io.github.mathdash.logic.collision.CollisionHandler;
+import io.github.mathdash.logic.Collision.CollisionHandler;
 import io.github.mathdash.logic.movement.ScrollMovement;
 
 /**

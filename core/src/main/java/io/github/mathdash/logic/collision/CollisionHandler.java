@@ -1,4 +1,4 @@
-package io.github.mathdash.logic.collision;
+package io.github.mathdash.logic.Collision;
 
 import io.github.mathdash.engine.collision.CollisionResult;
 import io.github.mathdash.engine.entity.Entity;

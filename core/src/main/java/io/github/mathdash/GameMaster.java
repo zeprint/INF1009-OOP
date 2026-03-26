@@ -7,6 +7,9 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 import io.github.mathdash.engine.ServiceLocator;
 import io.github.mathdash.engine.inputoutput.AudioManager;
+import io.github.mathdash.engine.inputoutput.InputBindings;
+import io.github.mathdash.engine.inputoutput.InputManager;
+import io.github.mathdash.engine.inputoutput.InputAction;
 import io.github.mathdash.engine.scene.SceneManager;
 import io.github.mathdash.logic.scene.DeathScene;
 import io.github.mathdash.logic.scene.GameScene;
@@ -16,14 +19,15 @@ import io.github.mathdash.logic.scene.PauseScene;
 /**
  * GameMaster - Main application entry point.
  *
- * Bootstraps the ServiceLocator with shared engine services (AudioManager),
- * then wires all scenes together via SceneManager.
+ * Bootstraps the ServiceLocator with shared engine services (AudioManager,
+ * InputManager), then wires all scenes together via SceneManager.
  */
 public class GameMaster extends ApplicationAdapter {
 
     private SpriteBatch batch;
     private SceneManager sceneManager;
     private AudioManager audioManager;
+    private InputManager inputManager;
 
     @Override
     public void create() {
@@ -38,6 +42,18 @@ public class GameMaster extends ApplicationAdapter {
         audioManager.loadSound("wrong", "kenney_new-platformer-pack-1.1/Sounds/sfx_bump.ogg");
         audioManager.loadSound("death", "kenney_new-platformer-pack-1.1/Sounds/sfx_disappear.ogg");
         ServiceLocator.provide(audioManager);
+
+        // Bootstrap shared InputManager via ServiceLocator so all scenes share one instance
+        InputBindings bindings = new InputBindings();
+        bindings.bindAction(InputAction.JUMP,         com.badlogic.gdx.Input.Keys.UP);
+        bindings.bindAction(InputAction.JUMP,         com.badlogic.gdx.Input.Keys.W);
+        bindings.bindAction(InputAction.CONFIRM,      com.badlogic.gdx.Input.Keys.DOWN);
+        bindings.bindAction(InputAction.CONFIRM,      com.badlogic.gdx.Input.Keys.S);
+        bindings.bindAction(InputAction.TOGGLE_PAUSE, com.badlogic.gdx.Input.Keys.ESCAPE);
+        bindings.bindAction(InputAction.TOGGLE_PAUSE, com.badlogic.gdx.Input.Keys.P);
+        bindings.bindAction(InputAction.TOGGLE_MUTE,  com.badlogic.gdx.Input.Keys.M);
+        inputManager = new InputManager(bindings);
+        ServiceLocator.provide(inputManager);
 
         sceneManager = new SceneManager();
 
@@ -112,6 +128,7 @@ public class GameMaster extends ApplicationAdapter {
         if (sceneManager != null) sceneManager.dispose();
         if (batch != null) batch.dispose();
         if (audioManager != null) audioManager.dispose();
+        if (inputManager != null) inputManager.dispose();
         ServiceLocator.reset();
     }
 }
