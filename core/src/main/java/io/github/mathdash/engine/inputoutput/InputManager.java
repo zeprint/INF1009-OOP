@@ -131,14 +131,10 @@ public class InputManager implements IInputSystem {
             // Keycode sanity (LibGDX uses non-negative keycodes)
             if (pair.negativeKey >= 0 && Gdx.input.isKeyPressed(pair.negativeKey)) {
                 v -= 1f;
-            } else if (pair.negativeKey < 0 && DEBUG_INPUT) {
-                Gdx.app.log("InputManager", "Invalid negativeKey for axis " + axis + ": " + pair.negativeKey);
             }
 
             if (pair.positiveKey >= 0 && Gdx.input.isKeyPressed(pair.positiveKey)) {
                 v += 1f;
-            } else if (pair.positiveKey < 0 && DEBUG_INPUT) {
-                Gdx.app.log("InputManager", "Invalid positiveKey for axis " + axis + ": " + pair.positiveKey);
             }
 
         }

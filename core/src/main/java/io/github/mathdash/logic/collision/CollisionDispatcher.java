@@ -13,10 +13,13 @@ import io.github.mathdash.logic.entity.Player;
  * Design Pattern: Observer (concrete observer).
  *
  * Centralises all game-specific collision rules:
- *   - Player hits Obstacle -> lose a life (unless surging)
+ *   - Player hits Obstacle  -> lose a life (always, regardless of surge state)
  *   - Player hits wrong AnswerBlock -> lose a life
  *   - Player hits correct AnswerBlock -> gain a life, increase speed
- *   - During Surge Mode: obstacles are destroyed on contact (power fantasy)
+ *
+ * Surge mode only affects scroll speed via SurgeComponent; it confers
+ * no collision immunity. Life loss and invincibility frames behave
+ * identically whether the player is surging or not.
  */
 public class CollisionDispatcher implements CollisionHandler {
 
@@ -25,7 +28,6 @@ public class CollisionDispatcher implements CollisionHandler {
 
     private final IAudioSystem audioSystem;
     private final GameEventListener listener;
-    private boolean surging = false;
 
     public interface GameEventListener {
         void onHealthChanged(int newHealth);
@@ -38,11 +40,6 @@ public class CollisionDispatcher implements CollisionHandler {
     public CollisionDispatcher(IAudioSystem audioSystem, GameEventListener listener) {
         this.audioSystem = audioSystem;
         this.listener = listener;
-    }
-
-    /** Sets whether the player is in surge mode (invincible, destroys obstacles). */
-    public void setSurging(boolean surging) {
-        this.surging = surging;
     }
 
     public void update(float deltaTime) {
@@ -77,12 +74,6 @@ public class CollisionDispatcher implements CollisionHandler {
     }
 
     private void handleObstacleHit(Player player) {
-        // During surge mode, obstacles are destroyed without hurting the player
-        if (surging) {
-            if (audioSystem != null) audioSystem.playSound("correct");
-            return;
-        }
-
         if (invincibilityTimer > 0f) return;
 
         player.loseLife();

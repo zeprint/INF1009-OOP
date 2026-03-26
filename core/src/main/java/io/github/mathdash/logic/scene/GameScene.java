@@ -313,7 +313,6 @@ public class GameScene extends Scene
         }
 
         // Update game systems
-        collisionDispatcher.setSurging(surgeComponent.isSurging());
         collisionDispatcher.update(deltaTime);
         surgeComponent.update(deltaTime);
         entityManager.update(deltaTime);
