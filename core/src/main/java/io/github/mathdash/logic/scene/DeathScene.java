@@ -148,6 +148,7 @@ public class DeathScene extends Scene {
         stageManager = new StageManager();
 
         DeathStage deathStage = new DeathStage(viewport);
+        deathStage.initialize();
         stageManager.addStage(deathStage);
     }
 
@@ -158,7 +159,7 @@ public class DeathScene extends Scene {
         }
 
         @Override
-        protected void initialize() {
+        public void initialize() {
             Table root = new Table();
             root.setFillParent(true);
 

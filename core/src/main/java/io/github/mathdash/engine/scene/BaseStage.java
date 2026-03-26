@@ -21,11 +21,10 @@ public abstract class BaseStage {
         }
         this.stage = new Stage(viewport);
         this.active = true;
-        initialize();
     }
 
     // Called once after the stage is created. Subclasses add actors and configure the stage here.
-    protected abstract void initialize();
+    public abstract void initialize();
 
     // Called every frame to update stage logic.
     public void update(float deltaTime) {

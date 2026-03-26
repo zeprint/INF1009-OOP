@@ -161,6 +161,7 @@ public class PauseScene extends Scene {
         stageManager = new StageManager();
 
         PauseStage pauseStage = new PauseStage(viewport);
+        pauseStage.initialize();
         stageManager.addStage(pauseStage);
     }
 
@@ -171,7 +172,7 @@ public class PauseScene extends Scene {
         }
 
         @Override
-        protected void initialize() {
+        public void initialize() {
             Table root = new Table();
             root.setFillParent(true);
             root.center();
